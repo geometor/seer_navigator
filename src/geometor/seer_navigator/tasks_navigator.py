@@ -72,15 +72,20 @@ class TasksNavigator(App):
         self.exit()
 
 
-if __name__ == "__main__":
+def run():
     parser = argparse.ArgumentParser(description="Navigate aggregated ARC task data across sessions.")
     parser.add_argument(
         "--sessions-dir",
         type=str,
-        default="./sessions",
+        default=".",
         help="Path to the root sessions directory",
     )
     args = parser.parse_args()
 
     app = TasksNavigator(sessions_root=args.sessions_dir)
     app.run()
+
+
+
+if __name__ == "__main__":
+    run()

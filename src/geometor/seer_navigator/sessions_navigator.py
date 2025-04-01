@@ -48,7 +48,7 @@ except ImportError:
     SolidGrid = BlockGrid = CharGrid = TinyGrid = DummyGrid
 
 
-class SessionNavigator(App):
+class SessionsNavigator(App):
 
     BINDINGS = [
         Binding("q", "quit", "Quit"),
@@ -266,16 +266,19 @@ class SessionNavigator(App):
         """Quits the application"""
         self.exit()
 
-
-if __name__ == "__main__":
+def run():
     parser = argparse.ArgumentParser(description="Navigate ARC test sessions.")
     parser.add_argument(
         "--sessions-dir",
         type=str,
-        default="./sessions",
+        default=".",
         help="Path to the sessions directory",
     )
     args = parser.parse_args()
 
-    app = SessionNavigator(sessions_root=args.sessions_dir)
+    app = SessionsNavigator(sessions_root=args.sessions_dir)
     app.run()
+
+
+if __name__ == "__main__":
+    run()

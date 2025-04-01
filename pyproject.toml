@@ -19,7 +19,8 @@ dependencies = [
 ]
 
 [project.scripts]
-seer_navigator = "geometor.seer_navigator.__main__:run"
+seer_sessions = "geometor.seer_navigator.sessions_navigator:run"
+seer_tasks = "geometor.seer_navigator.tasks_navigator:run"
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]

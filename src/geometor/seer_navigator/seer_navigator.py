@@ -1,3 +1,0 @@
-"""
-seer_navigator
-"""

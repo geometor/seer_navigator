@@ -10,26 +10,22 @@ from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import DataTable, Header, Footer, TextArea, Markdown, ContentSwitcher, Static # Added Static
+from textual.widgets import DataTable, Header, Footer, TextArea, Markdown, ContentSwitcher, Static 
 from textual.binding import Binding
 from textual import log
 
-# Import the new TrialViewer widget
-from geometor.seer.navigator.screens.trial_screen import TrialViewer
+from geometor.seer_navigator.screens.trial_screen import TrialViewer
 
 
-# Mapping file extensions to tree-sitter languages and TextArea theme
-# Add more mappings as needed
 LANGUAGE_MAP = {
     ".py": "python",
-    ".md": "markdown", # Keep this for TextArea if needed, but Markdown widget handles .md
+    ".md": "markdown", 
     ".json": "json",
     ".yaml": "yaml",
     ".yml": "yaml",
-    ".txt": None, # No specific language for plain text
-    # Add other extensions if necessary
+    ".txt": None, 
 }
-DEFAULT_THEME = "vscode_dark" # Changed from github_light to vscode_dark
+DEFAULT_THEME = "" 
 
 class StepScreen(Screen):
     """Displays the files within a step folder and their content."""
@@ -93,12 +89,12 @@ class StepScreen(Screen):
     BINDINGS = [
         Binding("j", "cursor_down", "Cursor Down", show=False),
         Binding("k", "cursor_up", "Cursor Up", show=False),
-        Binding("enter", "select_file", "Select File", show=False), # Changed description
+        Binding("enter", "select_file", "Select File", show=False), 
         Binding("h", "app.pop_screen", "Back", show=True),
-        Binding("t", "open_terminal", "Open Terminal", show=True), # Added terminal binding
+        Binding("r", "open_terminal", "Open Terminal", show=True), 
         # REMOVED Binding("i", "view_images", "View Images", show=True),
-        # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
-        # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
+        # Binding("[", "previous_sibling", "Previous Sibling", show=True), 
+        # Binding("]", "next_sibling", "Next Sibling", show=True),     
     ]
 
     # Reactive variable to store the list of files
@@ -113,9 +109,6 @@ class StepScreen(Screen):
         self.step_name = step_path.name
         self.task_name = task_path.name
         self.session_name = session_path.name
-        # REMOVED sxiv check state attributes
-
-    # REMOVED _check_sxiv method
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -123,18 +116,16 @@ class StepScreen(Screen):
             with Vertical(id="file-list-container"):
                 yield DataTable(id="file-list-table")
             with Vertical(id="file-content-container"):
-                # Use a ContentSwitcher to toggle between viewers
                 with ContentSwitcher(initial="text-viewer"):
                     yield TextArea.code_editor(
                         "",
                         read_only=True,
                         show_line_numbers=True,
-                        theme=DEFAULT_THEME,
+                        #  theme=DEFAULT_THEME,
                         id="text-viewer" # ID for the TextArea
                     )
                     yield Markdown(id="markdown-viewer")
                     yield TrialViewer(id="trial-viewer") # Add TrialViewer instance
-                    # Renamed placeholder, used for PNG and potentially others
                     yield Static("Select a file to view its content.", id="content-placeholder")
 
         yield Footer()
@@ -168,9 +159,8 @@ class StepScreen(Screen):
             for file_path in self.file_paths:
                 table.add_row(file_path.name)
 
-            # Select the first file by default and load its content
             self.select_row_index(0)
-            table.focus() # Focus the table
+            table.focus() 
 
     def select_row_index(self, index: int):
         """Selects a row by index and triggers loading/display logic."""

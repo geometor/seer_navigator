@@ -93,8 +93,8 @@ class TasksScreen(Screen):
 
     def on_mount(self) -> None:
         """Called when the screen is mounted."""
-        self.title = "Tasks Navigator"
-        self.sub_title = f"Root: {self.sessions_root}"
+        self.title = "SEER Tasks"
+        self.sub_title = f"{self.sessions_root.parent.name}"
 
         # Add columns to summary tables
         summary_table = self.query_one("#summary-table", DataTable)

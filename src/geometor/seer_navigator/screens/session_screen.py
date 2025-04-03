@@ -23,7 +23,7 @@ import json
 
 # Import Task to calculate weight
 from geometor.seer.tasks.tasks import Task
-from geometor.seer.navigator.screens.task_screen import TaskScreen
+from geometor.seer_navigator.screens.task_screen import TaskScreen
 from geometor.seer.session.level import Level  # Import Level
 
 
@@ -104,7 +104,7 @@ class SessionScreen(Screen):
         yield Footer()
 
     def on_mount(self) -> None:
-        self.title = self.session_path.name
+        self.title = f"SEER Session • {self.session_path.parent.name} • {self.session_path.name}"
         self.table.cursor_type = "row"
 
         # Add columns to summary tables

@@ -22,7 +22,7 @@ from pathlib import Path
 import json
 
 from geometor.seer.session.level import Level  # Import Level
-from geometor.seer.navigator.screens.step_screen import StepScreen # IMPORT THE NEW SCREEN
+from geometor.seer_navigator.screens.step_screen import StepScreen # IMPORT THE NEW SCREEN
 
 
 class TaskScreen(Screen):

@@ -433,7 +433,8 @@ class TasksScreen(Screen):
 
     def action_select_task(self) -> None:
         """Called when a task row is selected (Enter or 'l'). Pushes TaskSessionsScreen."""
-        table = self.query_one(DataTable)
+        # Ensure we target the correct table using its ID
+        table = self.query_one("#tasks-table", DataTable)
         if table.row_count == 0 or table.cursor_row is None:
             log.warning("action_select_task: Table empty or no cursor row.")
             return # No tasks or no selection
@@ -442,22 +443,32 @@ class TasksScreen(Screen):
         log.info(f"action_select_task: Cursor row is {cursor_row}")
 
         try:
-            # Get the task ID directly from the first column ('TASK') of the selected row
-            task_id_cell = table.get_cell_at((cursor_row, 0)) # Get cell at (row=cursor_row, col=0)
-            task_id = str(task_id_cell) # Ensure it's a string
+            # Get the entire row data using get_row_at
+            row_data = table.get_row_at(cursor_row)
+            if not row_data:
+                 log.error(f"action_select_task: Could not get row data for row {cursor_row}.")
+                 self.notify("Error selecting task row data.", severity="error")
+                 return
 
-            # Basic validation (optional, but good practice)
+            # The first element in the row data should be the task_id
+            task_id = str(row_data[0]) # Ensure it's a string
+
+            # Basic validation
             if not task_id:
-                log.error(f"action_select_task: Retrieved empty task ID from cell at row {cursor_row}.")
+                log.error(f"action_select_task: Retrieved empty task ID from row data at index {cursor_row}.")
                 self.notify("Error: Could not get task ID from selected row.", severity="error")
                 return
 
-            log.info(f"action_select_task: Task ID from cell ({cursor_row}, 0) is '{task_id}'. Pushing TaskSessionsScreen.")
+            log.info(f"action_select_task: Task ID from row data ({cursor_row}) is '{task_id}'. Pushing TaskSessionsScreen.")
             self.app.push_screen(TaskSessionsScreen(self.sessions_root, task_id))
 
+        except IndexError:
+            # This might happen if the row data structure is unexpected
+            log.exception(f"action_select_task: IndexError accessing row data for row {cursor_row}.")
+            self.notify("Error accessing task data.", severity="error")
         except Exception as e:
-            # Catch potential errors like invalid cursor row after table update or cell access issues
-            log.error(f"action_select_task: Error getting task ID from cell at row {cursor_row}: {e}")
+            # Catch other potential errors
+            log.exception(f"action_select_task: Error processing row {cursor_row}: {e}")
             self.notify("Error selecting task.", severity="error")
 
 

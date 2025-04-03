@@ -434,15 +434,31 @@ class TasksScreen(Screen):
     def action_select_task(self) -> None:
         """Called when a task row is selected (Enter or 'l'). Pushes TaskSessionsScreen."""
         table = self.query_one(DataTable)
-        if not self.sorted_task_ids or table.cursor_row is None:
+        if table.row_count == 0 or table.cursor_row is None:
+            log.warning("action_select_task: Table empty or no cursor row.")
             return # No tasks or no selection
 
-        if 0 <= table.cursor_row < len(self.sorted_task_ids):
-            task_id = self.sorted_task_ids[table.cursor_row]
-            log.info(f"Task selected: {task_id}. Pushing TaskSessionsScreen.")
+        cursor_row = table.cursor_row
+        log.info(f"action_select_task: Cursor row is {cursor_row}")
+
+        try:
+            # Get the task ID directly from the first column ('TASK') of the selected row
+            task_id_cell = table.get_cell_at((cursor_row, 0)) # Get cell at (row=cursor_row, col=0)
+            task_id = str(task_id_cell) # Ensure it's a string
+
+            # Basic validation (optional, but good practice)
+            if not task_id:
+                log.error(f"action_select_task: Retrieved empty task ID from cell at row {cursor_row}.")
+                self.notify("Error: Could not get task ID from selected row.", severity="error")
+                return
+
+            log.info(f"action_select_task: Task ID from cell ({cursor_row}, 0) is '{task_id}'. Pushing TaskSessionsScreen.")
             self.app.push_screen(TaskSessionsScreen(self.sessions_root, task_id))
-        else:
-            log.warning(f"Invalid cursor row {table.cursor_row} for task selection.")
+
+        except Exception as e:
+            # Catch potential errors like invalid cursor row after table update or cell access issues
+            log.error(f"action_select_task: Error getting task ID from cell at row {cursor_row}: {e}")
+            self.notify("Error selecting task.", severity="error")
 
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):

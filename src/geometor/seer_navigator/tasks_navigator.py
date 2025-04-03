@@ -11,6 +11,7 @@ from textual import log
 
 # Import screens
 from geometor.seer_navigator.screens.tasks_screen import TasksScreen
+from geometor.seer_navigator.screens.task_sessions_screen import TaskSessionsScreen # ADDED
 from geometor.seer_navigator.screens.sort_modal import SortModal # ADDED
 from geometor.seer_navigator.screens.image_view_modal import ImageViewModal # ADDED
 
@@ -118,22 +119,31 @@ class TasksNavigator(App):
 
         image_files = []
         try:
-            log.info(f"Searching for images in {context_path} with filter: {filter_type}")
+            log.info(f"Searching for images in {context_path} with filter: {filter_type}, task_id: {task_id}")
+
+            # --- Adjust rglob patterns based on task_id ---
             if filter_type == "all":
-                image_files = sorted(list(context_path.rglob("*.png")))
+                pattern = f"*/{task_id}/**/*.png" if task_id else "**/*.png"
+                image_files = sorted(list(context_path.rglob(pattern)))
             elif filter_type == "tasks":
-                # Find task.png files recursively
-                image_files = sorted(list(context_path.rglob("task.png")))
+                pattern = f"*/{task_id}/task.png" if task_id else "**/task.png"
+                image_files = sorted(list(context_path.rglob(pattern)))
             elif filter_type == "trials":
-                # Find *trial.png files recursively
-                image_files = sorted(list(context_path.rglob("*trial.png")))
+                pattern = f"*/{task_id}/*trial.png" if task_id else "**/*trial.png"
+                image_files = sorted(list(context_path.rglob(pattern)))
             elif filter_type == "passed_trials":
-                # Find *trial.png files where the corresponding .json shows test success
-                # In TasksNavigator context, this means checking across all sessions
                 image_files = []
-                all_trial_jsons = list(context_path.rglob("*trial.json")) # Find all trial json files first
-                log.info(f"Found {len(all_trial_jsons)} *trial.json files for passed_trials filter.")
-                for json_file in all_trial_jsons:
+                # Find relevant trial JSON files first
+                json_pattern = f"*/{task_id}/*trial.json" if task_id else "**/*trial.json"
+                relevant_trial_jsons = list(context_path.rglob(json_pattern))
+                log.info(f"Found {len(relevant_trial_jsons)} *trial.json files for passed_trials filter (task_id: {task_id}).")
+
+                for json_file in relevant_trial_jsons:
+                    # Check if the json_file is within the specific task directory if task_id is set
+                    # The rglob pattern already handles this, but double-check logic if needed
+                    # if task_id and f"/{task_id}/" not in str(json_file):
+                    #     continue # Skip if not in the correct task folder
+
                     try:
                         with open(json_file, "r") as f:
                             trial_data = json.load(f)

@@ -59,6 +59,7 @@ class TaskSessionsScreen(Screen):
         Binding("k", "move_up", "Cursor up", show=False),
         Binding("j", "move_down", "Cursor down", show=False),
         Binding("h", "app.pop_screen", "back", show=False),
+        Binding("i", "view_images", "View Images", show=True), # ADDED image view binding
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Not applicable here
         # Binding("]", "next_sibling", "Next Sibling", show=True),     # Not applicable here
     ]
@@ -421,6 +422,17 @@ class TaskSessionsScreen(Screen):
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         self.action_select_row()
+
+    # --- START ADDED IMAGE VIEW ACTION ---
+    def action_view_images(self) -> None:
+        """Action to trigger viewing images for the current task across sessions."""
+        # The context path is the root of all sessions
+        # The task_id is specific to this screen instance
+        log.info(f"Triggering image view for task '{self.task_id}' in context '{self.sessions_root}'")
+        # We need to call the app's action, which will push the modal
+        # The app's action needs to know which screen is calling to pass the correct context
+        self.app.action_view_images()
+    # --- END ADDED IMAGE VIEW ACTION ---
 
     def refresh_content(self) -> None:
         """Reloads task instance data and updates the screen."""

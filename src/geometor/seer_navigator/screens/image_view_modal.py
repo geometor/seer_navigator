@@ -53,7 +53,9 @@ Button {
     def compose(self) -> ComposeResult:
         yield Vertical(
             Label("Select images to view:", id="question"),
-            Static(f"Context: {self.context_path}", id="context-label"), # Show context path
+            Static(f"Context: {self.context_path}", id="context-label"),
+            # Conditionally display Task ID
+            *([Static(f"Task: {self.task_id}", id="task-label")] if self.task_id else []),
             Button("All (.png)", variant="primary", id="all"),
             Button("Tasks (task.png)", variant="primary", id="tasks"),
             Button("Trials (*trial.png)", variant="primary", id="trials"),
@@ -71,8 +73,9 @@ Button {
             try:
                 # Check if the app has the launch_sxiv method
                 if hasattr(self.app, "launch_sxiv"):
-                    log.info(f"Calling launch_sxiv with context={self.context_path}, filter='{filter_type}'")
-                    self.app.launch_sxiv(self.context_path, filter_type)
+                    log.info(f"Calling launch_sxiv with context={self.context_path}, filter='{filter_type}', task_id='{self.task_id}'")
+                    # Pass task_id to launch_sxiv
+                    self.app.launch_sxiv(self.context_path, filter_type, self.task_id)
                 else:
                     log.error("App does not have launch_sxiv method.")
                     self.app.notify("Error: Image launch function not found.", severity="error")

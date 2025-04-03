@@ -52,7 +52,7 @@ class TasksScreen(Screen):
     BINDINGS = [
         Binding("j", "cursor_down", "Cursor Down", show=False),
         Binding("k", "cursor_up", "Cursor Up", show=False),
-        # Binding("l,enter", "select_task", "Select Task", show=True), # Add later if needed
+        Binding("l,enter", "select_task", "Select Task", show=True), # ENABLED task selection
         # Binding("h", "app.pop_screen", "Back", show=False), # REMOVED - TasksScreen is root
     ]
 
@@ -428,15 +428,23 @@ class TasksScreen(Screen):
         """Move the cursor up in the DataTable."""
         self.table.action_cursor_up()
 
-    # def action_select_task(self) -> None:
-    #     """Called when a task row is selected."""
-    #     # TODO: Implement navigation to a screen showing sessions for this task?
-    #     table = self.query_one(DataTable)
-    #     if table.row_count > 0 and table.cursor_row is not None:
-    #         task_id = self.sorted_task_ids[table.cursor_row]
-    #         self.notify(f"Selected task: {task_id}")
-    #         # Example: self.app.push_screen(TaskSessionsScreen(self.sessions_root, task_id))
-    #     pass
+    def action_select_task(self) -> None:
+        """Called when a task row is selected (Enter or 'l'). Pushes TaskSessionsScreen."""
+        table = self.query_one(DataTable)
+        if not self.sorted_task_ids or table.cursor_row is None:
+            return # No tasks or no selection
+
+        if 0 <= table.cursor_row < len(self.sorted_task_ids):
+            task_id = self.sorted_task_ids[table.cursor_row]
+            log.info(f"Task selected: {task_id}. Pushing TaskSessionsScreen.")
+            self.app.push_screen(TaskSessionsScreen(self.sessions_root, task_id))
+        else:
+            log.warning(f"Invalid cursor row {table.cursor_row} for task selection.")
+
+
+    def on_data_table_row_selected(self, event: DataTable.RowSelected):
+        """Handle row selection via click."""
+        self.action_select_task()
 
     def refresh_content(self) -> None:
         """Reloads task data and updates the screen."""

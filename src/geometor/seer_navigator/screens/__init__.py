@@ -5,6 +5,7 @@ from .step_screen import StepScreen
 from .trial_screen import TrialViewer
 from .image_view_modal import ImageViewModal
 from .tasks_screen import TasksScreen
+from .task_sessions_screen import TaskSessionsScreen # ADDED
 from .sort_modal import SortModal # ADDED
 
 __all__ = [
@@ -15,5 +16,6 @@ __all__ = [
     "TrialViewer",
     "ImageViewModal",
     "TasksScreen",
+    "TaskSessionsScreen", # ADDED
     "SortModal", # ADDED
 ]

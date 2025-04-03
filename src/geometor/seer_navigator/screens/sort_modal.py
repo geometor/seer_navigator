@@ -1,18 +1,15 @@
-from typing import Dict, TYPE_CHECKING
+from typing import Dict
 
 from textual.app import ComposeResult
-from textual.containers import Grid
-from textual.screen import Screen
-from textual.widgets import Label, Static # Import Static, remove Button
+from textual.containers import Vertical # Changed from Grid
+from textual.screen import Screen, ModalScreen # Added ModalScreen
+from textual.widgets import Label, Button # Added Button, removed Static
 from textual.binding import Binding
-from textual.widgets._data_table import ColumnKey # Import ColumnKey
+from textual.widgets._data_table import ColumnKey
 from textual import log
-from textual.screen import Screen # Import Screen directly
-
-# Removed TYPE_CHECKING block and specific screen imports
 
 
-class SortModal(Screen):
+class SortModal(ModalScreen): # Changed base class
     """Modal dialog for selecting a column to sort."""
 
     CSS = """
@@ -20,98 +17,92 @@ class SortModal(Screen):
         align: center middle;
     }
 
-    #sort-dialog {
-        grid-size: 1; /* Changed to 1 column */
-        grid-gutter: 1 2;
-        grid-rows: auto auto; /* Explicitly define rows for label and instructions */
+    #dialog { /* Changed ID and styling */
         padding: 0 1;
-        width: auto;
-        max-width: 80%; /* Limit width */
-        height: auto;
-        max-height: 80%; /* Limit height */
-        border: thick $accent;
+        width: auto; /* Auto width based on content */
+        max-width: 60; /* Limit max width */
+        height: auto; /* Auto height based on content */
+        max-height: 80%; /* Limit max height */
+        border: thick $background 80%;
         background: $surface;
     }
 
-    #sort-instructions { /* Style for the instructions */
-        margin: 1 2;
-        height: auto;
-    }
-
-    #sort-dialog > Label {
-        /* width: 100%; */ /* No longer needed with grid-size: 1 */
+    #dialog > Label { /* Style label */
+        width: 100%;
         text-align: center;
         margin-bottom: 1;
     }
+
+    #dialog > Button { /* Style buttons */
+        width: 100%;
+        margin-top: 1; /* Add space between buttons */
+    }
     """
 
-    # BINDINGS will be generated dynamically
+    BINDINGS = [
+        Binding("escape", "app.pop_screen", "Cancel", show=False),
+    ]
 
     def __init__(
         self,
-        parent_screen: Screen, # Use the generic Screen type hint
-        columns: Dict[ColumnKey, object], # Pass columns dict directly
+        parent_screen: Screen,
+        columns: Dict[ColumnKey, object],
         *args,
         **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
         self.parent_screen = parent_screen
-        self.columns = columns
-        self.key_to_column_map: Dict[str, ColumnKey] = {}
-        self.key_bindings_text = ""
-        bindings = [Binding("escape", "app.pop_screen", "Cancel", show=False)]
-        key_options = "123456789abcdefghijklmnopqrstuvwxyz" # Available keys for binding
-        key_index = 0
+        # Store a mapping from button ID (derived from ColumnKey) to the actual ColumnKey
+        self.button_id_to_column_key: Dict[str, ColumnKey] = {}
+        self.sortable_columns: Dict[str, str] = {} # Store {button_id: column_label}
 
-        key_lines = []
-        for key, column in self.columns.items():
-            if key_index >= len(key_options):
-                log.warning("Ran out of keys for sort bindings!")
-                break
-
-            simple_key = key_options[key_index]
-            self.key_to_column_map[simple_key] = key
+        for col_key, column_obj in columns.items():
+            # Create a safe button ID from the ColumnKey string representation
+            button_id = f"sort_btn_{str(col_key)}"
+            self.button_id_to_column_key[button_id] = col_key
 
             # Get column label safely
             column_label = "Unknown"
-            if hasattr(column, 'label'):
-                column_label = str(column.label.plain) if hasattr(column.label, 'plain') else str(column.label)
-
-            key_lines.append(f"  Press '{simple_key}' to sort by '{column_label}'")
-            bindings.append(Binding(simple_key, f"sort_by_key('{simple_key}')", f"Sort by {column_label}", show=False))
-            key_index += 1
-
-        self.key_bindings_text = "\n".join(key_lines)
-        # Dynamically assign bindings
-        self.BINDINGS = bindings # type: ignore
+            if hasattr(column_obj, 'label'):
+                column_label = str(column_obj.label.plain) if hasattr(column_obj.label, 'plain') else str(column_obj.label)
+            self.sortable_columns[button_id] = column_label
 
         log.info(f"SortModal initialized for screen: {parent_screen.__class__.__name__}")
-        log.info(f"Sort bindings created: {self.key_bindings_text}")
+        log.info(f"Sortable columns prepared: {self.sortable_columns}")
 
 
     def compose(self) -> ComposeResult:
-        yield Grid(
-            Label("Sort by which column?"),
-            Static(self.key_bindings_text, id="sort-instructions"), # Display key bindings
-            # Removed buttons
-            id="sort-dialog",
-        )
+        with Vertical(id="dialog"):
+            yield Label("Sort by which column?")
+            # Create buttons for each sortable column
+            for button_id, column_label in self.sortable_columns.items():
+                yield Button(column_label, id=button_id, variant="primary")
+            yield Button("Cancel", id="cancel", variant="default") # Add cancel button
 
-    def action_sort_by_key(self, key: str) -> None:
-        """Sorts the parent screen's table based on the pressed key."""
-        log.info(f"Sort key '{key}' pressed.")
-        target_key = self.key_to_column_map.get(key)
 
-        if target_key is not None:
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Handle button presses for sorting or cancelling."""
+        button_id = event.button.id
+        log.info(f"Button pressed: {button_id}")
+
+        if button_id == "cancel":
+            self.app.pop_screen()
+        elif button_id in self.button_id_to_column_key:
+            target_key = self.button_id_to_column_key[button_id]
+            log.info(f"Attempting to sort by ColumnKey: {target_key}")
             if hasattr(self.parent_screen, "perform_sort"):
-                self.parent_screen.perform_sort(target_key)
-                self.app.pop_screen() # Close modal after initiating sort
+                try:
+                    self.parent_screen.perform_sort(target_key)
+                    self.app.pop_screen() # Close modal after initiating sort
+                except Exception as e:
+                    log.exception(f"Error calling perform_sort on {self.parent_screen.__class__.__name__}: {e}")
+                    self.app.notify(f"Error during sort: {e}", severity="error")
+                    self.app.pop_screen() # Close modal even on error
             else:
                 log.error(f"Parent screen {self.parent_screen.__class__.__name__} has no perform_sort method.")
                 self.app.notify("Sort function not implemented on parent screen.", severity="error")
                 self.app.pop_screen()
         else:
-            log.error(f"Could not find ColumnKey for sort key: {key}")
-            self.app.notify("Error identifying sort column.", severity="error")
-            self.app.pop_screen()
+            log.error(f"Unknown button ID pressed in SortModal: {button_id}")
+            self.app.pop_screen() # Close modal on unknown button
 

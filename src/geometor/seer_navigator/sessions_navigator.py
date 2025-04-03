@@ -173,8 +173,11 @@ class SessionsNavigator(App):
             log.error("Could not determine context path for image viewing.")
             self.notify("Error determining context for image viewing.", severity="error")
 
-    def launch_sxiv(self, context_path: Path, filter_type: str) -> None:
-        """Finds images based on filter and launches sxiv."""
+    # Added task_id parameter to match the call signature from ImageViewModal
+    def launch_sxiv(self, context_path: Path, filter_type: str, task_id: str | None = None) -> None:
+        """Finds images based on filter and launches sxiv. task_id is ignored in this navigator."""
+        # Log the received task_id, even if unused, for debugging
+        log.info(f"launch_sxiv called in SessionsNavigator with context={context_path}, filter={filter_type}, task_id={task_id}")
         sxiv_cmd = self._check_sxiv()
         if not sxiv_cmd:
             return # sxiv not found, notification already shown

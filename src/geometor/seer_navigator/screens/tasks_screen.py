@@ -53,7 +53,7 @@ class TasksScreen(Screen):
         Binding("j", "cursor_down", "Cursor Down", show=False),
         Binding("k", "cursor_up", "Cursor Up", show=False),
         # Binding("l,enter", "select_task", "Select Task", show=True), # Add later if needed
-        Binding("h", "app.pop_screen", "Back", show=False), # Although it's the root screen now
+        # Binding("h", "app.pop_screen", "Back", show=False), # REMOVED - TasksScreen is root
     ]
 
     def __init__(self, sessions_root: Path) -> None:

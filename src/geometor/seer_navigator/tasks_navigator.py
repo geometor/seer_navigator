@@ -19,7 +19,7 @@ try:
         TinyGrid,
         # ImageGrid, # Not typically used directly here
     )
-    DEFAULT_RENDERER = SolidGrid
+    DEFAULT_RENDERER = TinyGrid # Changed default to TinyGrid
 except ImportError:
     log.error("Could not import grid renderers. Grid visualization will fail.")
     # Define a dummy placeholder if imports fail
@@ -56,7 +56,7 @@ class TasksNavigator(App):
     def __init__(self, sessions_root: str = "./sessions"):
         super().__init__()
         self.sessions_root = Path(sessions_root)
-        self.renderer: type[Static] = DEFAULT_RENDERER # ADDED renderer state
+        self.renderer: type[Static] = DEFAULT_RENDERER # Use the updated DEFAULT_RENDERER
         log.info(f"TasksNavigator initialized with sessions_root: {self.sessions_root}, default renderer: {self.renderer.__name__}")
         self._sxiv_checked = False # ADDED sxiv check state
         self._sxiv_path = None     # ADDED sxiv path cache

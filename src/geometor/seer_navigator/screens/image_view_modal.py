@@ -1,15 +1,41 @@
 from pathlib import Path
 
 from textual.app import ComposeResult
-from textual.containers import Grid
-from textual.screen import Screen
+from textual.containers import Grid, Vertical
+from textual.screen import Screen, ModalScreen
 from textual.widgets import Button, Footer, Header, Label, Static
 from textual.binding import Binding # Added Binding
 from textual import log
 
 
-class ImageViewModal(Screen):
+#  class ImageViewModal(Screen):
+class ImageViewModal(ModalScreen):
     """Screen with a dialog to select image view filters."""
+
+    CSS = """
+ImageViewModal {
+    align: center middle;
+}
+
+#dialog {
+    padding: 0 1;
+    width: 60;
+    height: 100%;
+    border: thick $background 80%;
+    background: $surface;
+}
+
+#question {
+    column-span: 2;
+    height: 1fr;
+    width: 1fr;
+    content-align: center middle;
+}
+
+Button {
+    width: 100%;
+}
+"""
 
     BINDINGS = [
         Binding("a", "select_filter('all')", "All", show=False),
@@ -25,7 +51,7 @@ class ImageViewModal(Screen):
         log.info(f"ImageViewModal initialized with context: {self.context_path}")
 
     def compose(self) -> ComposeResult:
-        yield Grid(
+        yield Vertical(
             Label("Select images to view:", id="question"),
             Static(f"Context: {self.context_path}", id="context-label"), # Show context path
             Button("All (.png)", variant="primary", id="all"),

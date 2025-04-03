@@ -11,6 +11,13 @@ from textual import log
 from textual.widgets import Static # ADDED Static for DummyGrid
 
 # --- START ADDED RENDERER IMPORTS ---
+# Define DummyGrid first so it's always available
+class DummyGrid(Static):
+    """Placeholder widget used when real renderers fail to import."""
+    def __init__(self, grid_data: list, *args, **kwargs):
+        super().__init__("Renderer Import Error", *args, **kwargs)
+        log.error("DummyGrid used - real renderer import failed.")
+
 try:
     from geometor.seer_navigator.renderers import (
         SolidGrid,
@@ -22,11 +29,8 @@ try:
     DEFAULT_RENDERER = TinyGrid # Changed default to TinyGrid
 except ImportError:
     log.error("Could not import grid renderers. Grid visualization will fail.")
-    # Define a dummy placeholder if imports fail
-    class DummyGrid(Static):
-        """Placeholder widget used when real renderers fail to import."""
-        def __init__(self, grid_data: list, *args, **kwargs):
-            super().__init__("Renderer import failed", *args, **kwargs)
+    # Assign the already defined DummyGrid in case of import failure
+    SolidGrid = CharGrid = BlockGrid = TinyGrid = DummyGrid # Assign DummyGrid to all renderer types
     DEFAULT_RENDERER = DummyGrid
 # --- END ADDED RENDERER IMPORTS ---
 

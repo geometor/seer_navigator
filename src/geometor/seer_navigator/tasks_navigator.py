@@ -8,6 +8,27 @@ from textual.app import App, ComposeResult
 from textual.containers import Container
 from textual.binding import Binding
 from textual import log
+from textual.widgets import Static # ADDED Static for DummyGrid
+
+# --- START ADDED RENDERER IMPORTS ---
+try:
+    from geometor.seer_navigator.renderers import (
+        SolidGrid,
+        CharGrid,
+        BlockGrid,
+        TinyGrid,
+        # ImageGrid, # Not typically used directly here
+    )
+    DEFAULT_RENDERER = SolidGrid
+except ImportError:
+    log.error("Could not import grid renderers. Grid visualization will fail.")
+    # Define a dummy placeholder if imports fail
+    class DummyGrid(Static):
+        """Placeholder widget used when real renderers fail to import."""
+        def __init__(self, grid_data: list, *args, **kwargs):
+            super().__init__("Renderer import failed", *args, **kwargs)
+    DEFAULT_RENDERER = DummyGrid
+# --- END ADDED RENDERER IMPORTS ---
 
 # Import screens
 from geometor.seer_navigator.screens.tasks_screen import TasksScreen
@@ -22,14 +43,21 @@ class TasksNavigator(App):
     BINDINGS = [
         Binding("q", "quit", "Quit"),
         Binding("r", "refresh_screen", "Refresh", show=True),
-        Binding("s", "sort_table", "Sort Table", show=True),   # ADDED sort binding
-        Binding("i", "view_images", "View Images", show=True), # ADDED image view binding
+        Binding("s", "sort_table", "Sort Table", show=True),
+        Binding("i", "view_images", "View Images", show=True),
+        # --- START ADDED RENDERER BINDINGS ---
+        Binding("ctrl+s", "set_renderer('solid')", "Solid", show=False), # Use Ctrl+ to avoid conflict with sort
+        Binding("ctrl+c", "set_renderer('char')", "Char", show=False),
+        Binding("ctrl+b", "set_renderer('block')", "Block", show=False),
+        Binding("ctrl+t", "set_renderer('tiny')", "Tiny", show=False),
+        # --- END ADDED RENDERER BINDINGS ---
     ]
 
     def __init__(self, sessions_root: str = "./sessions"):
         super().__init__()
         self.sessions_root = Path(sessions_root)
-        log.info(f"TasksNavigator initialized with sessions_root: {self.sessions_root}")
+        self.renderer: type[Static] = DEFAULT_RENDERER # ADDED renderer state
+        log.info(f"TasksNavigator initialized with sessions_root: {self.sessions_root}, default renderer: {self.renderer.__name__}")
         self._sxiv_checked = False # ADDED sxiv check state
         self._sxiv_path = None     # ADDED sxiv path cache
 
@@ -191,6 +219,47 @@ class TasksNavigator(App):
             self.notify(f"Error viewing images: {e}", severity="error")
     # --- END ADDED IMAGE VIEWING ACTIONS ---
 
+    # --- START ADDED RENDERER ACTION ---
+    def action_set_renderer(self, renderer_name: str) -> None:
+        """Sets the active grid renderer."""
+        renderer_map = {
+            "solid": SolidGrid,
+            "char": CharGrid,
+            "block": BlockGrid,
+            "tiny": TinyGrid,
+            # "image": ImageGrid, # If needed later
+        }
+        new_renderer = renderer_map.get(renderer_name)
+
+        if new_renderer and new_renderer != self.renderer:
+            # Check if the selected renderer is available (didn't fail import)
+            if new_renderer == DummyGrid:
+                 log.warning(f"Attempted to set unavailable renderer: {renderer_name}")
+                 self.notify(f"Renderer '{renderer_name}' failed to import.", severity="warning")
+                 return
+
+            self.renderer = new_renderer
+            log.info(f"Switched renderer to: {renderer_name}")
+            self.notify(f"Renderer set to: {renderer_name.capitalize()}")
+
+            # Refresh the current screen if it displays trials that use the renderer
+            # StepScreen handles this via watch_selected_file_path, but a general refresh might be needed
+            # if other screens start using the renderer directly.
+            current_screen = self.screen
+            if hasattr(current_screen, "refresh_content"):
+                 # Check if the screen has a TrialViewer that needs updating
+                 try:
+                     trial_viewer = current_screen.query_one("TrialViewer") # Assumes TrialViewer has default ID
+                     if trial_viewer:
+                         log.info(f"Refreshing screen {current_screen.__class__.__name__} due to renderer change.")
+                         current_screen.refresh_content() # Trigger refresh which should update TrialViewer
+                 except Exception:
+                     pass # No TrialViewer found or other query error, ignore.
+
+        elif not new_renderer:
+            log.warning(f"Unknown renderer name: {renderer_name}")
+            self.notify(f"Unknown renderer: {renderer_name}", severity="warning")
+    # --- END ADDED RENDERER ACTION ---
 
     def action_quit(self) -> None:
         """Quits the application"""

@@ -214,7 +214,7 @@ class SessionsNavigator(App):
                             png_filename = json_file.stem + ".png" # e.g., "code_00_trial.json" -> "code_00_trial.png"
                             png_path = json_file.with_name(png_filename)
                             if png_path.exists():
-                                image_files.append(png_path)
+                                passed_trial_files.append(png_path) # Use the correct list name
                                 log.debug(f"Adding passed trial image: {png_path}")
                             else:
                                 log.warning(f"Passed trial JSON found ({json_file}), but corresponding PNG not found: {png_path}")

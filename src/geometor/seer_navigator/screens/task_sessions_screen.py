@@ -536,26 +536,3 @@ class TaskSessionsScreen(Screen):
              return (session_name, Text("ERR"), Text("-"), Text("-"), Text("-"),
                      Text("-"), Text("-"), Text("-"), Text("-"), Text("-"),
                      Text("-"))
-
-```
-
-**2. Update `TasksScreen` to use the new screen:**
-
-```python
-src/geometor/seer_navigator/screens/tasks_screen.py
-<<<<<<< SEARCH
-from textual.widgets._data_table import ColumnKey # ADDED ColumnKey
-from textual import log
-
-# Import Grid
-from textual.containers import Vertical, Grid
-
-# Import Task for weight calculation
-from geometor.seer.tasks.tasks import Task
-
-# Import the new screen
-from .task_sessions_screen import TaskSessionsScreen # ADDED
-
-
-class TasksScreen(Screen):
-    """Displays aggregated task data across all sessions."""

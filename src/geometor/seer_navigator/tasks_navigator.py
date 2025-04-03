@@ -152,33 +152,32 @@ class TasksNavigator(App):
         if not sxiv_cmd:
             return # sxiv not found, notification already shown
 
-        image_files = []
+        all_found_files = [] # Store all initially found files
+        unique_task_images = {} # Dict to store {task_id: first_image_path}
+        final_image_files = [] # List to pass to sxiv
+
         try:
             log.info(f"Searching for images in {context_path} with filter: {filter_type}, task_id: {task_id}")
 
-            # --- Adjust rglob patterns based on task_id ---
+            # --- Step 1: Find all potentially relevant files based on task_id context ---
             if filter_type == "all":
                 pattern = f"*/{task_id}/**/*.png" if task_id else "**/*.png"
-                image_files = sorted(list(context_path.rglob(pattern)))
+                all_found_files = sorted(list(context_path.rglob(pattern)))
+                final_image_files = all_found_files # No uniqueness needed for 'all'
             elif filter_type == "tasks":
                 pattern = f"*/{task_id}/task.png" if task_id else "**/task.png"
-                image_files = sorted(list(context_path.rglob(pattern)))
+                all_found_files = sorted(list(context_path.rglob(pattern)))
             elif filter_type == "trials":
                 pattern = f"*/{task_id}/*trial.png" if task_id else "**/*trial.png"
-                image_files = sorted(list(context_path.rglob(pattern)))
+                all_found_files = sorted(list(context_path.rglob(pattern)))
+                final_image_files = all_found_files # No uniqueness needed for 'trials'
             elif filter_type == "passed_trials":
-                image_files = []
-                # Find relevant trial JSON files first
+                passed_trial_files = []
                 json_pattern = f"*/{task_id}/*trial.json" if task_id else "**/*trial.json"
                 relevant_trial_jsons = list(context_path.rglob(json_pattern))
                 log.info(f"Found {len(relevant_trial_jsons)} *trial.json files for passed_trials filter (task_id: {task_id}).")
 
                 for json_file in relevant_trial_jsons:
-                    # Check if the json_file is within the specific task directory if task_id is set
-                    # The rglob pattern already handles this, but double-check logic if needed
-                    # if task_id and f"/{task_id}/" not in str(json_file):
-                    #     continue # Skip if not in the correct task folder
-
                     try:
                         with open(json_file, "r") as f:
                             trial_data = json.load(f)
@@ -197,21 +196,45 @@ class TasksNavigator(App):
                         log.error(f"Could not decode JSON for passed_trials filter: {json_file}")
                     except Exception as e:
                         log.error(f"Error processing {json_file} for passed_trials filter: {e}")
-                image_files = sorted(list(set(image_files))) # Use set to remove duplicates across sessions, then sort
+                all_found_files = sorted(passed_trial_files) # Store all passed trial images
             else:
                 log.warning(f"Unknown image filter type: {filter_type}")
                 self.notify(f"Unknown image filter: {filter_type}", severity="warning")
                 return
 
-            if not image_files:
+            # --- Step 2: Apply uniqueness filter if needed (only when task_id is NOT specified) ---
+            # If task_id *is* specified, the rglob already limited results to that task,
+            # so uniqueness isn't strictly needed, but we apply it for consistency.
+            if filter_type in ["tasks", "passed_trials"]:
+                for img_path in all_found_files:
+                    try:
+                        # Assuming structure .../session_id/task_id/...
+                        task_id_dir = img_path.parent # For task.png
+                        if filter_type == "passed_trials":
+                            task_id_dir = img_path.parent.parent # For *trial.png
+
+                        task_id_str = task_id_dir.name
+                        if task_id_str not in unique_task_images:
+                            unique_task_images[task_id_str] = img_path
+                            log.debug(f"Adding unique image for task '{task_id_str}': {img_path}")
+                    except IndexError:
+                         log.warning(f"Could not determine task ID for image path: {img_path}")
+                    except Exception as e:
+                         log.error(f"Error extracting task ID for uniqueness filter on {img_path}: {e}")
+
+                final_image_files = sorted(list(unique_task_images.values()))
+                log.info(f"Applied uniqueness filter: {len(all_found_files)} found -> {len(final_image_files)} unique.")
+            # else: final_image_files is already set for 'all' and 'trials'
+
+            if not final_image_files:
                 self.notify(f"No images found for filter '{filter_type}' in {context_path.name}.", severity="information")
                 log.info(f"No images found for filter '{filter_type}' in {context_path}")
                 return
 
             # Prepare the command list
-            command = [sxiv_cmd] + [str(img_path) for img_path in image_files]
+            command = [sxiv_cmd] + [str(img_path) for img_path in final_image_files]
 
-            log.info(f"Opening {len(image_files)} images with sxiv (filter: {filter_type})")
+            log.info(f"Opening {len(final_image_files)} images with sxiv (filter: {filter_type}, task_id: {task_id})")
             subprocess.Popen(command)
 
         except FileNotFoundError:

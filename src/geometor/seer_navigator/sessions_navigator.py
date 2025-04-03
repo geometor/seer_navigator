@@ -55,14 +55,14 @@ class SessionsNavigator(App):
         Binding("q", "quit", "Quit"),
         #  Binding("[", "previous_sibling", "Previous Sibling"),
         #  Binding("]", "next_sibling", "Next Sibling"),
-        # Add renderer bindings
-        Binding("s", "set_renderer('solid')", "Solid", show=False), # Hide from footer
-        Binding("c", "set_renderer('char')", "Char", show=False),   # Hide from footer
-        Binding("b", "set_renderer('block')", "Block", show=False),
-        Binding("t", "set_renderer('tiny')", "Tiny", show=False),
+        # Add renderer bindings (using Ctrl+ to avoid conflict with sort 's')
+        Binding("ctrl+s", "set_renderer('solid')", "Solid", show=False),
+        Binding("ctrl+c", "set_renderer('char')", "Char", show=False),
+        Binding("ctrl+b", "set_renderer('block')", "Block", show=False),
+        Binding("ctrl+t", "set_renderer('tiny')", "Tiny", show=False),
         Binding("r", "refresh_screen", "Refresh", show=True),
         Binding("i", "view_images", "View Images", show=True), # ADDED image view binding
-        Binding("s", "sort_table", "Sort Table", show=True),   # ADDED sort binding
+        Binding("s", "sort_table", "Sort Table", show=True),   # ADDED sort binding (plain 's')
     ]
 
     def __init__(self, sessions_root: str = "./sessions"):

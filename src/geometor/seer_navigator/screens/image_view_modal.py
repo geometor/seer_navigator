@@ -45,10 +45,11 @@ Button {
         Binding("escape", "app.pop_screen", "Cancel", show=False),
     ]
 
-    def __init__(self, context_path: Path, *args, **kwargs) -> None:
+    def __init__(self, context_path: Path, task_id: str | None = None, *args, **kwargs) -> None: # Added task_id
         super().__init__(*args, **kwargs)
         self.context_path = context_path
-        log.info(f"ImageViewModal initialized with context: {self.context_path}")
+        self.task_id = task_id # Store task_id
+        log.info(f"ImageViewModal initialized with context: {self.context_path}, task_id: {self.task_id}")
 
     def compose(self) -> ComposeResult:
         yield Vertical(

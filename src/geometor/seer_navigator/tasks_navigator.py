@@ -92,27 +92,30 @@ class TasksNavigator(App):
         """Pushes the image view modal screen."""
         current_screen = self.screen
         context_path = None
+        task_id = None # Initialize task_id
 
-        # Determine context path based on the current screen
-        # For TasksNavigator, the main context is always the sessions_root
+        # Determine context path and potentially task_id based on the current screen
         if isinstance(current_screen, TasksScreen):
             context_path = current_screen.sessions_root
+            # task_id remains None for the main TasksScreen
+        elif isinstance(current_screen, TaskSessionsScreen): # ADDED case for TaskSessionsScreen
+            context_path = current_screen.sessions_root
+            task_id = current_screen.task_id # Get the specific task_id
         else:
-            # This case shouldn't typically happen in TasksNavigator, but handle defensively
             log.warning(f"Image viewing not supported on screen: {current_screen.__class__.__name__}")
             self.notify("Image viewing not supported here.", severity="warning")
             return
 
         if context_path:
-            log.info(f"Pushing ImageViewModal with context: {context_path}")
-            self.push_screen(ImageViewModal(context_path=context_path))
+            log.info(f"Pushing ImageViewModal with context: {context_path}, task_id: {task_id}")
+            # Pass task_id (which might be None) to the modal
+            self.push_screen(ImageViewModal(context_path=context_path, task_id=task_id))
         else:
-            # Should not happen if current_screen is TasksScreen, but check anyway
             log.error("Could not determine context path for image viewing.")
             self.notify("Error determining context for image viewing.", severity="error")
 
-    def launch_sxiv(self, context_path: Path, filter_type: str) -> None:
-        """Finds images based on filter and launches sxiv."""
+    def launch_sxiv(self, context_path: Path, filter_type: str, task_id: str | None = None) -> None: # Added task_id parameter
+        """Finds images based on filter and launches sxiv. Filters by task_id if provided."""
         sxiv_cmd = self._check_sxiv()
         if not sxiv_cmd:
             return # sxiv not found, notification already shown

@@ -20,7 +20,7 @@ ImageViewModal {
 #dialog {
     padding: 0 1;
     width: 60;
-    height: 100%;
+    height: 20;
     border: thick $background 80%;
     background: $surface;
 }

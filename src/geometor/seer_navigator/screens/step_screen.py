@@ -10,7 +10,7 @@ from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import DataTable, Header, Footer, TextArea, Markdown, ContentSwitcher, Static 
+from textual.widgets import DataTable, Header, Footer, TextArea, ContentSwitcher, Static # Removed Markdown
 from textual.binding import Binding
 from textual import log
 
@@ -60,13 +60,9 @@ class StepScreen(Screen):
     ContentSwitcher {
         height: 1fr;
     }
-    TextArea, Markdown, #content-placeholder { /* Renamed placeholder */
+    TextArea, #content-placeholder { /* Removed Markdown */
         height: 1fr;
         border: none; /* Remove default border if desired */
-    }
-    /* Ensure Markdown content is scrollable */
-    Markdown {
-        overflow-y: auto;
     }
     /* Center placeholder text */
     #content-placeholder { /* Renamed placeholder */

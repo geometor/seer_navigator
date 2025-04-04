@@ -390,13 +390,38 @@ class TaskScreen(Screen):
 
         row_id = self.table.cursor_row
         if row_id is None or not (0 <= row_id < len(self.step_dirs)):
+             log.warning(f"action_select_row: Invalid row_id {row_id} or step_dirs empty.")
              return # Invalid selection
 
-        # Get the step directory corresponding to the selected row
-        step_path = self.step_dirs[row_id]
+        try:
+            # Get the data for the selected row
+            row_data = self.table.get_row_at(row_id)
+            if not row_data:
+                log.error(f"action_select_row: Could not get row data for row {row_id}.")
+                self.notify("Error selecting step row data.", severity="error")
+                return
 
-        # Push the StepScreen
-        self.app.push_screen(StepScreen(self.session_path, self.task_path, step_path))
+            # The first element is the step name (e.g., "001_code")
+            selected_step_name = str(row_data[0])
+
+            # Find the corresponding Path object in self.step_dirs
+            step_path = next((p for p in self.step_dirs if p.name == selected_step_name), None)
+
+            if step_path is None:
+                log.error(f"action_select_row: Could not find step path for name '{selected_step_name}' in self.step_dirs.")
+                self.notify(f"Error finding step directory: {selected_step_name}", severity="error")
+                return
+
+            # Push the StepScreen with the correct path
+            log.info(f"action_select_row: Pushing StepScreen for {step_path}")
+            self.app.push_screen(StepScreen(self.session_path, self.task_path, step_path))
+
+        except IndexError:
+            log.exception(f"action_select_row: IndexError accessing row data for row {row_id}.")
+            self.notify("Error accessing step data.", severity="error")
+        except Exception as e:
+            log.exception(f"action_select_row: Error processing row {row_id}: {e}")
+            self.notify("Error selecting step.", severity="error")
 
     # REMOVED action_view_images method
 

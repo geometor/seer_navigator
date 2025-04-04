@@ -117,6 +117,7 @@ class StepScreen(Screen):
                         "",
                         read_only=True,
                         show_line_numbers=True,
+                        soft_wrap=True, # Enable soft wrapping
                         #  theme=DEFAULT_THEME,
                         id="text-viewer" # ID for the TextArea
                     )

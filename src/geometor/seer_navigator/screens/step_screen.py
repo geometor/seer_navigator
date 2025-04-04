@@ -124,7 +124,7 @@ class StepScreen(Screen):
                         #  theme=DEFAULT_THEME,
                         id="text-viewer" # ID for the TextArea
                     )
-                    yield Markdown(id="markdown-viewer")
+                    # Removed Markdown viewer
                     yield TrialViewer(id="trial-viewer") # Add TrialViewer instance
                     yield Static("Select a file to view its content.", id="content-placeholder")
 
@@ -179,7 +179,7 @@ class StepScreen(Screen):
         """Called when selected_file_path changes. Updates the content viewer."""
         switcher = self.query_one(ContentSwitcher)
         text_viewer = self.query_one("#text-viewer", TextArea)
-        markdown_viewer = self.query_one("#markdown-viewer", Markdown)
+        # Removed markdown_viewer query
         trial_viewer = self.query_one("#trial-viewer", TrialViewer) # Get TrialViewer
         placeholder = self.query_one("#content-placeholder", Static)
 
@@ -202,15 +202,17 @@ class StepScreen(Screen):
                 switcher.current = "content-placeholder"
 
             elif file_suffix == ".md":
-                # Handle Markdown files
+                # Handle Markdown files using TextArea
                 try:
                     content = new_path.read_text()
-                    markdown_viewer.update(content)
-                    switcher.current = "markdown-viewer"
-                    markdown_viewer.scroll_home(animate=False) # Scroll Markdown to top
+                    # Load into TextArea and set language
+                    text_viewer.load_text(content)
+                    text_viewer.language = "markdown"
+                    switcher.current = "text-viewer"
+                    text_viewer.scroll_home(animate=False) # Scroll TextArea to top
                 except Exception as e:
                     log.error(f"Error loading Markdown file {new_path}: {e}")
-                    # Display error in TextArea
+                    # Display error in TextArea (fallback)
                     error_content = f"Error loading file:\n\n{e}"
                     text_viewer.load_text(error_content)
                     text_viewer.language = None
@@ -244,7 +246,7 @@ class StepScreen(Screen):
             # Clear all viewers if no file is selected
             text_viewer.load_text("")
             text_viewer.language = None
-            markdown_viewer.update("")
+            # Removed markdown_viewer clear
             placeholder.update("No file selected.") # Reset placeholder
             switcher.current = "text-viewer" # Default to text viewer when empty
 

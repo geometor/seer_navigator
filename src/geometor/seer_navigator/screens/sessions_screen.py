@@ -136,7 +136,7 @@ class SessionsScreen(Screen):
             try:
                 with open(summary_path, 'r') as f:
                     summary = json.load(f)
-                num_tasks = Text(str(summary.get("count", 0)), style="", justify="right")
+                num_tasks = Text(str(summary.get("task_count", 0)), style="", justify="right") # Corrected key
                 num_steps = Text(str(summary.get("total_steps", 0)), style="", justify="right") # Get total_steps
 
                 # Use the updated _format_duration method
@@ -168,14 +168,14 @@ class SessionsScreen(Screen):
                 # --- END ADDED TOKEN HANDLING ---
 
                 # Right-align TEST and TRAIN counts and color based on value
-                train_passed_count = summary.get("train_passed", 0)
+                train_passed_count = summary.get("train_passed_count", 0) # Corrected key
                 train_passed = (
                     Text(str(train_passed_count), style="bold green", justify="right")
                     if train_passed_count > 0
                     else Text("0", style="red", justify="right")
                 )
 
-                test_passed_count = summary.get("test_passed", 0)
+                test_passed_count = summary.get("test_passed_count", 0) # Corrected key
                 test_passed = (
                     Text(str(test_passed_count), style="bold green", justify="right")
                     if test_passed_count > 0
@@ -261,9 +261,9 @@ class SessionsScreen(Screen):
                     with open(summary_path, "r") as f:
                         session_summary = json.load(f)
 
-                    total_tasks_count += session_summary.get("count", 0) # Sum tasks
-                    train_passed_count += session_summary.get("train_passed", 0)
-                    test_passed_count += session_summary.get("test_passed", 0)
+                    total_tasks_count += session_summary.get("task_count", 0) # Sum tasks - Corrected key
+                    train_passed_count += session_summary.get("train_passed_count", 0) # Corrected key
+                    test_passed_count += session_summary.get("test_passed_count", 0) # Corrected key
                     total_steps += session_summary.get("total_steps", 0)
                     total_error_count += session_summary.get("errors", {}).get("count", 0) # Accumulate errors
 

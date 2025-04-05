@@ -155,11 +155,10 @@ class SessionScreen(Screen):
                 )
 
                 # --- START ERROR HANDLING ---
-                # Check if the task itself had errors during its processing/summarization
-                task_errors = summary.get("errors", {})
-                has_errors = task_errors.get("count", 0) > 0 # Check if error count > 0
+                # Check for errors using the 'has_errors' boolean field
+                has_errors = summary.get("has_errors", False) # Default to False if missing
                 error_text = (
-                    Text("⚠", style="bold yellow", justify="center")
+                    Text("⚠", style="bold yellow", justify="center") # Use warning symbol
                     if has_errors
                     else Text("-", justify="center")
                 )

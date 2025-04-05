@@ -90,14 +90,24 @@ class GridAnimator(Static):
         if not self.current_grid_state:
             self.update("Grid data is empty.")
             return
+
+        # Add diagnostic logging
+        log.info(f"--- Updating Display ---")
+        log.info(f"Renderer Class: {self.renderer_class}")
+        log.info(f"Renderer Class Type: {type(self.renderer_class)}")
+        log.info(f"Grid Data Type: {type(self.current_grid_state)}")
+        log.info(f"Grid Data Rows: {len(self.current_grid_state)}")
+        log.info(f"Grid Data First Row Sample: {self.current_grid_state[0] if self.current_grid_state else 'N/A'}")
+
         try:
-            # Instantiate the renderer with the current grid data (trying keyword argument again)
+            # Instantiate the renderer with the current grid data (using keyword argument)
             renderer_instance = self.renderer_class(grid=self.current_grid_state)
             # Render the grid (assuming renderers have a 'render' method returning Text or compatible)
             rendered_content = renderer_instance.render()
             self.update(rendered_content)
         except Exception as e:
             # Use log.error instead of log.exception
+            # Log the exception with traceback info
             log.error(f"Error rendering grid with {self.renderer_class.__name__}: {e}")
             self.update(f"Render Error:\n{e}")
 

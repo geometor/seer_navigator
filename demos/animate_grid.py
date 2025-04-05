@@ -91,8 +91,8 @@ class GridAnimator(Static):
             self.update("Grid data is empty.")
             return
         try:
-            # Instantiate the renderer with the current grid data, passing as keyword arg
-            renderer_instance = self.renderer_class(grid=self.current_grid_state)
+            # Instantiate the renderer with the current grid data (positional argument)
+            renderer_instance = self.renderer_class(self.current_grid_state)
             # Render the grid (assuming renderers have a 'render' method returning Text or compatible)
             rendered_content = renderer_instance.render()
             self.update(rendered_content)

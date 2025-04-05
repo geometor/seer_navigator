@@ -146,7 +146,7 @@ class TaskScreen(Screen):
                 # --- START ERROR HANDLING ---
                 has_errors = summary.get("has_errors", False) # Default to False if missing
                 error_text = (
-                    Text("⚠", style="bold yellow", justify="center") # CHANGED character and style
+                    Text("⚠", style="bold gold", justify="center") # CHANGED character and style
                     if has_errors
                     else Text("-", justify="center")
                 )

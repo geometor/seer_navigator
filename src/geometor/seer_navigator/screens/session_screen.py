@@ -158,7 +158,7 @@ class SessionScreen(Screen):
                 # Check for errors using the 'has_errors' boolean field
                 has_errors = summary.get("has_errors", False) # Default to False if missing
                 error_text = (
-                    Text("⚠", style="bold yellow", justify="center") # Use warning symbol
+                    Text("⚠", style="bold gold", justify="center") # Use warning symbol
                     if has_errors
                     else Text("-", justify="center")
                 )

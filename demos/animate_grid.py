@@ -1,5 +1,4 @@
 
-import argparse
 import random
 import time
 from pathlib import Path
@@ -15,13 +14,14 @@ from textual.reactive import reactive
 from textual.widgets import Header, Footer, Static
 from textual import log
 
-# --- Grid Parsing ---
+# --- Grid Parsing & Task Loading ---
 # Assuming string_to_grid is available and returns a Grid object with a .grid attribute (list of lists)
 try:
     from geometor.seer.tasks.grid import string_to_grid, Grid as SeerGrid
+    from geometor.seer.tasks.tasks import Tasks # Import Tasks
 except ImportError:
-    log.error("Failed to import string_to_grid or Grid from geometor.seer.tasks.grid")
-    # Define a dummy if needed for basic structure, but parsing will fail
+    log.error("Failed to import Grid or Tasks from geometor.seer.tasks")
+    # Define dummies if needed for basic structure, but loading/parsing will fail
     class SeerGrid:
         def __init__(self, grid_data):
             self.grid = grid_data
@@ -48,30 +48,6 @@ except ImportError:
     BaseGrid = Static # Type hint alias
 
 DEFAULT_INTERVAL = 0.05 # Animation speed (seconds per step)
-
-# --- Helper Function ---
-def load_grid_from_source(source: str) -> Optional[List[List[int]]]:
-    """Loads grid data from a file path or a string."""
-    path = Path(source)
-    grid_obj: Optional[SeerGrid] = None
-    if path.is_file():
-        try:
-            content = path.read_text().strip()
-            grid_obj = string_to_grid(content)
-            log.info(f"Loaded grid from file: {path}")
-        except Exception as e:
-            log.error(f"Error reading or parsing grid file {path}: {e}")
-            return None
-    else:
-        # Assume it's a string representation
-        grid_obj = string_to_grid(source)
-        if grid_obj:
-            log.info("Parsed grid from string.")
-        else:
-            log.error(f"Could not parse grid from string: {source[:50]}...")
-            return None
-
-    return grid_obj.grid if grid_obj else None
 
 # --- Animation Widget ---
 class GridAnimator(Static):
@@ -294,32 +270,63 @@ class GridAnimatorApp(App):
 
 # --- Main Execution ---
 def main():
-    parser = argparse.ArgumentParser(description="Animate transition between two grids.")
-    parser.add_argument("input_grid", help="File path or string representation of the input grid.")
-    parser.add_argument("output_grid", help="File path or string representation of the output grid.")
-    args = parser.parse_args()
+    script_dir = Path(__file__).parent
+    task_file = script_dir / "task.json"
 
-    print("Loading grids...")
-    input_grid = load_grid_from_source(args.input_grid)
-    output_grid = load_grid_from_source(args.output_grid)
+    print(f"Looking for task file: {task_file}")
 
-    if input_grid is None or output_grid is None:
-        print("Error loading one or both grids. Exiting.")
+    if not task_file.exists():
+        print(f"Error: task.json not found in {script_dir}")
+        log.error(f"task.json not found in {script_dir}")
         return
 
-    # Validate dimensions
+    try:
+        print("Loading task...")
+        # Tasks expects a folder path, so give it the script's directory
+        tasks = Tasks(script_dir)
+        if not tasks:
+            print("Error: No tasks found or loaded from the directory.")
+            log.error("No tasks found or loaded from the directory containing task.json.")
+            return
+
+        # Assume the first task and its first training pair
+        task = tasks[0]
+        if not task.train:
+            print(f"Error: Task '{task.id}' has no training pairs.")
+            log.error(f"Task '{task.id}' has no training pairs.")
+            return
+
+        first_train_pair = task.train[0]
+        input_grid = first_train_pair.input.grid.tolist() # Get as list of lists
+        output_grid = first_train_pair.output.grid.tolist() # Get as list of lists
+        task_id = task.id
+        print(f"Loaded task '{task_id}', using first training pair.")
+        log.info(f"Loaded task '{task_id}', using first training pair.")
+
+    except ImportError:
+        print("Error: Failed to import necessary geometor modules (Tasks/Grid). Cannot load task.")
+        log.critical("Failed to import necessary geometor modules (Tasks/Grid).")
+        return
+    except Exception as e:
+        print(f"Error loading or processing task.json: {e}")
+        log.exception(f"Error loading or processing {task_file}: {e}")
+        return
+
+    # Validate dimensions (already numpy arrays in TaskPair, convert back for App)
     if not input_grid or not output_grid:
-         print("One or both grids are empty after loading. Exiting.")
+         print("One or both grids are empty after loading from task. Exiting.")
+         log.error("Input or output grid is empty after loading from task.")
          return
 
     rows_in, cols_in = len(input_grid), len(input_grid[0])
     rows_out, cols_out = len(output_grid), len(output_grid[0])
 
     if rows_in != rows_out or cols_in != cols_out:
-        print(f"Grid dimensions do not match! Input: {rows_in}x{cols_in}, Output: {rows_out}x{cols_out}. Exiting.")
+        print(f"Grid dimensions from task do not match! Input: {rows_in}x{cols_in}, Output: {rows_out}x{cols_out}. Exiting.")
+        log.error(f"Grid dimensions mismatch in task '{task_id}': Input {rows_in}x{cols_in}, Output {rows_out}x{cols_out}")
         return
 
-    print(f"Grids loaded ({rows_in}x{cols_in}). Starting Textual app...")
+    print(f"Grids loaded ({rows_in}x{cols_in}) from task '{task_id}'. Starting Textual app...")
     app = GridAnimatorApp(input_grid, output_grid)
     app.run()
 

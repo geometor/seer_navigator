@@ -160,7 +160,9 @@ class TasksScreen(Screen):
                                         summary = json.load(f)
 
                                     # Aggregate counts
-                                    task_data['errors'] += summary.get("errors", {}).get("count", 0)
+                                    # Increment 'errors' if the task had errors in this session
+                                    if summary.get("has_errors", False):
+                                        task_data['errors'] += 1
                                     if summary.get("test_passed") is True:
                                         task_data['test_passed'] += 1
                                     if summary.get("train_passed") is True:
@@ -341,15 +343,17 @@ class TasksScreen(Screen):
 
         for task_id, data in self.tasks_summary.items():
             num_sessions_for_task = len(data['sessions'])
-            task_error_count = data['errors']
+            task_error_count = data['errors'] # Now represents sessions with errors for this task
 
             total_sessions_involved.update(data['sessions'])
-            total_errors += task_error_count # Keep aggregating total errors
+            # total_errors is no longer a simple sum of counts, but sum of sessions with errors
+            total_errors += task_error_count
 
-            # --- START: Check if task failed in all its sessions ---
-            if num_sessions_for_task > 0 and num_sessions_for_task == task_error_count:
-                tasks_failed_all_sessions += 1
-            # --- END: Check if task failed in all its sessions ---
+            # --- START: Check if task had errors in *any* session ---
+            # tasks_failed_all_sessions is renamed/repurposed to count tasks that had at least one error
+            if task_error_count > 0:
+                tasks_failed_all_sessions += 1 # Count tasks that had errors in at least one session
+            # --- END: Check if task had errors in *any* session ---
 
             # --- START: Increment unique task pass counters ---
             if data['test_passed'] > 0: # Check if task passed test at least once

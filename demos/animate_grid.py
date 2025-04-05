@@ -108,7 +108,7 @@ class GridAnimator(Static):
         except Exception as e:
             # Use log.error instead of log.exception
             # Log the exception with traceback info
-            log.error(f"Error rendering grid with {self.renderer_class.__name__}: {e}")
+            log.error(f"Error rendering grid with {self.renderer_class.__name__}", exc_info=True) # Add exc_info=True
             self.update(f"Render Error:\n{e}")
 
     def watch_current_grid_state(self, old_state, new_state) -> None:

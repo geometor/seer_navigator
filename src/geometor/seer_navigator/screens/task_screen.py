@@ -168,22 +168,24 @@ class TaskScreen(Screen):
                 # --- END TOKEN HANDLING ---
 
                 # --- START PASS/FAIL HANDLING ---
-                if "train_passed" in summary and summary["train_passed"] is not None:
+                if "train_passed" in summary: # Check if key exists
                     train_passed = (
                         Text("✔", style="green", justify="center")
                         if summary["train_passed"]
                         else Text("✘", style="red", justify="center")
                     )
                 else:
+                    # Default if key is missing
                     train_passed = Text("-", style="", justify="center")
 
-                if "test_passed" in summary and summary["test_passed"] is not None:
+                if "test_passed" in summary: # Check if key exists
                     test_passed = (
                         Text("✔", style="green", justify="center")
                         if summary["test_passed"]
                         else Text("✘", style="red", justify="center")
                     )
                 else:
+                    # Default if key is missing
                     test_passed = Text("-", style="", justify="center")
                 # --- END PASS/FAIL HANDLING ---
 

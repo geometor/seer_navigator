@@ -199,7 +199,8 @@ class TaskScreen(Screen):
                 # --- END BEST SCORE HANDLING ---
 
                 # --- START BEST TRIAL METRICS HANDLING ---
-                metrics = summary.get("best_trial_metrics", {})
+                # Read metrics directly from the summary dictionary
+                # metrics = summary.get("best_trial_metrics", {}) # REMOVED - Read directly
 
                 def format_bool_metric(value):
                     if value is True:
@@ -209,16 +210,18 @@ class TaskScreen(Screen):
                     else:
                         return Text("-", justify="center")
 
-                size_correct_text = format_bool_metric(metrics.get("all_size_correct"))
-                palette_correct_text = format_bool_metric(metrics.get("all_palette_correct"))
-                color_count_correct_text = format_bool_metric(metrics.get("all_color_count_correct"))
+                # Use the correct top-level keys from the summary
+                size_correct_text = format_bool_metric(summary.get("size_correct"))
+                palette_correct_text = format_bool_metric(summary.get("color_palette_correct"))
+                color_count_correct_text = format_bool_metric(summary.get("color_count_correct"))
 
-                # Get TOTAL pixels off count
-                pixels_off_val = metrics.get("pixels_off")
+                # Get TOTAL pixels off count directly from summary
+                pixels_off_val = summary.get("pixels_off")
                 # Format as integer string
                 pixels_off_text = Text(str(pixels_off_val) if pixels_off_val is not None else "-", justify="right")
 
-                percent_correct_val = metrics.get("avg_percent_correct")
+                # Get percent correct directly from summary
+                percent_correct_val = summary.get("percent_correct")
                 percent_correct_text = Text(f"{percent_correct_val:.1f}" if percent_correct_val is not None else "-", justify="right")
                 # --- END BEST TRIAL METRICS HANDLING ---
 

@@ -147,8 +147,8 @@ class SessionsScreen(Screen):
                 )
 
                 # --- START ADDED ERROR HANDLING ---
-                errors_data = summary.get("errors", {})
-                error_count = errors_data.get("count", 0)
+                # Use the correct key from the session index.json
+                error_count = summary.get("tasks_with_errors_count", 0)
                 error_text = (
                     Text(str(error_count), style="bold #FFD700", justify="center")
                     if error_count > 0

@@ -248,7 +248,7 @@ class TasksScreen(Screen):
         for task_id in self.sorted_task_ids:
             data = self.tasks_summary[task_id]
             session_count = len(data['sessions'])
-            error_text = Text(str(data['errors']), style="bold gold", justify="center") if data['errors'] > 0 else Text("-", justify="center")
+            error_text = Text(str(data['errors']), style="bold #FFD700", justify="center") if data['errors'] > 0 else Text("-", justify="center")
 
             # Color TEST and TRAIN counts
             test_passed_count = data['test_passed']

@@ -265,7 +265,8 @@ class SessionsScreen(Screen):
                     train_passed_count += session_summary.get("train_passed", 0) # Use new 'train_passed' key
                     test_passed_count += session_summary.get("test_passed", 0) # Use new 'test_passed' key
                     total_steps += session_summary.get("total_steps", 0)
-                    total_error_count += session_summary.get("errors", {}).get("count", 0) # Accumulate errors
+                    # Use the correct key for the total error count from the session summary
+                    total_error_count += session_summary.get("tasks_with_errors_count", 0) # Accumulate errors
 
                     # Sum duration
                     duration = session_summary.get("duration_seconds")

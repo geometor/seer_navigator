@@ -244,52 +244,52 @@ class SessionScreen(Screen):
 
         num_tasks = len(self.task_dirs)
         total_steps_count = 0
-        train_passed_count = 0
-        test_passed_count = 0
-        error_count = 0
+        # train_passed_count = 0 # No longer needed, read from session summary
+        # test_passed_count = 0 # No longer needed, read from session summary
+        # error_count = 0 # No longer needed, read from session summary
+        total_steps_count = 0 # Keep for avg calculation
         total_duration_seconds = 0.0
-        best_scores = []
-        total_prompt_tokens = 0
+        best_scores = [] # Keep for best score calculation
+        total_prompt_tokens = 0 # Keep for token summary
         total_candidates_tokens = 0
         total_tokens_all_tasks = 0
         total_weight = 0 # ADDED total weight counter
 
+        # --- Load session summary data ---
+        session_summary_path = self.session_path / "index.json"
+        session_summary_data = {}
+        try:
+            with open(session_summary_path, "r") as f:
+                session_summary_data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            log.error(f"Could not load session summary {session_summary_path}: {e}")
+            # Handle error state? For now, summary will show defaults.
+
+        # --- Extract values from session summary ---
+        num_tasks = session_summary_data.get("count", 0) # Use 'count' from session summary
+        train_passed_count = session_summary_data.get("train_passed", 0)
+        test_passed_count = session_summary_data.get("test_passed", 0)
+        error_count = session_summary_data.get("tasks_with_errors_count", 0) # Use the correct key
+        total_steps_count = session_summary_data.get("total_steps", 0)
+        total_duration_seconds = session_summary_data.get("duration_seconds", 0.0)
+        tokens_data = session_summary_data.get("tokens", {})
+        total_prompt_tokens = tokens_data.get("prompt_tokens", 0)
+        total_candidates_tokens = tokens_data.get("candidates_tokens", 0)
+        total_tokens_all_tasks = tokens_data.get("total_tokens", 0)
+
+        # --- Calculate best score and total weight by iterating tasks (still needed) ---
         for task_dir in self.task_dirs:
-            summary_path = task_dir / "index.json"
-            task_json_path = task_dir / "task.json" # Path to task.json
+            task_summary_path = task_dir / "index.json"
+            task_json_path = task_dir / "task.json"
             try:
-                with open(summary_path, "r") as f:
+                # Get best score from task summary
+                with open(task_summary_path, "r") as f:
                     task_summary = json.load(f)
-
-                total_steps_count += task_summary.get("steps", 0)
-                if task_summary.get("train_passed"):
-                    train_passed_count += 1
-                if task_summary.get("test_passed"):
-                    test_passed_count += 1
-                if task_summary.get("errors", {}).get("count", 0) > 0:
-                    error_count += 1
-
-                duration = task_summary.get("duration_seconds")
-                if duration is not None:
-                    total_duration_seconds += duration
-
                 score = task_summary.get("best_score")
                 if score is not None:
                     best_scores.append(score)
 
-                tokens_data = task_summary.get("tokens", {})
-                prompt_tokens = tokens_data.get("prompt_tokens")
-                candidates_tokens = tokens_data.get("candidates_tokens")
-                total_tokens = tokens_data.get("total_tokens")
-
-                if prompt_tokens is not None:
-                    total_prompt_tokens += prompt_tokens
-                if candidates_tokens is not None:
-                    total_candidates_tokens += candidates_tokens
-                if total_tokens is not None:
-                    total_tokens_all_tasks += total_tokens
-
-                # ADDED: Calculate and add task weight
+                # Get weight from task.json
                 if task_json_path.exists():
                     try:
                         with open(task_json_path, "r") as f_task:
@@ -297,25 +297,22 @@ class SessionScreen(Screen):
                         task_obj = Task(task_dir.name, task_data)
                         total_weight += task_obj.weight
                     except (json.JSONDecodeError, Exception) as e_task:
-                        log.error(f"Error loading or processing {task_json_path} for summary weight: {e_task}")
-
-
+                        log.error(f"Error loading/processing {task_json_path} for summary weight: {e_task}")
             except (FileNotFoundError, json.JSONDecodeError):
-                pass # Skip tasks with missing/invalid index.json
+                pass # Skip tasks with missing/invalid index.json for score/weight
 
         best_score_summary = (
             f"{min(best_scores):.2f}" if best_scores else "-"
         )
         formatted_total_duration = Level._format_duration(total_duration_seconds)
 
-        # Calculate test percentage
+        # Calculate test percentage (using counts from session summary)
         test_percent = (test_passed_count / num_tasks * 100) if num_tasks > 0 else 0.0
         test_percent_str = f"{test_percent:.1f}%"
 
-        # --- START Calculate difference ---
+        # Calculate difference (using counts from session summary)
         diff = test_passed_count - train_passed_count
         diff_str = f"{diff:+}" # Format with sign (+/-)
-        # --- END Calculate difference ---
 
         # --- START Calculate average steps per task ---
         avg_steps_per_task = (total_steps_count / num_tasks) if num_tasks > 0 else 0.0

@@ -37,6 +37,7 @@ except ImportError:
 # Import screens
 from geometor.seer_navigator.screens.tasks_screen import TasksScreen
 from geometor.seer_navigator.screens.task_sessions_screen import TaskSessionsScreen
+from geometor.seer_navigator.screens.task_screen import TaskScreen # ADDED import
 from geometor.seer_navigator.screens.sort_modal import SortModal
 from geometor.seer_navigator.screens.image_view_modal import ImageViewModal
 from textual.widgets._data_table import ColumnKey # Ensure ColumnKey is imported

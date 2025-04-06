@@ -1,16 +1,18 @@
-from typing import Dict
+from typing import Dict, Union # Added Union
 
 from textual.app import ComposeResult
-from textual.containers import Vertical # Changed from Grid
-from textual.screen import Screen, ModalScreen # Added ModalScreen
-from textual.widgets import Label, Button # Added Button, removed Static
+from textual.containers import Vertical
+# Use ModalScreen[ReturnType] to specify what dismiss returns
+from textual.screen import ModalScreen
+from textual.widgets import Label, Button
 from textual.binding import Binding
 from textual.widgets._data_table import ColumnKey
 from textual import log
 
 
-class SortModal(ModalScreen): # Changed base class
-    """Modal dialog for selecting a column to sort."""
+# Specify the return type for dismiss()
+class SortModal(ModalScreen[Union[ColumnKey, None]]):
+    """Modal dialog for selecting a column to sort. Returns the selected ColumnKey or None."""
 
     CSS = """
     SortModal {
@@ -40,18 +42,18 @@ class SortModal(ModalScreen): # Changed base class
     """
 
     BINDINGS = [
-        Binding("escape", "app.pop_screen", "Cancel", show=False),
+        Binding("escape", "cancel_sort", "Cancel", show=False), # Changed action
     ]
 
+    # Remove parent_screen from __init__
     def __init__(
         self,
-        parent_screen: Screen,
         columns: Dict[ColumnKey, object],
         *args,
         **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.parent_screen = parent_screen
+        # self.parent_screen = parent_screen # REMOVED
         # Store a mapping from button ID (derived from ColumnKey) to the actual ColumnKey
         self.button_id_to_column_key: Dict[str, ColumnKey] = {}
         self.sortable_columns: Dict[str, str] = {} # Store {button_id: column_label}
@@ -82,29 +84,25 @@ class SortModal(ModalScreen): # Changed base class
             yield Button("Cancel", id="cancel", variant="default") # Add cancel button
 
 
+    # Use dismiss() instead of pop_screen() and calling parent
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Handle button presses for sorting or cancelling."""
+        """Handle button presses, dismissing the modal with the result."""
         button_id = event.button.id
         log.info(f"Button pressed: {button_id}")
 
         if button_id == "cancel":
-            self.app.pop_screen()
+            self.dismiss(None) # Dismiss with None for cancellation
         elif button_id in self.button_id_to_column_key:
             target_key = self.button_id_to_column_key[button_id]
-            log.info(f"Attempting to sort by ColumnKey: {target_key}")
-            if hasattr(self.parent_screen, "perform_sort"):
-                try:
-                    self.parent_screen.perform_sort(target_key)
-                    self.app.pop_screen() # Close modal after initiating sort
-                except Exception as e:
-                    log.exception(f"Error calling perform_sort on {self.parent_screen.__class__.__name__}: {e}")
-                    self.app.notify(f"Error during sort: {e}", severity="error")
-                    self.app.pop_screen() # Close modal even on error
-            else:
-                log.error(f"Parent screen {self.parent_screen.__class__.__name__} has no perform_sort method.")
-                self.app.notify("Sort function not implemented on parent screen.", severity="error")
-                self.app.pop_screen()
+            log.info(f"Dismissing SortModal with ColumnKey: {target_key}")
+            self.dismiss(target_key) # Dismiss with the selected ColumnKey
         else:
             log.error(f"Unknown button ID pressed in SortModal: {button_id}")
-            self.app.pop_screen() # Close modal on unknown button
+            self.dismiss(None) # Dismiss with None on error/unknown button
+
+    # Action for the escape binding
+    def action_cancel_sort(self) -> None:
+        """Called when escape is pressed."""
+        log.info("SortModal cancelled via escape key.")
+        self.dismiss(None)
 

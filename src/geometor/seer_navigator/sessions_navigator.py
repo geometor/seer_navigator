@@ -19,7 +19,9 @@ from geometor.seer_navigator.screens.step_screen import StepScreen
 from geometor.seer_navigator.screens.trial_screen import TrialViewer
 # Import the modal screens
 from geometor.seer_navigator.screens.image_view_modal import ImageViewModal
-from geometor.seer_navigator.screens.sort_modal import SortModal # ADDED import
+from geometor.seer_navigator.screens.sort_modal import SortModal
+from textual.widgets._data_table import ColumnKey # Ensure ColumnKey is imported
+from textual.screen import Screen # Import Screen for type hinting
 
 # Define DummyGrid first so it's always available
 class DummyGrid(Static):
@@ -272,24 +274,42 @@ class SessionsNavigator(App):
 
     # --- START ADDED SORT ACTION ---
     def action_sort_table(self) -> None:
-        """Pushes the sort modal screen for the current data table."""
-        current_screen = self.screen
+        """Pushes the SortModal screen to select a column for sorting."""
+        # Get the currently active screen
+        current_screen = self.screen_stack[-1]
 
         # Check if the current screen has a sortable table
-        if hasattr(current_screen, "table") and hasattr(current_screen, "perform_sort"):
-            table = current_screen.table
-            columns = table.columns # Get the columns dictionary
+        if hasattr(current_screen, "table") and hasattr(current_screen.table, "columns") and current_screen.table.columns:
+            log.info(f"Opening SortModal for screen: {current_screen.__class__.__name__}")
 
-            if not columns:
-                self.notify("No columns available to sort.", severity="warning")
-                return
+            # Define the callback function to handle the result from SortModal
+            def handle_sort_dismiss(selected_key: ColumnKey | None) -> None:
+                """Callback executed when SortModal is dismissed."""
+                # Ensure the screen context is still valid (might have changed)
+                active_screen = self.screen_stack[-1]
+                if selected_key:
+                    log.info(f"SortModal dismissed for {active_screen.__class__.__name__}, sorting by: {selected_key}")
+                    if hasattr(active_screen, "perform_sort"):
+                        try:
+                            # Call perform_sort on the screen that was active
+                            active_screen.perform_sort(selected_key)
+                        except Exception as e:
+                            log.exception(f"Error calling perform_sort on {active_screen.__class__.__name__} after SortModal dismiss: {e}")
+                            self.notify(f"Error during sort: {e}", severity="error")
+                    else:
+                        log.error(f"Screen {active_screen.__class__.__name__} has no perform_sort method.")
+                        self.notify("Sort function not implemented on current screen.", severity="error")
+                else:
+                    log.info(f"SortModal dismissed (cancelled) for {active_screen.__class__.__name__}.")
 
-            log.info(f"Pushing SortModal for screen: {current_screen.__class__.__name__}")
-            # Pass the parent screen instance and the columns dict
-            self.push_screen(SortModal(parent_screen=current_screen, columns=columns))
+            # Push the SortModal screen with the callback
+            self.push_screen(
+                SortModal(columns=current_screen.table.columns),
+                handle_sort_dismiss # Pass the callback function
+            )
         else:
-            log.warning(f"Sorting not supported on screen: {current_screen.__class__.__name__}")
-            self.notify("Sorting not supported on this screen.", severity="warning")
+            log.warning("Attempted to sort on a screen without a valid table/columns.")
+            self.notify("No sortable table on the current screen.", severity="warning")
     # --- END ADDED SORT ACTION ---
 
     def action_quit(self) -> None:

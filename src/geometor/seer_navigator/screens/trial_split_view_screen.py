@@ -15,6 +15,7 @@ from geometor.seer_navigator.screens.trial_screen import TrialViewer
 from geometor.seer_navigator.renderers.solid_grid import SolidGrid
 
 class TrialSplitViewScreen(Screen):
+    """
     A screen that displays Python source code side-by-side with the
     rendered TrialViewer grid for a set of trials, allowing navigation between them.
     """

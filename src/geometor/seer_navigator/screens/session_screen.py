@@ -448,16 +448,10 @@ class SessionScreen(Screen):
         self.current_sort_key = sort_key
         self.current_sort_reverse = reverse
 
-        # Define key functions for different columns
-        def get_sort_key(row_data):
-            try:
-                col_index = list(self.table.columns.keys()).index(sort_key)
-                cell_data = row_data[col_index]
-            except (ValueError, IndexError):
-                log.error(f"Could not find index for sort key '{sort_key}'")
-                return float('-inf') # Return comparable value instead of None
-
-            key_str = str(sort_key)
+        # Define key function: receives cell_data directly when sorting by one key
+        def get_sort_key(cell_data):
+            # No need to find index or extract cell_data, it's passed directly.
+            key_str = str(sort_key) # Use string representation of the *column* key
 
             if key_str == "TASKS":
                 return cell_data # Simple string sort

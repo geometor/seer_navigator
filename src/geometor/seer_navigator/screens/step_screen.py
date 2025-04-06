@@ -282,7 +282,7 @@ class StepScreen(Screen):
              # This ensures the watch method runs even if the selection didn't change visually
              self.selected_file_path = None
              self.selected_file_path = current_path
-       pass
+        pass # Corrected indentation
 
    def action_view_trial_split(self) -> None:
        """Pushes a new screen to view trial JSON and grid side-by-side."""

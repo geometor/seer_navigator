@@ -56,39 +56,38 @@ class TrialSplitViewScreen(Screen):
     }
     """
 
-    # Store the path and renderer type
-    trial_path: var[Path | None] = var(None) # Path to the trial.json file
-    python_file_path: var[Path | None] = var(None) # Path to the corresponding .py file
-    renderer: var[type[Static] | None] = var(None) # Reactive variable, default to None
+    # Store the list of trial paths and current index
+    trial_paths: var[list[Path]] = var([])
+    current_index: var[int] = var(0)
+    # Store the derived python path for the *current* trial
+    current_python_path: var[Path | None] = var(None)
+    # Store the renderer class
+    renderer: var[type[Static] | None] = var(None)
 
-    def __init__(self, trial_path: Path, renderer_class_arg: type[Static], name: str | None = None, id: str | None = None, classes: str | None = None):
+    def __init__(self, trial_paths: list[Path], renderer_class_arg: type[Static], name: str | None = None, id: str | None = None, classes: str | None = None):
         super().__init__(name=name, id=id, classes=classes)
-        log.info(f"TrialSplitViewScreen.__init__: Received trial_path: {trial_path}, renderer type: {type(renderer_class_arg)}, value: {renderer_class_arg}")
+        log.info(f"TrialSplitViewScreen.__init__: Received {len(trial_paths)} trial paths. Renderer: {renderer_class_arg}")
 
-        # Validate the passed renderer argument
+        if not trial_paths:
+            log.error("TrialSplitViewScreen initialized with no trial paths!")
+            # Handle this case gracefully, maybe pop screen or show error message
+            self.trial_paths = []
+            # Consider popping the screen immediately or showing an error static widget
+            # self.app.pop_screen()
+            # self.app.notify("No trial files found to view.", severity="error", timeout=5)
+
+        self.trial_paths = trial_paths # Store the list
+
+        # Validate and store the renderer class
         if not isinstance(renderer_class_arg, type) or not issubclass(renderer_class_arg, Static):
-             log.error(f"TrialSplitViewScreen received invalid renderer: {renderer_class_arg}. Falling back to default.")
+             log.error(f"TrialSplitViewScreen received invalid renderer: {renderer_class_arg}. Falling back to SolidGrid.")
              from geometor.seer_navigator.renderers.solid_grid import SolidGrid
-             renderer_to_use = SolidGrid
+             self.renderer = SolidGrid
         else:
-             renderer_to_use = renderer_class_arg
+             self.renderer = renderer_class_arg
 
-        self.trial_path = trial_path # Store the original trial path for TrialViewer
-
-        # Derive the python file path (assuming '.py.trial.json' structure)
-        if trial_path.name.endswith(".py.trial.json"):
-            python_filename = trial_path.name[:-len(".trial.json")] # Remove '.trial.json'
-            self.python_file_path = trial_path.with_name(python_filename)
-            log.info(f"Derived Python file path: {self.python_file_path}")
-        else:
-            # Handle cases where the naming convention might differ or it's not a .py trial
-            log.warning(f"Could not derive Python filename from {trial_path.name}. Displaying trial JSON instead.")
-            self.python_file_path = trial_path # Fallback to showing trial JSON if derivation fails
-
-        # Assign the validated class to the reactive variable
-        self.renderer = renderer_to_use
-        log.info(f"TrialSplitViewScreen.__init__: Set self.renderer to: {self.renderer}")
-
+        # Initial setup will be handled by watch_current_index or on_mount calling load_current_trial
+        # self.current_index is already 0 by default
 
     def compose(self) -> ComposeResult:
         yield Header()

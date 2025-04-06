@@ -23,6 +23,8 @@ import json
 
 from geometor.seer.session.level import Level  # Import Level
 from geometor.seer_navigator.screens.step_screen import StepScreen # IMPORT THE NEW SCREEN
+# Import the trial split view screen
+from geometor.seer_navigator.screens.trial_split_view_screen import TrialSplitViewScreen
 
 
 class TaskScreen(Screen):
@@ -56,6 +58,7 @@ class TaskScreen(Screen):
         Binding("k", "move_up", "Cursor up", show=False),
         Binding("j", "move_down", "Cursor down", show=False),
         Binding("h", "app.pop_screen", "back", show=False),
+        Binding("v", "view_all_trials", "View Trials", show=True), # Add binding for viewing all trials
         # REMOVED Binding("i", "view_images", "View Images", show=True),
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
         # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
@@ -524,3 +527,40 @@ class TaskScreen(Screen):
             log.error(f"Error during DataTable sort: {e}")
             self.notify(f"Error sorting table: {e}", severity="error")
     # --- END ADDED SORT METHOD ---
+
+    def action_view_all_trials(self) -> None:
+        """Finds all trial files across all steps in this task and pushes TrialSplitViewScreen."""
+        all_trial_files = []
+        log.info(f"Searching for trial files across {len(self.step_dirs)} steps in task {self.task_name}...")
+        try:
+            for step_dir in self.step_dirs:
+                try:
+                    step_trials = [
+                        f for f in step_dir.iterdir()
+                        if f.is_file() and (f.name.endswith(".trial.json") or f.name.endswith("trials.json"))
+                    ]
+                    if step_trials:
+                        log.debug(f"Found {len(step_trials)} trials in step {step_dir.name}")
+                        all_trial_files.extend(step_trials)
+                except FileNotFoundError:
+                    log.warning(f"Step directory not found while searching for trials: {step_dir}")
+                except Exception as e:
+                    log.error(f"Error searching for trials in step {step_dir}: {e}")
+
+            if not all_trial_files:
+                self.app.notify("No '.trial.json' files found in any steps of this task.", severity="warning")
+                return
+
+            # Sort combined list (optional, but nice - sort by full path which groups by step)
+            all_trial_files.sort()
+
+            log.info(f"Found total {len(all_trial_files)} trial files across task {self.task_name}. Pushing TrialSplitViewScreen.")
+            split_screen = TrialSplitViewScreen(
+                trial_paths=all_trial_files, # Pass the combined list
+                renderer_class_arg=self.app.renderer # Pass the app's current renderer class
+            )
+            self.app.push_screen(split_screen)
+
+        except Exception as e:
+             self.app.notify(f"Error finding trial files: {e}", severity="error")
+             log.error(f"Error finding trial files across task {self.task_name}: {e}")

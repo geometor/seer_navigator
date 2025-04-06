@@ -98,6 +98,7 @@ class TrialSplitViewScreen(Screen):
                     "",
                     read_only=True,
                     show_line_numbers=True,
+                    soft_wrap=True, # Enable soft wrapping
                     language="python", # Default to python, will be updated in load_content
                     id="code-text-area" # Keep ID
                 )

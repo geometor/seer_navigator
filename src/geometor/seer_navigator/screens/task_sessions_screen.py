@@ -169,10 +169,10 @@ class TaskSessionsScreen(Screen):
                             if summary.get("duration_seconds") is not None
                             else "-"
                         )
-                        task_errors = summary.get("errors", {})
-                        has_errors = task_errors.get("count", 0) > 0
+                        # Check the 'has_errors' boolean field directly
+                        has_errors = summary.get("has_errors", False) # Default to False if missing
                         error_text = (
-                            Text("⚠", style="bold yellow", justify="center")
+                            Text("⚠", style="bold #FFD700", justify="center") # Use warning symbol
                             if has_errors
                             else Text("-", justify="center")
                         )
@@ -289,7 +289,8 @@ class TaskSessionsScreen(Screen):
                     train_passed_count += 1
                 if task_summary.get("test_passed"):
                     test_passed_count += 1
-                if task_summary.get("errors", {}).get("count", 0) > 0:
+                # Check the 'has_errors' boolean field directly for summary count
+                if task_summary.get("has_errors", False):
                     error_count += 1
 
                 duration = task_summary.get("duration_seconds")

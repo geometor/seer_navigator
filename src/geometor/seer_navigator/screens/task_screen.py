@@ -68,6 +68,7 @@ class TaskScreen(Screen):
         super().__init__()
         self.session_path = session_path
         self.task_path = task_path
+        self.task_name = task_path.name # Store task name
         self.step_dirs = step_dirs  # Receive step_dirs
         self.step_index = 0
         # REMOVED sxiv check state attributes

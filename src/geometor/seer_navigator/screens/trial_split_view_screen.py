@@ -57,13 +57,13 @@ class TrialSplitViewScreen(Screen):
     """
 
     # Store the path and renderer type
-    trial_path: var[Path | None] = var(None)
+    trial_path: var[Path | None] = var(None) # Path to the trial.json file
+    python_file_path: var[Path | None] = var(None) # Path to the corresponding .py file
     renderer: var[type[Static] | None] = var(None) # Reactive variable, default to None
 
-    # Rename argument to avoid potential conflict with reactive var name during init
     def __init__(self, trial_path: Path, renderer_class_arg: type[Static], name: str | None = None, id: str | None = None, classes: str | None = None):
         super().__init__(name=name, id=id, classes=classes)
-        log.info(f"TrialSplitViewScreen.__init__: Received renderer type: {type(renderer_class_arg)}, value: {renderer_class_arg}")
+        log.info(f"TrialSplitViewScreen.__init__: Received trial_path: {trial_path}, renderer type: {type(renderer_class_arg)}, value: {renderer_class_arg}")
 
         # Validate the passed renderer argument
         if not isinstance(renderer_class_arg, type) or not issubclass(renderer_class_arg, Static):
@@ -73,10 +73,22 @@ class TrialSplitViewScreen(Screen):
         else:
              renderer_to_use = renderer_class_arg
 
-        self.trial_path = trial_path
+        self.trial_path = trial_path # Store the original trial path for TrialViewer
+
+        # Derive the python file path (assuming '.py.trial.json' structure)
+        if trial_path.name.endswith(".py.trial.json"):
+            python_filename = trial_path.name[:-len(".trial.json")] # Remove '.trial.json'
+            self.python_file_path = trial_path.with_name(python_filename)
+            log.info(f"Derived Python file path: {self.python_file_path}")
+        else:
+            # Handle cases where the naming convention might differ or it's not a .py trial
+            log.warning(f"Could not derive Python filename from {trial_path.name}. Displaying trial JSON instead.")
+            self.python_file_path = trial_path # Fallback to showing trial JSON if derivation fails
+
         # Assign the validated class to the reactive variable
         self.renderer = renderer_to_use
         log.info(f"TrialSplitViewScreen.__init__: Set self.renderer to: {self.renderer}")
+
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -86,8 +98,8 @@ class TrialSplitViewScreen(Screen):
                     "",
                     read_only=True,
                     show_line_numbers=True,
-                    language="json",
-                    id="json-text-area"
+                    language="python", # Default to python, will be updated in load_content
+                    id="code-text-area" # Rename ID for clarity
                 )
             with Container(id="trial-viewer-container"):
                 # Pass the reactive variable's value (the class) to TrialViewer
@@ -111,41 +123,69 @@ class TrialSplitViewScreen(Screen):
 
     def on_mount(self) -> None:
         """Load content when the screen is mounted."""
-        self.title = f"Trial View: {self.trial_path.name}"
+        # Update title based on the file being shown in the text area
+        display_file = self.python_file_path if self.python_file_path else self.trial_path
+        self.title = f"Code View: {display_file.name}"
         self.load_content()
 
     def load_content(self) -> None:
-        """Loads the JSON into the TextArea and tells TrialViewer to load."""
-        json_viewer = self.query_one("#json-text-area", TextArea)
+        """Loads the Python code (or fallback JSON) into the TextArea and tells TrialViewer to load."""
+        code_viewer = self.query_one("#code-text-area", TextArea) # Use updated ID
         trial_viewer = self.query_one("#trial-viewer-widget", TrialViewer)
 
-        if not self.trial_path or not self.trial_path.is_file():
-            log.error(f"Trial file not found or invalid: {self.trial_path}")
-            json_viewer.load_text(f"Error: Trial file not found\n{self.trial_path}")
-            # Optionally clear or show an error in TrialViewer as well
-            self.app.notify(f"Error: Trial file not found: {self.trial_path.name}", severity="error")
+        # Determine which file to load into the text area
+        file_to_load = self.python_file_path
+        language = "python"
+        if not file_to_load or not file_to_load.is_file():
+            log.warning(f"Python file {self.python_file_path} not found. Falling back to trial JSON {self.trial_path}.")
+            file_to_load = self.trial_path # Fallback to trial path
+            language = "json" # Set language to json for fallback
+
+        # Check if the final file_to_load exists
+        if not file_to_load or not file_to_load.is_file():
+            error_msg = f"Error: Neither Python file nor Trial file found.\nPython attempt: {self.python_file_path}\nTrial file: {self.trial_path}"
+            log.error(error_msg)
+            code_viewer.load_text(error_msg)
+            code_viewer.language = None
+            self.app.notify("Error: Could not load file content.", severity="error")
+            # Optionally clear TrialViewer or show error state
+            # trial_viewer.clear() # Assuming TrialViewer has a clear method
             return
 
+        # Load content into the text area
         try:
-            # Load JSON content
-            content = self.trial_path.read_text()
-            json_viewer.load_text(content)
-            json_viewer.scroll_home(animate=False)
+            content = file_to_load.read_text()
+            code_viewer.load_text(content)
+            code_viewer.language = language
+            code_viewer.scroll_home(animate=False)
+            log.info(f"Loaded {file_to_load.name} into text area.")
+        except Exception as e:
+            log.error(f"Error loading file {file_to_load} into text area: {e}")
+            error_msg = f"Error loading file:\n{file_to_load.name}\n\n{e}"
+            code_viewer.load_text(error_msg)
+            code_viewer.language = None
+            self.app.notify(f"Error loading file: {e}", severity="error")
 
-            # Configure and load TrialViewer
+        # Load TrialViewer using the original trial_path (regardless of text area content)
+        if self.trial_path and self.trial_path.is_file():
             # Path and renderer are already set during __init__ and passed to yield
             # We just need to trigger its loading mechanism if it doesn't load automatically on mount
             # (TrialViewer's on_mount should call load_and_display)
             # If TrialViewer needs an explicit call after mount:
-            trial_viewer.load_and_display()
-            log.info(f"Loaded trial data for {self.trial_path.name} into split view.")
+            try:
+                # TrialViewer's on_mount should handle its loading if path/renderer are set
+                # If explicit loading is needed after mount/path change:
+                trial_viewer.load_and_display()
+                log.info(f"Triggered TrialViewer load for {self.trial_path.name}.")
+            except Exception as e:
+                 log.error(f"Error loading TrialViewer for {self.trial_path}: {e}")
+                 self.app.notify(f"Error loading grid view: {e}", severity="error")
+                 # Optionally display an error within the TrialViewer widget itself
+        else:
+            log.error(f"Trial file {self.trial_path} not found for TrialViewer.")
+            # Optionally clear TrialViewer or show error state
+            # trial_viewer.clear()
 
-        except Exception as e:
-            log.error(f"Error loading trial file {self.trial_path}: {e}")
-            error_msg = f"Error loading trial file:\n\n{e}"
-            json_viewer.load_text(error_msg)
-            self.app.notify(f"Error loading trial: {e}", severity="error")
-            # Optionally show error in TrialViewer side too
 
     # --- Renderer Cycling Actions ---
     # These actions allow changing the renderer within the split view

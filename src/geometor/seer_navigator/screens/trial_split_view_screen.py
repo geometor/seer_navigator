@@ -58,23 +58,25 @@ class TrialSplitViewScreen(Screen):
 
     # Store the path and renderer type
     trial_path: var[Path | None] = var(None)
-    renderer: var[type[Static] | None] = var(None) # Default to None, set in __init__
+    renderer: var[type[Static] | None] = var(None) # Reactive variable, default to None
 
-    def __init__(self, trial_path: Path, renderer: type[Static], name: str | None = None, id: str | None = None, classes: str | None = None):
+    # Rename argument to avoid potential conflict with reactive var name during init
+    def __init__(self, trial_path: Path, renderer_class_arg: type[Static], name: str | None = None, id: str | None = None, classes: str | None = None):
         super().__init__(name=name, id=id, classes=classes)
-        log.info(f"TrialSplitViewScreen.__init__: Received renderer type: {type(renderer)}, value: {renderer}")
-        # Validate the passed renderer before assigning to the reactive var
-        if not isinstance(renderer, type) or not issubclass(renderer, Static):
-             log.error(f"TrialSplitViewScreen received invalid renderer: {renderer}. Falling back to default.")
-             # Import default renderer locally if needed
+        log.info(f"TrialSplitViewScreen.__init__: Received renderer type: {type(renderer_class_arg)}, value: {renderer_class_arg}")
+
+        # Validate the passed renderer argument
+        if not isinstance(renderer_class_arg, type) or not issubclass(renderer_class_arg, Static):
+             log.error(f"TrialSplitViewScreen received invalid renderer: {renderer_class_arg}. Falling back to default.")
              from geometor.seer_navigator.renderers.solid_grid import SolidGrid
-             renderer_to_use = SolidGrid # Use default SolidGrid class
+             renderer_to_use = SolidGrid
         else:
-             renderer_to_use = renderer
+             renderer_to_use = renderer_class_arg
 
         self.trial_path = trial_path
-        # Set the validated renderer class AFTER super().__init__ and validation
+        # Assign the validated class to the reactive variable
         self.renderer = renderer_to_use
+        log.info(f"TrialSplitViewScreen.__init__: Set self.renderer to: {self.renderer}")
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -88,10 +90,21 @@ class TrialSplitViewScreen(Screen):
                     id="json-text-area"
                 )
             with Container(id="trial-viewer-container"):
-                # Instantiate TrialViewer here, passing the path and renderer
+                # Pass the reactive variable's value (the class) to TrialViewer
+                # Ensure self.renderer holds the correct class type here
+                if not self.renderer:
+                    # Fallback if renderer is somehow None (shouldn't happen after __init__)
+                    log.error("TrialSplitViewScreen.compose: self.renderer is None, falling back to SolidGrid for TrialViewer.")
+                    from geometor.seer_navigator.renderers.solid_grid import SolidGrid
+                    renderer_for_viewer = SolidGrid
+                else:
+                    renderer_for_viewer = self.renderer
+
+                log.info(f"TrialSplitViewScreen.compose: Instantiating TrialViewer with renderer: {renderer_for_viewer}")
+                # Instantiate TrialViewer here, passing the path and validated renderer class
                 yield TrialViewer(
                     trial_path=self.trial_path,
-                    renderer=self.renderer,
+                    renderer=renderer_for_viewer, # Pass the class
                     id="trial-viewer-widget"
                 )
         yield Footer()

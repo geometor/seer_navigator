@@ -517,8 +517,8 @@ class TaskScreen(Screen):
                     log.warning(f"Could not parse time string '{time_str}' for sorting")
                     return float('-inf')
 
-            # Fallback
-            return cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+            # Fallback: Ensure a string is always returned for comparison
+            return str(cell_data.plain) if hasattr(cell_data, 'plain') else str(cell_data)
 
         # Perform the sort
         try:

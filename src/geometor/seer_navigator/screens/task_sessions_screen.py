@@ -503,7 +503,8 @@ class TaskSessionsScreen(Screen):
                 except ValueError:
                     return float('-inf')
 
-            return cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+            # Fallback: Ensure a string is always returned for comparison
+            return str(cell_data.plain) if hasattr(cell_data, 'plain') else str(cell_data)
 
         try:
             # Sort the underlying data list first

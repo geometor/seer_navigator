@@ -57,13 +57,24 @@ class TrialSplitViewScreen(Screen):
     """
 
     # Store the path and renderer type
-    trial_path = var(None)
-    renderer = var(SolidGrid) # Default renderer
+    trial_path: var[Path | None] = var(None)
+    renderer: var[type[Static] | None] = var(None) # Default to None, set in __init__
 
     def __init__(self, trial_path: Path, renderer: type[Static], name: str | None = None, id: str | None = None, classes: str | None = None):
         super().__init__(name=name, id=id, classes=classes)
+        log.info(f"TrialSplitViewScreen.__init__: Received renderer type: {type(renderer)}, value: {renderer}")
+        # Validate the passed renderer before assigning to the reactive var
+        if not isinstance(renderer, type) or not issubclass(renderer, Static):
+             log.error(f"TrialSplitViewScreen received invalid renderer: {renderer}. Falling back to default.")
+             # Import default renderer locally if needed
+             from geometor.seer_navigator.renderers.solid_grid import SolidGrid
+             renderer_to_use = SolidGrid # Use default SolidGrid class
+        else:
+             renderer_to_use = renderer
+
         self.trial_path = trial_path
-        self.renderer = renderer # Store the renderer passed from the app
+        # Set the validated renderer class AFTER super().__init__ and validation
+        self.renderer = renderer_to_use
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -140,9 +151,10 @@ class TrialSplitViewScreen(Screen):
 
         if new_renderer_class:
             log.info(f"Setting renderer to {renderer_name}")
-            self.renderer = new_renderer_class
+            self.renderer = new_renderer_class # Update the screen's reactive var
             trial_viewer = self.query_one("#trial-viewer-widget", TrialViewer)
-            trial_viewer.renderer = new_renderer_class
+            # Update the renderer_class attribute within the TrialViewer instance
+            trial_viewer.renderer_class = new_renderer_class
             # Trigger a refresh of the TrialViewer's display
             trial_viewer.refresh_display()
             self.app.notify(f"Renderer set to: {renderer_name.capitalize()}")

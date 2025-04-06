@@ -455,7 +455,7 @@ class SessionScreen(Screen):
                 cell_data = row_data[col_index]
             except (ValueError, IndexError):
                 log.error(f"Could not find index for sort key '{sort_key}'")
-                return None
+                return float('-inf') # Return comparable value instead of None
 
             key_str = str(sort_key)
 

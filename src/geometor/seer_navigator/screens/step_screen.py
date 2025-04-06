@@ -1,10 +1,7 @@
 from pathlib import Path
-import json
-import yaml
 import subprocess
 import shutil # To find terminal emulator
 
-from rich.text import Text
 
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
@@ -14,7 +11,6 @@ from textual.widgets import DataTable, Header, Footer, TextArea, ContentSwitcher
 from textual.binding import Binding
 from textual import log
 
-from geometor.seer_navigator.screens.trial_screen import TrialViewer
 # Import the new screen we will create
 from geometor.seer_navigator.screens.trial_split_view_screen import TrialSplitViewScreen
 
@@ -25,9 +21,9 @@ LANGUAGE_MAP = {
     ".json": "json",
     ".yaml": "yaml",
     ".yml": "yaml",
-    ".txt": None, 
+    ".txt": None,
 }
-DEFAULT_THEME = "" 
+# DEFAULT_THEME = "" # Removed unused variable
 
 class StepScreen(Screen):
     """Displays the files within a step folder and their content."""
@@ -304,9 +300,10 @@ class StepScreen(Screen):
 
    def action_open_terminal(self) -> None:
        """Opens a new terminal window in the current step directory."""
-        terminal_commands = [
-            "gnome-terminal",
-            "konsole",
+       # Corrected indentation for the whole method body
+       terminal_commands = [
+           "gnome-terminal",
+           "konsole",
             "xfce4-terminal",
             "lxterminal",
             "mate-terminal",
@@ -343,7 +340,7 @@ class StepScreen(Screen):
             subprocess.Popen([terminal_cmd], cwd=self.step_path)
         except Exception as e:
             log.error(f"Failed to open terminal {terminal_cmd}: {e}")
-            self.app.notify(f"Failed to open terminal: {e}", severity="error")
+           self.app.notify(f"Failed to open terminal: {e}", severity="error")
 
 
    # Removed action_view_images as the binding was removed.
@@ -351,10 +348,11 @@ class StepScreen(Screen):
 
    def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
        """Handle row selection in the DataTable (e.g., by clicking)."""
-        # Ensure the index is valid before selecting
-        if event.cursor_row is not None and 0 <= event.cursor_row < len(self.file_paths):
-            # Use select_row_index to trigger the watch method consistently
-            self.select_row_index(event.cursor_row)
+       # Corrected indentation for the whole method body
+       # Ensure the index is valid before selecting
+       if event.cursor_row is not None and 0 <= event.cursor_row < len(self.file_paths):
+           # Use select_row_index to trigger the watch method consistently
+           self.select_row_index(event.cursor_row)
         else:
             self.selected_file_path = None # Clear if selection is invalid
 

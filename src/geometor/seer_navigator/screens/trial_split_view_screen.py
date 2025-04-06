@@ -1,5 +1,5 @@
 from pathlib import Path
-import json
+# import json # Removed unused import
 
 from textual.app import ComposeResult
 from textual.binding import Binding

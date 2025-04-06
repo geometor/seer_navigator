@@ -289,7 +289,7 @@ class StepScreen(Screen):
                # Pass the path and the current renderer from the app
                split_screen = TrialSplitViewScreen(
                    trial_path=self.selected_file_path,
-                   renderer=self.app.renderer # Pass the app's current renderer
+                   renderer_class_arg=self.app.renderer # Pass the app's current renderer class
                )
                self.app.push_screen(split_screen)
            else:

@@ -58,8 +58,8 @@ class SortModal(ModalScreen): # Changed base class
 
         for col_key, column_obj in columns.items():
             # Create a safe button ID from the ColumnKey's underlying string key
-            # Access the .key attribute of the ColumnKey object
-            column_string_key = col_key.key # Get the actual string key
+            # Convert the ColumnKey object to its string representation
+            column_string_key = str(col_key) # Get the string representation of the ColumnKey
             button_id = f"sort_btn_{column_string_key}" # Use the string key for the ID
             self.button_id_to_column_key[button_id] = col_key # Store the original ColumnKey object
 

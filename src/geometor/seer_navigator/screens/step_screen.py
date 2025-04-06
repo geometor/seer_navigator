@@ -60,12 +60,12 @@ class StepScreen(Screen):
     ContentSwitcher {
         height: 1fr;
     }
-    TextArea, #content-placeholder { /* Removed Markdown */
+    TextArea, #content-placeholder {
         height: 1fr;
         border: none; /* Remove default border if desired */
     }
     /* Center placeholder text */
-    #content-placeholder { /* Renamed placeholder */
+    #content-placeholder {
         content-align: center middle;
         color: $text-muted;
     }
@@ -121,8 +121,7 @@ class StepScreen(Screen):
                         #  theme=DEFAULT_THEME,
                         id="text-viewer" # ID for the TextArea
                     )
-                    # Removed Markdown viewer
-                    yield TrialViewer(id="trial-viewer") # Add TrialViewer instance
+                    # Removed TrialViewer from here
                     yield Static("Select a file to view its content.", id="content-placeholder")
 
         yield Footer()
@@ -176,26 +175,32 @@ class StepScreen(Screen):
         """Called when selected_file_path changes. Updates the content viewer."""
         switcher = self.query_one(ContentSwitcher)
         text_viewer = self.query_one("#text-viewer", TextArea)
-        # Removed markdown_viewer query
-        trial_viewer = self.query_one("#trial-viewer", TrialViewer) # Get TrialViewer
         placeholder = self.query_one("#content-placeholder", Static)
 
         if new_path:
             file_suffix = new_path.suffix.lower()
             file_name = new_path.name
 
-            # Check if it's a trial file
+            # Check if it's a trial file - treat like other text files now
+            # The special handling is moved to action_view_trial_split
             if file_name.endswith("trial.json") or file_name.endswith("trials.json"):
-                log.info(f"Loading TrialViewer for: {new_path}")
-                # Update TrialViewer's path and renderer, then load data
-                trial_viewer.trial_path = new_path
-                trial_viewer.renderer = self.app.renderer # Get current renderer from app
-                trial_viewer.load_and_display()
-                switcher.current = "trial-viewer" # Switch to the trial viewer
+                log.info(f"Displaying JSON content for: {new_path}")
+                try:
+                    content = new_path.read_text()
+                    text_viewer.load_text(content)
+                    text_viewer.language = "json" # Set language to JSON
+                    switcher.current = "text-viewer"
+                    text_viewer.scroll_home(animate=False)
+                except Exception as e:
+                    log.error(f"Error loading trial JSON file {new_path}: {e}")
+                    error_content = f"Error loading file:\n\n{e}"
+                    text_viewer.load_text(error_content)
+                    text_viewer.language = None
+                    switcher.current = "text-viewer"
 
             elif file_suffix == ".png":
                 # Handle PNG files - show placeholder
-                placeholder.update(f"Selected: '{new_path.name}' (PNG)\n\nPress 'i' to view images.")
+                placeholder.update(f"Selected: '{new_path.name}' (PNG)\n\nPress 'i' to view images (if available).") # Updated placeholder text
                 switcher.current = "content-placeholder"
 
             elif file_suffix == ".md":
@@ -240,12 +245,13 @@ class StepScreen(Screen):
                     switcher.current = "text-viewer"
 
         else:
-            # Clear all viewers if no file is selected
+            # Clear viewer if no file is selected
             text_viewer.load_text("")
             text_viewer.language = None
-            # Removed markdown_viewer clear
             placeholder.update("No file selected.") # Reset placeholder
-            switcher.current = "text-viewer" # Default to text viewer when empty
+            # Switch to placeholder when nothing is selected
+            switcher.current = "content-placeholder"
+
 
     def action_cursor_down(self) -> None:
         """Move the cursor down in the DataTable."""
@@ -273,10 +279,28 @@ class StepScreen(Screen):
              # This ensures the watch method runs even if the selection didn't change visually
              self.selected_file_path = None
              self.selected_file_path = current_path
-        pass
+       pass
 
-    def action_open_terminal(self) -> None:
-        """Opens a new terminal window in the current step directory."""
+   def action_view_trial_split(self) -> None:
+       """Pushes a new screen to view trial JSON and grid side-by-side."""
+       if self.selected_file_path:
+           file_name = self.selected_file_path.name
+           if file_name.endswith("trial.json") or file_name.endswith("trials.json"):
+               log.info(f"Pushing TrialSplitViewScreen for {self.selected_file_path}")
+               # Pass the path and the current renderer from the app
+               split_screen = TrialSplitViewScreen(
+                   trial_path=self.selected_file_path,
+                   renderer=self.app.renderer # Pass the app's current renderer
+               )
+               self.app.push_screen(split_screen)
+           else:
+               self.app.notify("Select a 'trial.json' or 'trials.json' file to use this view.", severity="warning")
+       else:
+           self.app.notify("No file selected.", severity="warning")
+
+
+   def action_open_terminal(self) -> None:
+       """Opens a new terminal window in the current step directory."""
         terminal_commands = [
             "gnome-terminal",
             "konsole",
@@ -319,37 +343,11 @@ class StepScreen(Screen):
             self.app.notify(f"Failed to open terminal: {e}", severity="error")
 
 
-    def action_view_images(self) -> None:
-        """Find and open all PNG images in the current step directory using sxiv."""
-        sxiv_cmd = self._check_sxiv()
-        if not sxiv_cmd:
-            return # sxiv not found, notification already shown
+   # Removed action_view_images as the binding was removed.
+   # If you want to keep the functionality but trigger it differently, let me know.
 
-        try:
-            # Find all .png files recursively within the step directory
-            image_files = sorted(list(self.step_path.rglob("*.png")))
-
-            if not image_files:
-                self.app.notify("No PNG images found in this step.", severity="information")
-                return
-
-            # Prepare the command list
-            command = [sxiv_cmd] + [str(img_path) for img_path in image_files]
-
-            log.info(f"Opening {len(image_files)} images with sxiv from {self.step_path}")
-            subprocess.Popen(command)
-
-        except FileNotFoundError:
-            # This case should be caught by _check_sxiv, but handle defensively
-            log.error(f"'sxiv' command not found when trying to execute.")
-            self.app.notify("sxiv not found. Cannot open images.", severity="error")
-        except Exception as e:
-            log.error(f"Error finding or opening images with sxiv from {self.step_path}: {e}")
-            self.app.notify(f"Error viewing images: {e}", severity="error")
-
-
-    def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
-        """Handle row selection in the DataTable (e.g., by clicking)."""
+   def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
+       """Handle row selection in the DataTable (e.g., by clicking)."""
         # Ensure the index is valid before selecting
         if event.cursor_row is not None and 0 <= event.cursor_row < len(self.file_paths):
             # Use select_row_index to trigger the watch method consistently

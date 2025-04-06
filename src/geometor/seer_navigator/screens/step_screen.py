@@ -15,6 +15,8 @@ from textual.binding import Binding
 from textual import log
 
 from geometor.seer_navigator.screens.trial_screen import TrialViewer
+# Import the new screen we will create
+from geometor.seer_navigator.screens.trial_split_view_screen import TrialSplitViewScreen
 
 
 LANGUAGE_MAP = {

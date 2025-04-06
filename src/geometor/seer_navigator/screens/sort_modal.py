@@ -71,7 +71,7 @@ class SortModal(ModalScreen[Union[ColumnKey, None]]):
                 column_label = str(column_obj.label.plain) if hasattr(column_obj.label, 'plain') else str(column_obj.label)
             self.sortable_columns[button_id] = column_label
 
-        log.info(f"SortModal initialized for screen: {parent_screen.__class__.__name__}")
+        # Removed log line referencing parent_screen as it's no longer passed
         log.info(f"Sortable columns prepared: {self.sortable_columns}")
 
 

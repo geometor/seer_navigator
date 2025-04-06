@@ -280,9 +280,9 @@ class StepScreen(Screen):
              self.selected_file_path = current_path
         pass # Corrected indentation
 
-   def action_view_trial_split(self) -> None:
-       """Pushes a new screen to view trial JSON and grid side-by-side."""
-       if self.selected_file_path:
+    def action_view_trial_split(self) -> None:
+        """Pushes a new screen to view trial JSON and grid side-by-side."""
+        if self.selected_file_path:
            file_name = self.selected_file_path.name
            if file_name.endswith("trial.json") or file_name.endswith("trials.json"):
                log.info(f"Pushing TrialSplitViewScreen for {self.selected_file_path}")
@@ -294,22 +294,22 @@ class StepScreen(Screen):
                self.app.push_screen(split_screen)
            else:
                self.app.notify("Select a 'trial.json' or 'trials.json' file to use this view.", severity="warning")
-       else:
+        else:
            self.app.notify("No file selected.", severity="warning")
 
 
-   def action_open_terminal(self) -> None:
-       """Opens a new terminal window in the current step directory."""
-       # Corrected indentation for the whole method body
-       terminal_commands = [
-           "gnome-terminal",
-           "konsole",
-            "xfce4-terminal",
-            "lxterminal",
-            "mate-terminal",
-            "terminator",
-            "xterm",
-            # Add other common Linux terminals if needed
+    def action_open_terminal(self) -> None:
+        """Opens a new terminal window in the current step directory."""
+        # Corrected indentation for the whole method body
+        terminal_commands = [
+            "gnome-terminal",
+            "konsole",
+             "xfce4-terminal",
+             "lxterminal",
+             "mate-terminal",
+             "terminator",
+             "xterm",
+             # Add other common Linux terminals if needed
         ]
         terminal_cmd = None
         for cmd in terminal_commands:
@@ -328,11 +328,11 @@ class StepScreen(Screen):
                  except Exception as e:
                      log.error(f"Failed to open macOS Terminal: {e}")
                      # Fall through to notify error if 'open' failed
-
+ 
             log.error("Could not find a suitable terminal emulator.")
             self.app.notify("Could not find a suitable terminal emulator.", severity="error")
             return
-
+ 
         try:
             log.info(f"Opening terminal '{terminal_cmd}' in {self.step_path}")
             # Most terminals accept --working-directory= or similar, but launching
@@ -340,19 +340,19 @@ class StepScreen(Screen):
             subprocess.Popen([terminal_cmd], cwd=self.step_path)
         except Exception as e:
             log.error(f"Failed to open terminal {terminal_cmd}: {e}")
-           self.app.notify(f"Failed to open terminal: {e}", severity="error")
+            self.app.notify(f"Failed to open terminal: {e}", severity="error")
+ 
+ 
+    # Removed action_view_images as the binding was removed.
+    # If you want to keep the functionality but trigger it differently, let me know.
 
-
-   # Removed action_view_images as the binding was removed.
-   # If you want to keep the functionality but trigger it differently, let me know.
-
-   def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
-       """Handle row selection in the DataTable (e.g., by clicking)."""
-       # Corrected indentation for the whole method body
-       # Ensure the index is valid before selecting
-       if event.cursor_row is not None and 0 <= event.cursor_row < len(self.file_paths):
-           # Use select_row_index to trigger the watch method consistently
-           self.select_row_index(event.cursor_row)
+    def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
+        """Handle row selection in the DataTable (e.g., by clicking)."""
+        # Corrected indentation for the whole method body
+        # Ensure the index is valid before selecting
+        if event.cursor_row is not None and 0 <= event.cursor_row < len(self.file_paths):
+            # Use select_row_index to trigger the watch method consistently
+            self.select_row_index(event.cursor_row)
         else:
             self.selected_file_path = None # Clear if selection is invalid
 

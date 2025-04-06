@@ -496,109 +496,122 @@ class TasksScreen(Screen):
 
         self.table.focus() # Ensure table has focus
 
-    # --- START ADDED SORT METHOD ---
+    # --- START REVISED SORT METHOD ---
     def perform_sort(self, sort_key: ColumnKey) -> None:
-        """Sorts the DataTable by the given column key."""
+        """Sorts the task data and reloads the DataTable."""
         log.info(f"Performing sort on TasksScreen by key: {sort_key}")
 
         # Determine sort direction
         reverse = False
         if self.current_sort_key == sort_key:
-            # If same key, toggle direction
             reverse = not self.current_sort_reverse
         else:
-            # If new key, default to descending
-            reverse = True
+            # Default sort directions (can be customized per column if needed)
+            # Typically descending for numeric/counts, ascending for names
+            key_str = str(sort_key)
+            if key_str in ["SESSIONS", "ERRORS", "TEST", "TRAIN", "STEPS", "BEST", "IN", "OUT", "TOTAL", "WEIGHT", "TIME"]:
+                 reverse = True # Default descending for numeric-like columns
+            else: # TASK
+                 reverse = False # Default ascending for text
 
         self.current_sort_key = sort_key
         self.current_sort_reverse = reverse
 
-        # Define key functions for different columns
-        def get_sort_key(row_data):
-            try:
-                col_index = list(self.table.columns.keys()).index(sort_key)
-                cell_data = row_data[col_index]
-            except (ValueError, IndexError):
-                log.error(f"Could not find index for sort key '{sort_key}'")
-                return None
-
+        # Define key function operating directly on the summary data dict
+        def get_sort_key_from_dict(item):
+            task_id, data_dict = item
             key_str = str(sort_key)
 
             if key_str == "TASK":
-                return cell_data # Simple string sort
+                return task_id
 
-            if key_str in ["SESSIONS", "ERRORS", "TEST", "TRAIN", "STEPS", "BEST", "IN", "OUT", "TOTAL", "WEIGHT"]: # ADDED WEIGHT
-                # Handle numbers (potentially in Text objects)
-                plain_text = cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
-                plain_text = plain_text.replace(',', '') # Remove commas
-                if key_str == "WEIGHT" and plain_text in ["ERR", "?"]: return float('-inf') # Sort weight errors/unknown first
-                if plain_text == "-": return float('-inf') # Sort '-' first
-                try:
-                    return float(plain_text)
-                except ValueError:
-                    log.warning(f"Could not convert '{plain_text}' to float for sorting key '{key_str}'")
-                    return float('-inf') # Sort errors consistently first
+            if key_str == "SESSIONS":
+                # Sort by the number of sessions
+                return len(data_dict.get('sessions', set()))
+
+            if key_str == "ERRORS":
+                # Sort by the count of sessions with errors for this task
+                return data_dict.get('errors', 0)
+
+            if key_str == "TEST":
+                # Sort by count of sessions where test passed
+                return data_dict.get('test_passed', 0)
+
+            if key_str == "TRAIN":
+                 # Sort by count of sessions where train passed
+                return data_dict.get('train_passed', 0)
+
+            if key_str == "STEPS":
+                return data_dict.get('total_steps', 0)
+
+            if key_str == "BEST":
+                # Lower score is better, inf sorts last when ascending
+                score = data_dict.get('best_score', float('inf'))
+                # Return negative score for descending sort (highest score first)
+                # Or handle inf appropriately if reverse=False (lowest score first)
+                # Python's float('inf') comparison handles this correctly with reverse flag.
+                return score
 
             if key_str == "TIME":
-                # Parse HH:MM:SS string into seconds
-                time_str = cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
-                if time_str == "-": return -1
-                try:
-                    parts = list(map(int, time_str.split(':')))
-                    if len(parts) == 3: return parts[0] * 3600 + parts[1] * 60 + parts[2]
-                    else: return float('-inf')
-                except ValueError:
-                    log.warning(f"Could not parse time string '{time_str}' for sorting")
-                    return float('-inf')
+                # Sort by total duration in seconds
+                duration = data_dict.get('total_duration', -1.0)
+                return duration if duration is not None else -1.0
 
-            # Fallback
-            return cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+            if key_str == "IN":
+                return data_dict.get('total_prompt_tokens', 0)
 
-        # Perform the sort
+            if key_str == "OUT":
+                return data_dict.get('total_candidates_tokens', 0)
+
+            if key_str == "TOTAL":
+                return data_dict.get('total_tokens', 0)
+
+            if key_str == "WEIGHT":
+                # Sort valid weights numerically. ERR/?: sort them last when descending, first when ascending.
+                weight = data_dict.get('weight', -2) # Use -2 for not found/default
+                if weight >= 0: return weight
+                # Assign values that sort consistently relative to numbers based on 'reverse'
+                # If reverse (desc), we want ERR/? to be effectively -inf
+                # If not reverse (asc), we want ERR/? to be effectively +inf (or handle separately)
+                # Let's use a simpler approach: map ERR/ ? to values that place them consistently.
+                # Ascending: ERR (-1) < ? (-2) < 0 < positive weights.
+                # Map: ERR -> float('-inf'), ? -> float('-inf') + 1
+                if weight == -1: return float('-inf')      # ERR sorts first (ascending) / last (descending)
+                if weight == -2: return float('-inf') + 1  # ? sorts after ERR (ascending) / before ERR (descending)
+                return float('-inf') # Fallback for unexpected negative values
+
+            # Fallback for unknown column
+            log.error(f"Unknown sort key encountered: {key_str}")
+            return None # Should not happen if modal uses table columns
+
         try:
-            # We need to sort the underlying data (self.tasks_summary) and then reload the table
-            # DataTable.sort() works on the current rows, but we aggregate data dynamically.
+            # 1. Get items from the summary dictionary
+            items_to_sort = list(self.tasks_summary.items())
 
-            # 1. Get the current data into a list of tuples/dicts including the sort key value
-            data_to_sort = []
-            for task_id in self.sorted_task_ids:
-                task_details = self.tasks_summary[task_id]
-                # Create a temporary row structure similar to what get_sort_key expects
-                # This needs to match the order of columns in the table
-                row_tuple = (
-                    task_id, # TASK
-                    Text(str(len(task_details['sessions']))), # SESSIONS
-                    Text(str(task_details['errors'])) if task_details['errors'] > 0 else Text("-"), # ERRORS
-                    Text(str(task_details['test_passed'])), # TEST
-                    Text(str(task_details['train_passed'])), # TRAIN
-                    Text(str(task_details['total_steps'])), # STEPS
-                    Text(self._format_duration(task_details['total_duration'])), # TIME
-                    Text(f"{task_details['best_score']:.2f}" if task_details['best_score'] != float('inf') else "-"), # BEST
-                    Text(f"{task_details['total_prompt_tokens']:,}" if task_details['total_prompt_tokens'] > 0 else "-"), # IN
-                    Text(f"{task_details['total_candidates_tokens']:,}" if task_details['total_candidates_tokens'] > 0 else "-"), # OUT
-                    Text(f"{task_details['total_tokens']:,}" if task_details['total_tokens'] > 0 else "-"), # TOTAL
-                    # ADDED WEIGHT to tuple for sorting
-                    Text(f"{task_details['weight']:,}" if task_details.get('weight', -2) >= 0 else ("ERR" if task_details.get('weight') == -1 else "?")), # WEIGHT
-                )
-                sort_value = get_sort_key(row_tuple)
-                data_to_sort.append((task_id, sort_value))
-
-            # 2. Sort the list based on the calculated sort_value
-            data_to_sort.sort(key=lambda item: item[1], reverse=reverse)
+            # 2. Sort the items using the new key function
+            # Handle potential None return from key function gracefully during sort
+            items_to_sort.sort(key=lambda item: get_sort_key_from_dict(item) or 0, reverse=reverse)
 
             # 3. Update the order of task IDs
-            self.sorted_task_ids = [item[0] for item in data_to_sort]
+            self.sorted_task_ids = [item[0] for item in items_to_sort]
 
             # 4. Reload the table content using the new sorted order
-            self.load_and_display_tasks() # This already clears and repopulates
+            # load_and_display_tasks already calls self.table.clear()
+            self.load_and_display_tasks()
+
+            # Ensure the cursor is reset or maintained appropriately after sort
+            if self.table.row_count > 0:
+                self.table.move_cursor(row=0, animate=False) # Move cursor to top after sort
 
             self.notify(f"Sorted by {str(self.table.columns[sort_key].label)} {'(desc)' if reverse else '(asc)'}")
 
         except Exception as e:
-            log.error(f"Error during TasksScreen sort preparation or reload: {e}")
+            log.exception(f"Error during TasksScreen sort: {e}") # Use log.exception
             self.notify(f"Error sorting table: {e}", severity="error")
-            # Attempt to restore original sort order? Maybe just log.
-            self.sorted_task_ids = sorted(self.tasks_summary.keys()) # Restore default sort
-            self.load_and_display_tasks() # Reload with default sort
-
-    # --- END ADDED SORT METHOD ---
+            # Restore default sort on error
+            self.sorted_task_ids = sorted(self.tasks_summary.keys())
+            # load_and_display_tasks already calls self.table.clear()
+            self.load_and_display_tasks()
+            if self.table.row_count > 0:
+                 self.table.move_cursor(row=0, animate=False) # Reset cursor on error too
+    # --- END REVISED SORT METHOD ---

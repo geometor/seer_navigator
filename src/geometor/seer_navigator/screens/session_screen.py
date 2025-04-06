@@ -441,9 +441,11 @@ class SessionScreen(Screen):
         # Determine sort direction
         reverse = False
         if self.current_sort_key == sort_key:
+            # If same key, toggle direction
             reverse = not self.current_sort_reverse
         else:
-            reverse = False # Default to ascending for new column
+            # If new key, default to descending
+            reverse = True
 
         self.current_sort_key = sort_key
         self.current_sort_reverse = reverse

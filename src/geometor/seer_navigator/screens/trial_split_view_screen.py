@@ -15,14 +15,14 @@ from geometor.seer_navigator.screens.trial_screen import TrialViewer
 from geometor.seer_navigator.renderers.solid_grid import SolidGrid
 
 class TrialSplitViewScreen(Screen):
-    """
-    A screen that displays trial JSON content side-by-side with the
-    rendered TrialViewer grid.
+    A screen that displays Python source code side-by-side with the
+    rendered TrialViewer grid for a set of trials, allowing navigation between them.
     """
 
     BINDINGS = [
-        Binding("h,escape,q", "app.pop_screen", "Back", show=True), # Added 'q'
-        # Add other bindings if needed, e.g., for cycling renderers within this view
+        Binding("h,escape,q", "app.pop_screen", "Back", show=True),
+        Binding("j,down", "next_trial", "Next Trial", show=True),
+        Binding("k,up", "previous_trial", "Previous Trial", show=True),
         Binding("ctrl+s", "set_renderer('solid')", "Solid", show=False),
         Binding("ctrl+c", "set_renderer('char')", "Char", show=False),
         Binding("ctrl+b", "set_renderer('block')", "Block", show=False),
@@ -99,95 +99,122 @@ class TrialSplitViewScreen(Screen):
                     read_only=True,
                     show_line_numbers=True,
                     language="python", # Default to python, will be updated in load_content
-                    id="code-text-area" # Rename ID for clarity
+                    id="code-text-area" # Keep ID
                 )
             with Container(id="trial-viewer-container"):
-                # Pass the reactive variable's value (the class) to TrialViewer
-                # Ensure self.renderer holds the correct class type here
-                if not self.renderer:
-                    # Fallback if renderer is somehow None (shouldn't happen after __init__)
-                    log.error("TrialSplitViewScreen.compose: self.renderer is None, falling back to SolidGrid for TrialViewer.")
-                    from geometor.seer_navigator.renderers.solid_grid import SolidGrid
-                    renderer_for_viewer = SolidGrid
-                else:
-                    renderer_for_viewer = self.renderer
-
-                log.info(f"TrialSplitViewScreen.compose: Instantiating TrialViewer with renderer: {renderer_for_viewer}")
-                # Instantiate TrialViewer here, passing the path and validated renderer class
+                # Instantiate TrialViewer here. It will be configured by load_current_trial
+                # Pass the initial renderer class. Path will be set dynamically.
                 yield TrialViewer(
-                    trial_path=self.trial_path,
-                    renderer=renderer_for_viewer, # Pass the class
+                    trial_path=None, # Initial path is None, set by load_current_trial
+                    renderer=self.renderer, # Pass the class stored on the screen
                     id="trial-viewer-widget"
                 )
         yield Footer()
 
     def on_mount(self) -> None:
-        """Load content when the screen is mounted."""
-        # Update title based on the file being shown in the text area
-        display_file = self.python_file_path if self.python_file_path else self.trial_path
-        self.title = f"Code View: {display_file.name}"
-        self.load_content()
+        """Load the initial trial content when the screen is mounted."""
+        if not self.trial_paths:
+             # If initialized with no paths, show error and potentially pop
+             self.query_one("#code-text-area", TextArea).load_text("Error: No trial files were provided.")
+             self.app.notify("No trial files found to view.", severity="error", timeout=5)
+             # Consider adding a placeholder to the TrialViewer side as well
+             # self.app.call_later(self.app.pop_screen, delay=1.0) # Optionally auto-close
+             return
+        self.load_current_trial() # Load content for index 0
 
-    def load_content(self) -> None:
-        """Loads the Python code (or fallback JSON) into the TextArea and tells TrialViewer to load."""
-        code_viewer = self.query_one("#code-text-area", TextArea) # Use updated ID
-        trial_viewer = self.query_one("#trial-viewer-widget", TrialViewer)
+    def watch_current_index(self, old_index: int, new_index: int) -> None:
+        """Called when current_index changes. Reloads the content."""
+        log.debug(f"Index changed from {old_index} to {new_index}. Reloading trial.")
+        if 0 <= new_index < len(self.trial_paths):
+            self.load_current_trial()
+        else:
+            log.error(f"Attempted to switch to invalid index: {new_index}")
+            # Optionally reset index or show error
+            self.current_index = old_index # Revert to old index
 
-        # Determine which file to load into the text area
-        file_to_load = self.python_file_path
-        language = "python"
-        if not file_to_load or not file_to_load.is_file():
-            log.warning(f"Python file {self.python_file_path} not found. Falling back to trial JSON {self.trial_path}.")
-            file_to_load = self.trial_path # Fallback to trial path
-            language = "json" # Set language to json for fallback
+    def _derive_python_path(self, trial_path: Path) -> Path | None:
+        """Derives the corresponding python file path from a trial path."""
+        if trial_path.name.endswith(".py.trial.json"):
+            python_filename = trial_path.name[:-len(".trial.json")]
+            py_path = trial_path.with_name(python_filename)
+            log.debug(f"Derived Python path {py_path} from {trial_path}")
+            return py_path
+        else:
+            log.warning(f"Could not derive Python filename from {trial_path.name}. Cannot display source.")
+            return None
 
-        # Check if the final file_to_load exists
-        if not file_to_load or not file_to_load.is_file():
-            error_msg = f"Error: Neither Python file nor Trial file found.\nPython attempt: {self.python_file_path}\nTrial file: {self.trial_path}"
-            log.error(error_msg)
-            code_viewer.load_text(error_msg)
-            code_viewer.language = None
-            self.app.notify("Error: Could not load file content.", severity="error")
-            # Optionally clear TrialViewer or show error state
-            # trial_viewer.clear() # Assuming TrialViewer has a clear method
+    def load_current_trial(self) -> None:
+        """Loads the Python code and TrialViewer grid for the current index."""
+        if not self.trial_paths or not (0 <= self.current_index < len(self.trial_paths)):
+            log.error(f"load_current_trial called with invalid index {self.current_index} or empty paths.")
             return
 
-        # Load content into the text area
-        try:
-            content = file_to_load.read_text()
-            code_viewer.load_text(content)
-            code_viewer.language = language
-            code_viewer.scroll_home(animate=False)
-            log.info(f"Loaded {file_to_load.name} into text area.")
-        except Exception as e:
-            log.error(f"Error loading file {file_to_load} into text area: {e}")
-            error_msg = f"Error loading file:\n{file_to_load.name}\n\n{e}"
-            code_viewer.load_text(error_msg)
-            code_viewer.language = None
-            self.app.notify(f"Error loading file: {e}", severity="error")
+        current_trial_path = self.trial_paths[self.current_index]
+        self.current_python_path = self._derive_python_path(current_trial_path)
 
-        # Load TrialViewer using the original trial_path (regardless of text area content)
-        if self.trial_path and self.trial_path.is_file():
-            # Path and renderer are already set during __init__ and passed to yield
-            # We just need to trigger its loading mechanism if it doesn't load automatically on mount
-            # (TrialViewer's on_mount should call load_and_display)
-            # If TrialViewer needs an explicit call after mount:
+        # Update Title
+        total_trials = len(self.trial_paths)
+        display_name = self.current_python_path.name if self.current_python_path else current_trial_path.name
+        self.title = f"Trial ({self.current_index + 1}/{total_trials}): {display_name}"
+
+        # --- Load Code into TextArea ---
+        code_viewer = self.query_one("#code-text-area", TextArea)
+        if self.current_python_path and self.current_python_path.is_file():
             try:
-                # TrialViewer's on_mount should handle its loading if path/renderer are set
-                # If explicit loading is needed after mount/path change:
-                trial_viewer.load_and_display()
-                log.info(f"Triggered TrialViewer load for {self.trial_path.name}.")
+                content = self.current_python_path.read_text()
+                code_viewer.load_text(content)
+                code_viewer.language = "python"
+                code_viewer.scroll_home(animate=False)
+                log.info(f"Loaded code from {self.current_python_path.name}")
             except Exception as e:
-                 log.error(f"Error loading TrialViewer for {self.trial_path}: {e}")
-                 self.app.notify(f"Error loading grid view: {e}", severity="error")
-                 # Optionally display an error within the TrialViewer widget itself
+                log.error(f"Error loading Python file {self.current_python_path}: {e}")
+                code_viewer.load_text(f"# Error loading file:\n# {self.current_python_path.name}\n\n{e}")
+                code_viewer.language = None
+        elif self.current_python_path:
+            # Derived path exists but file doesn't
+             log.warning(f"Python file not found: {self.current_python_path}")
+             code_viewer.load_text(f"# Python file not found:\n# {self.current_python_path.name}")
+             code_viewer.language = None
         else:
-            log.error(f"Trial file {self.trial_path} not found for TrialViewer.")
+            # Could not derive python path
+            code_viewer.load_text(f"# Could not determine Python source for:\n# {current_trial_path.name}")
+            code_viewer.language = None
+
+
+        # --- Load Grid into TrialViewer ---
+        trial_viewer = self.query_one("#trial-viewer-widget", TrialViewer)
+        if current_trial_path.is_file():
+            try:
+                # Update the path and renderer class on the existing TrialViewer instance
+                trial_viewer.trial_path = current_trial_path
+                trial_viewer.renderer = self.renderer # Ensure it has the correct class
+                trial_viewer.load_and_display() # Tell it to reload based on new path/renderer
+                log.info(f"Loaded trial grid from {current_trial_path.name}")
+            except Exception as e:
+                 log.error(f"Error loading TrialViewer for {current_trial_path}: {e}")
+                 self.app.notify(f"Error loading grid view: {e}", severity="error")
+                 # Optionally display an error within the TrialViewer widget itself (e.g., clear it)
+                 # trial_viewer.clear_display() # Assuming such a method exists
+        else:
+            log.error(f"Trial file {current_trial_path} not found for TrialViewer.")
             # Optionally clear TrialViewer or show error state
-            # trial_viewer.clear()
+            # trial_viewer.clear_display()
 
+    def action_next_trial(self) -> None:
+        """Go to the next trial in the list."""
+        if self.current_index < len(self.trial_paths) - 1:
+            self.current_index += 1
+        else:
+            self.app.bell() # Optional feedback
 
-    # --- Renderer Cycling Actions ---
+    def action_previous_trial(self) -> None:
+        """Go to the previous trial in the list."""
+        if self.current_index > 0:
+            self.current_index -= 1
+        else:
+            self.app.bell() # Optional feedback
+
+    # --- Renderer Cycling Actions --- (Keep as is, but ensure TrialViewer uses self.renderer)
     # These actions allow changing the renderer within the split view
     def action_set_renderer(self, renderer_name: str) -> None:
         """Sets the grid renderer type for the TrialViewer."""

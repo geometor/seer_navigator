@@ -281,21 +281,30 @@ class StepScreen(Screen):
         pass # Corrected indentation
 
     def action_view_trial_split(self) -> None:
-        """Pushes a new screen to view trial JSON and grid side-by-side."""
-        if self.selected_file_path:
-           file_name = self.selected_file_path.name
-           if file_name.endswith("trial.json") or file_name.endswith("trials.json"):
-               log.info(f"Pushing TrialSplitViewScreen for {self.selected_file_path}")
-               # Pass the path and the current renderer from the app
-               split_screen = TrialSplitViewScreen(
-                   trial_path=self.selected_file_path,
-                   renderer_class_arg=self.app.renderer # Pass the app's current renderer class
-               )
-               self.app.push_screen(split_screen)
-           else:
-               self.app.notify("Select a 'trial.json' or 'trials.json' file to use this view.", severity="warning")
-        else:
-           self.app.notify("No file selected.", severity="warning")
+        """Finds all trial files in the current step and pushes TrialSplitViewScreen."""
+        try:
+            trial_files = sorted([
+                f for f in self.step_path.iterdir()
+                if f.is_file() and (f.name.endswith(".trial.json") or f.name.endswith("trials.json"))
+            ])
+
+            if not trial_files:
+                self.app.notify("No '.trial.json' files found in this step.", severity="warning")
+                return
+
+            log.info(f"Found {len(trial_files)} trial files in step {self.step_name}. Pushing TrialSplitViewScreen.")
+            split_screen = TrialSplitViewScreen(
+                trial_paths=trial_files, # Pass the list of paths
+                renderer_class_arg=self.app.renderer # Pass the app's current renderer class
+            )
+            self.app.push_screen(split_screen)
+
+        except FileNotFoundError:
+             self.app.notify("Step directory not found.", severity="error")
+             log.error(f"Step directory not found when searching for trials: {self.step_path}")
+        except Exception as e:
+             self.app.notify(f"Error finding trial files: {e}", severity="error")
+             log.error(f"Error finding trial files in {self.step_path}: {e}")
 
 
     def action_open_terminal(self) -> None:

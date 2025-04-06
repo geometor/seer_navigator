@@ -89,15 +89,14 @@ class SortModal(ModalScreen[Union[ColumnKey, None]]):
         # Use Container instead of Vertical for more control if needed, but Vertical works
         with Vertical(id="dialog"):
             yield Label("Sort by which column?")
-            # Create a ListView
-            list_view = ListView(id="sort-list")
-            for label, key in self.column_options:
-                # Create a ListItem containing a Label
-                item = ListItem(Label(label))
-                # Store the actual ColumnKey object as a custom attribute on the ListItem
-                item.sort_key = key
-                list_view.append(item)
-            yield list_view
+            # Yield the ListView first
+            with ListView(id="sort-list"):
+                # Yield each ListItem as a child of the ListView
+                for label, key in self.column_options:
+                    item = ListItem(Label(label))
+                    # Store the actual ColumnKey object as a custom attribute on the ListItem
+                    item.sort_key = key
+                    yield item
             # Consider adding a Cancel button or relying solely on Escape binding
             # yield Button("Cancel", id="cancel", variant="default")
 

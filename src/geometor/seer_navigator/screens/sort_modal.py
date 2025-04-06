@@ -57,10 +57,11 @@ class SortModal(ModalScreen): # Changed base class
         self.sortable_columns: Dict[str, str] = {} # Store {button_id: column_label}
 
         for col_key, column_obj in columns.items():
-            # Create a safe button ID from the ColumnKey (which is a string)
-            # Use col_key directly as it's the string key.
-            button_id = f"sort_btn_{col_key}"
-            self.button_id_to_column_key[button_id] = col_key
+            # Create a safe button ID from the ColumnKey's underlying string key
+            # Access the .key attribute of the ColumnKey object
+            column_string_key = col_key.key # Get the actual string key
+            button_id = f"sort_btn_{column_string_key}" # Use the string key for the ID
+            self.button_id_to_column_key[button_id] = col_key # Store the original ColumnKey object
 
             # Get column label safely
             column_label = "Unknown"

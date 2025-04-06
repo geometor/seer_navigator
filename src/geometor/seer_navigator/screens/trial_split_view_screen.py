@@ -206,8 +206,8 @@ class TrialSplitViewScreen(Screen):
             log.info(f"Setting renderer to {renderer_name}")
             self.renderer = new_renderer_class # Update the screen's reactive var
             trial_viewer = self.query_one("#trial-viewer-widget", TrialViewer)
-            # Update the renderer_class attribute within the TrialViewer instance
-            trial_viewer.renderer_class = new_renderer_class
+            # Update the 'renderer' attribute (which holds the class) within the TrialViewer instance
+            trial_viewer.renderer = new_renderer_class
             # Trigger a refresh of the TrialViewer's display
             trial_viewer.refresh_display()
             self.app.notify(f"Renderer set to: {renderer_name.capitalize()}")

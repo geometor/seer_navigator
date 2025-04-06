@@ -90,6 +90,7 @@ class StepScreen(Screen):
         Binding("enter", "select_file", "Select File", show=False), 
         Binding("h", "app.pop_screen", "Back", show=True),
         Binding("r", "open_terminal", "Open Terminal", show=True), 
+        Binding("v", "view_trial_split", "View Trial Split", show=True), # Added binding
         # REMOVED Binding("i", "view_images", "View Images", show=True),
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), 
         # Binding("]", "next_sibling", "Next Sibling", show=True),     

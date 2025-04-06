@@ -414,7 +414,7 @@ class TasksScreen(Screen):
         )
         trials_table.add_row(
             Text("errors:", justify="right"),
-            Text(str(tasks_failed_all_sessions), justify="right"),
+            Text(str(tasks_failed_all_sessions), justify="right"), # Use the count of tasks with errors
             Text(error_percent_str, justify="right") # Add percentage
         )
         # Removed best score row

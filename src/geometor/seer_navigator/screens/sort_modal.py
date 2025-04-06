@@ -44,7 +44,8 @@ class SortModal(ModalScreen[Union[ColumnKey, None]]):
     }
 
     #sort-list > ListItem {
-        padding: 1;
+        padding: 0 1; /* Remove vertical padding, keep horizontal */
+        height: 1; /* Explicitly set height to 1 */
     }
 
     #sort-list > ListItem.--highlight {

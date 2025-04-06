@@ -21,7 +21,7 @@ class TrialSplitViewScreen(Screen):
     """
 
     BINDINGS = [
-        Binding("h,escape", "app.pop_screen", "Back", show=True),
+        Binding("h,escape,q", "app.pop_screen", "Back", show=True), # Added 'q'
         # Add other bindings if needed, e.g., for cycling renderers within this view
         Binding("ctrl+s", "set_renderer('solid')", "Solid", show=False),
         Binding("ctrl+c", "set_renderer('char')", "Char", show=False),

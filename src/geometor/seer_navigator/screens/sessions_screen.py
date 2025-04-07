@@ -65,7 +65,7 @@ class SessionsScreen(Screen):
 
     def __init__(self, sessions_root: Path) -> None:
         super().__init__()
-        self.sessions_root = Path(sessions_root)
+        self.sessions_root = Path(sessions_root).absolute()
         self.session_dirs = []  # Store sibling dirs here
         self.session_index = 0
         # REMOVED sxiv check state attributes

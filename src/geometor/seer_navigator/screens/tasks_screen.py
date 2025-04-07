@@ -61,7 +61,7 @@ class TasksScreen(Screen):
 
     def __init__(self, sessions_root: Path) -> None:
         super().__init__()
-        self.sessions_root = sessions_root
+        self.sessions_root = Path(sessions_root).absolute()
         self.tasks_summary = defaultdict(lambda: {
             'sessions': set(),
             'errors': 0,
@@ -96,8 +96,7 @@ class TasksScreen(Screen):
 
     def on_mount(self) -> None:
         """Called when the screen is mounted."""
-        self.title = "SEER Tasks"
-        self.sub_title = f"{self.sessions_root.parent.name}"
+        self.title = f"SEER Tasks • {self.sessions_root.name}"
 
         # Add columns to summary tables
         summary_table = self.query_one("#summary-table", DataTable)

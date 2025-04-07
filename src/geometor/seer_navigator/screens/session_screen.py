@@ -65,7 +65,7 @@ class SessionScreen(Screen):
 
     def __init__(self, session_path: Path, task_dirs: list[Path]) -> None:
         super().__init__()
-        self.session_path = session_path
+        self.session_path = session_path.absolute()
         self.task_dirs = task_dirs  # Receive task_dirs
         self.task_index = 0
         # REMOVED sxiv check state attributes

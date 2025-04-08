@@ -1,3 +1,5 @@
+"""Provides the ImageGrid renderer using PIL and rich-pixels."""
+
 from geometor.seer_navigator.renderers.base_grid import *
 
 class ImageGrid(BaseGrid):

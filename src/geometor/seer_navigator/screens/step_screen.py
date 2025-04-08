@@ -1,3 +1,5 @@
+"""Defines the StepScreen for browsing files within a task step."""
+
 from pathlib import Path
 import subprocess
 import shutil # To find terminal emulator

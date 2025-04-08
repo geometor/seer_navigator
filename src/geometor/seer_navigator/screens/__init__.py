@@ -1,3 +1,5 @@
+"""Screen definitions for the Seer Navigator application."""
+
 from .sessions_screen import SessionsScreen
 from .session_screen import SessionScreen
 from .task_screen import TaskScreen

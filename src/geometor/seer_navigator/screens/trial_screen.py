@@ -1,3 +1,5 @@
+"""Defines the TrialViewer widget for displaying trial input/output grids."""
+
 import json
 from pathlib import Path
 from typing import List, Tuple, Any

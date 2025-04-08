@@ -1,3 +1,5 @@
+"""Provides the BaseGrid class, the foundation for grid rendering widgets."""
+
 from textual.widgets import Static
 from textual.color import Color  # Import the Color class
 

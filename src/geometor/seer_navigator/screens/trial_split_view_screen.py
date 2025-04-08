@@ -1,3 +1,5 @@
+"""Defines the TrialSplitViewScreen for showing code alongside trial grids."""
+
 from pathlib import Path
 # import json # Removed unused import
 

@@ -1,3 +1,5 @@
+"""Defines the main SessionsNavigator Textual App class."""
+
 from textual.app import App, ComposeResult
 from textual.widgets import Static
 from textual.containers import Container # Import Container

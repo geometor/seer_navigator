@@ -1,3 +1,5 @@
+"""Defines the main TasksNavigator Textual App class."""
+
 import argparse
 from pathlib import Path
 import subprocess # ADDED import

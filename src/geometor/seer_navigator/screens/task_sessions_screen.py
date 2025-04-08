@@ -1,3 +1,5 @@
+"""Defines the TaskSessionsScreen for viewing a specific task across sessions."""
+
 import os
 from pathlib import Path
 from datetime import timedelta # Import timedelta

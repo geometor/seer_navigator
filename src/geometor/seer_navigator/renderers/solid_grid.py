@@ -1,3 +1,5 @@
+"""Provides the SolidGrid renderer using solid block characters."""
+
 from geometor.seer_navigator.renderers.base_grid import *
 #  from geometor.seer.tasks.tasks import Task  # Import Task
 from rich.text import Text

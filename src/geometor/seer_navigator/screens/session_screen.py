@@ -1,3 +1,5 @@
+"""Defines the SessionScreen for displaying tasks within a single session."""
+
 import os
 from pathlib import Path
 from datetime import timedelta # Import timedelta

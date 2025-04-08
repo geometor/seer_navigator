@@ -1,3 +1,5 @@
+"""Provides the TinyGrid renderer using Unicode half-block characters."""
+
 from textual.color import Color
 from rich.text import Text
 from .base_grid import BaseGrid

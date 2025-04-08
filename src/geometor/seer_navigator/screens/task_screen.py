@@ -1,3 +1,5 @@
+"""Defines the TaskScreen for displaying steps and summary of a single task."""
+
 import re
 from rich.text import Text
 from datetime import timedelta # Import timedelta

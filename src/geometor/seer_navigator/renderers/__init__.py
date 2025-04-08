@@ -1,3 +1,5 @@
+"""Grid rendering widgets for the Seer Navigator."""
+
 from .base_grid import BaseGrid
 from .solid_grid import SolidGrid
 from .char_grid import CharGrid

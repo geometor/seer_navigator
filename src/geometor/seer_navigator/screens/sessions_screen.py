@@ -1,3 +1,5 @@
+"""Defines the SessionsScreen, the initial screen listing all sessions."""
+
 from pathlib import Path
 from datetime import timedelta # Import timedelta for duration calculation
 

@@ -1,3 +1,5 @@
+"""Defines the TasksScreen for displaying aggregated data for all unique tasks."""
+
 import json
 from pathlib import Path
 from collections import defaultdict

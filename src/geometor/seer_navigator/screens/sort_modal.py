@@ -1,3 +1,5 @@
+"""Defines the SortModal screen for selecting a DataTable column to sort."""
+
 from typing import Dict, Union, List, Tuple # Added List, Tuple
 
 from textual.app import ComposeResult

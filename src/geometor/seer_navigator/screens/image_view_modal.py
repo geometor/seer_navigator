@@ -1,3 +1,5 @@
+"""Defines the ImageViewModal screen for selecting image viewing filters."""
+
 from pathlib import Path
 
 from textual.app import ComposeResult

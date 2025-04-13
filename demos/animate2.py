@@ -56,6 +56,7 @@ class GridAnimator(Static):
     current_grid_state: reactive[List[List[int]]] = reactive([])
     renderer_class: reactive[Type[BaseGrid]] = reactive(RENDERERS[0]) # Start with the first renderer
     animating: reactive[bool] = reactive(False)
+    _renderer: Optional[BaseGrid] = None # Initialize renderer instance variable
 
     def __init__(self, input_g: List[List[int]], output_g: List[List[int]], **kwargs):
         super().__init__(**kwargs)
@@ -66,10 +67,7 @@ class GridAnimator(Static):
         self.interval = DEFAULT_INTERVAL
         # Initialize current_grid_state directly in __init__
         self.current_grid_state = copy.deepcopy(input_g)
-        
-        # Create a renderer instance immediately, but don't display yet
-        self._renderer = None
-        self._initialize_renderer()
+        # Renderer will be initialized in on_mount via update_display
 
     def _initialize_renderer(self) -> None:
         """Initialize the renderer instance."""

@@ -1,4 +1,3 @@
-
 import random
 import time
 from pathlib import Path
@@ -49,7 +48,6 @@ except ImportError:
 
 DEFAULT_INTERVAL = 0.05 # Animation speed (seconds per step)
 
-# --- Animation Widget ---
 class GridAnimator(Static):
     """Widget to display and animate the grid transition."""
 
@@ -68,24 +66,38 @@ class GridAnimator(Static):
         self.interval = DEFAULT_INTERVAL
         # Initialize current_grid_state directly in __init__
         self.current_grid_state = copy.deepcopy(input_g)
+        
+        # Create a renderer instance immediately, but don't display yet
+        self._renderer = None
+        self._initialize_renderer()
+
+    def _initialize_renderer(self) -> None:
+        """Initialize the renderer instance."""
+        try:
+            # Create a new renderer instance with the grid as first argument
+            self._renderer = self.renderer_class(self.current_grid_state)
+            log.info(f"Successfully created renderer: {self.renderer_class.__name__}")
+        except Exception as e:
+            log.error(f"Failed to initialize renderer: {e}", exc_info=True)
+            self._renderer = None
 
     def on_mount(self) -> None:
         """Initialize state when mounted."""
-        # Initialize directly here instead of calling reset_animation
-        # This avoids potential timing issues with method resolution
+        # Calculate differences between input and output grids
         self._diff_indices = self._calculate_diff()
         self.animating = False
         
-        # Create an initial renderer instance and update the display
-        self._update_display_with_new_renderer()
+        # Update the display
+        self.update_display()
         
-        # Set the subtitle
+        # Set UI elements if app is available
         if hasattr(self, 'app') and self.app:
-            self.app.sub_title = f"Ready ({self.renderer_class.__name__})"
+            renderer_name = getattr(self.renderer_class, '__name__', 'Unknown')
+            self.app.sub_title = f"Ready ({renderer_name})"
             
-        # Notify if grids are identical
-        if not self._diff_indices and hasattr(self, 'app') and self.app:
-            self.app.notify("Input and Output grids are identical.")
+            # Notify if grids are identical
+            if not self._diff_indices:
+                self.app.notify("Input and Output grids are identical.")
 
     def _calculate_diff(self) -> List[Tuple[int, int]]:
         """Find coordinates where input and output grids differ."""
@@ -101,57 +113,57 @@ class GridAnimator(Static):
         log.info(f"Calculated {len(diff)} differing cells.")
         return diff
 
-    def _create_renderer(self) -> Static:
-        """Create a renderer instance with the current grid state."""
-        try:
-            log.info(f"Creating renderer of type {self.renderer_class.__name__}")
-            # Try to create the renderer with the grid data as a positional argument
-            return self.renderer_class(self.current_grid_state)
-        except Exception as e:
-            log.error(f"Error creating renderer: {e}", exc_info=True)
-            # Fall back to a simple text representation
-            grid_text = "\n".join(" ".join(str(cell) for cell in row) for row in self.current_grid_state)
-            return Static(f"Renderer Error: {e}\n\nGrid Data:\n{grid_text}")
-
-    def _update_display_with_new_renderer(self) -> None:
-        """Create a new renderer and update the display with it."""
-        log.info("Updating display with new renderer")
-        try:
-            # Create the renderer
-            renderer = self._create_renderer()
-            
-            # Get the rendered content
-            if hasattr(renderer, 'render'):
-                content = renderer.render()
-                self.update(content)
-            else:
-                # If it's a Static or has no render method, use it directly
-                self.update(renderer)
-        except Exception as e:
-            log.error(f"Display update error: {e}", exc_info=True)
-            self.update(f"Error updating display: {e}")
-
     def update_display(self) -> None:
         """Update the display with the current grid state."""
         if not self.current_grid_state:
             self.update("Grid data is empty.")
             return
             
-        log.info("--- Updating Display ---")
-        self._update_display_with_new_renderer()
+        try:
+            if self._renderer is None:
+                self._initialize_renderer()
+                
+            if self._renderer:
+                # Set the grid data on the existing renderer
+                self._renderer.grid = self.current_grid_state
+                
+                # Get the rendered content
+                if hasattr(self._renderer, 'render'):
+                    content = self._renderer.render()
+                    self.update(content)
+                else:
+                    # If it doesn't have a render method, update with simple text
+                    grid_text = "\n".join(" ".join(str(cell) for cell in row) for row in self.current_grid_state)
+                    self.update(f"Grid Data:\n{grid_text}")
+            else:
+                # Fallback if renderer creation failed
+                grid_text = "\n".join(" ".join(str(cell) for cell in row) for row in self.current_grid_state)
+                self.update(f"Renderer Error - Using Text Display:\n\n{grid_text}")
+        except Exception as e:
+            log.error(f"Display update error: {e}", exc_info=True)
+            self.update(f"Error updating display: {e}")
 
-    # Reactive watchers
+    # Watch for changes to renderer_class
+    def watch_renderer_class(self, old_class, new_class) -> None:
+        """Update renderer when class changes."""
+        log.info(f"Renderer changed to: {new_class.__name__}")
+        # Create a new renderer instance with the new class
+        try:
+            self._renderer = new_class(self.current_grid_state)
+            self.update_display()
+        except Exception as e:
+            log.error(f"Error creating new renderer: {e}", exc_info=True)
+            self._renderer = None
+            grid_text = "\n".join(" ".join(str(cell) for cell in row) for row in self.current_grid_state)
+            self.update(f"Renderer Creation Error: {e}\n\n{grid_text}")
+
+    # Watch for changes to current_grid_state
     def watch_current_grid_state(self, old_state, new_state) -> None:
         """Update display when grid state changes."""
         if new_state:
             self.update_display()
 
-    def watch_renderer_class(self, old_class, new_class) -> None:
-        """Update display when renderer changes."""
-        log.info(f"Renderer changed to: {new_class.__name__}")
-        self.update_display()
-
-    # Animation methods
+    # Animation methods - unchanged
     def step_animation(self) -> None:
         """Perform one step of the animation."""
         if not self._diff_indices:
@@ -180,7 +192,8 @@ class GridAnimator(Static):
             else:
                 self._animation_timer = self.set_interval(self.interval, self.step_animation)
             if hasattr(self, 'app') and self.app:
-                self.app.sub_title = f"Animating ({self.renderer_class.__name__}) - Speed: {self.interval:.2f}s"
+                renderer_name = getattr(self.renderer_class, '__name__', 'Unknown')
+                self.app.sub_title = f"Animating ({renderer_name}) - Speed: {self.interval:.2f}s"
         elif not self._diff_indices:
             log.info("Animation already finished or no differences.")
             if hasattr(self, 'app') and self.app:
@@ -194,7 +207,8 @@ class GridAnimator(Static):
             if self._animation_timer:
                 self._animation_timer.pause()
             if hasattr(self, 'app') and self.app:
-                self.app.sub_title = f"Paused ({self.renderer_class.__name__})"
+                renderer_name = getattr(self.renderer_class, '__name__', 'Unknown')
+                self.app.sub_title = f"Paused ({renderer_name})"
 
     def reset_animation(self) -> None:
         """Reset the animation to the initial state."""
@@ -209,7 +223,8 @@ class GridAnimator(Static):
         self.animating = False
         self.update_display()
         if hasattr(self, 'app') and self.app:
-            self.app.sub_title = f"Ready ({self.renderer_class.__name__})"
+            renderer_name = getattr(self.renderer_class, '__name__', 'Unknown')
+            self.app.sub_title = f"Ready ({renderer_name})"
         if not self._diff_indices and hasattr(self, 'app') and self.app:
             self.app.notify("Input and Output grids are identical.")
 
@@ -224,7 +239,87 @@ class GridAnimator(Static):
                 self._animation_timer = None
             self.start_animation()
         elif hasattr(self, 'app') and self.app:
-            self.app.sub_title = f"Paused ({self.renderer_class.__name__}) - Speed: {self.interval:.2f}s"
+            renderer_name = getattr(self.renderer_class, '__name__', 'Unknown')
+            self.app.sub_title = f"Paused ({renderer_name}) - Speed: {self.interval:.2f}s"
+
+
+# --- Textual App ---
+class GridAnimatorApp(App):
+    """Textual app to animate grid transitions."""
+
+    CSS_PATH = None # Add if you have specific CSS
+    BINDINGS = [
+        Binding("q", "quit", "Quit"),
+        Binding("space", "toggle_animation", "Start/Pause"),
+        Binding("r", "reset_animation", "Reset"),
+        Binding("n", "cycle_renderer", "Next Renderer"),
+        Binding("p", "prev_renderer", "Prev Renderer"),
+        Binding("+", "speed_up", "Faster"),
+        Binding("-", "slow_down", "Slower"),
+    ]
+
+    def __init__(self, input_grid_data: List[List[int]], output_grid_data: List[List[int]]):
+        super().__init__()
+        self.input_grid_data = input_grid_data
+        self.output_grid_data = output_grid_data
+        self.renderer_index = 0
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        # Pass initial data to the animator widget
+        yield GridAnimator(self.input_grid_data, self.output_grid_data, id="grid-animator")
+        yield Footer()
+
+    def on_mount(self) -> None:
+        """Set initial title."""
+        self.title = "Grid Transition Animator"
+        self.sub_title = f"Ready ({RENDERERS[self.renderer_index].__name__})"
+
+    # --- Actions ---
+    def action_quit(self) -> None:
+        """Quit the application."""
+        self.exit()
+
+    def action_toggle_animation(self) -> None:
+        """Start or pause the animation."""
+        animator = self.query_one(GridAnimator)
+        if animator.animating:
+            animator.pause_animation()
+        else:
+            animator.start_animation()
+
+    def action_reset_animation(self) -> None:
+        """Reset the animation to the beginning."""
+        animator = self.query_one(GridAnimator)
+        animator.reset_animation()
+
+    def action_cycle_renderer(self) -> None:
+        """Switch to the next renderer."""
+        self.renderer_index = (self.renderer_index + 1) % len(RENDERERS)
+        animator = self.query_one(GridAnimator)
+        animator.renderer_class = RENDERERS[self.renderer_index]
+        # Update subtitle
+        state = "Animating" if animator.animating else ("Paused" if animator._animation_timer else "Ready")
+        self.sub_title = f"{state} ({animator.renderer_class.__name__}) - Speed: {animator.interval:.2f}s"
+
+    def action_prev_renderer(self) -> None:
+        """Switch to the previous renderer."""
+        self.renderer_index = (self.renderer_index - 1 + len(RENDERERS)) % len(RENDERERS)
+        animator = self.query_one(GridAnimator)
+        animator.renderer_class = RENDERERS[self.renderer_index]
+        # Update subtitle
+        state = "Animating" if animator.animating else ("Paused" if animator._animation_timer else "Ready")
+        self.sub_title = f"{state} ({animator.renderer_class.__name__}) - Speed: {animator.interval:.2f}s"
+
+    def action_speed_up(self) -> None:
+        """Decrease animation interval (faster)."""
+        animator = self.query_one(GridAnimator)
+        animator.set_speed(animator.interval / 1.5) # Decrease interval
+
+    def action_slow_down(self) -> None:
+        """Increase animation interval (slower)."""
+        animator = self.query_one(GridAnimator)
+        animator.set_speed(animator.interval * 1.5) # Increase interval
 
 
 # --- Main Execution ---

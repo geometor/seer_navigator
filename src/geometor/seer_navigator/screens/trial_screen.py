@@ -90,6 +90,13 @@ class TrialViewer(ScrollableContainer):
         text-align: center;
         margin-bottom: 1;
     }
+    /* Add style for the individual grid renderer cells */
+    .grid-renderer-cell {
+        overflow-x: scroll; /* Enable horizontal scrolling */
+        overflow-y: hidden; /* Prevent vertical scrolling within the cell */
+        height: auto; /* Let content determine height */
+        /* The TextualGrid layout will determine the width */
+    }
     """
 
     def __init__(self, trial_path: Path | None = None, renderer: type[Static] = SolidGrid, **kwargs) -> None:
@@ -214,9 +221,10 @@ class TrialViewer(ScrollableContainer):
                 # Use the aliased TextualGrid for layout
                 trial_grid = TextualGrid(
                     self._create_details_table(trial),
-                    current_renderer(input_grid_data), # Pass numpy array or []
-                    current_renderer(expected_grid_data), # Pass numpy array or []
-                    current_renderer(actual_grid_data), # Pass numpy array or []
+                    # Add the 'grid-renderer-cell' class here
+                    current_renderer(input_grid_data, classes="grid-renderer-cell"),
+                    current_renderer(expected_grid_data, classes="grid-renderer-cell"),
+                    current_renderer(actual_grid_data, classes="grid-renderer-cell"),
                     classes="trial-grid"
                     # id=f"train-trial-{i}" # REMOVED ID
                 )
@@ -240,9 +248,10 @@ class TrialViewer(ScrollableContainer):
                 # Use the aliased TextualGrid for layout
                 trial_grid = TextualGrid(
                     self._create_details_table(trial),
-                    current_renderer(input_grid_data), # Pass numpy array or []
-                    current_renderer(expected_grid_data), # Pass numpy array or []
-                    current_renderer(actual_grid_data), # Pass numpy array or []
+                    # Add the 'grid-renderer-cell' class here
+                    current_renderer(input_grid_data, classes="grid-renderer-cell"),
+                    current_renderer(expected_grid_data, classes="grid-renderer-cell"),
+                    current_renderer(actual_grid_data, classes="grid-renderer-cell"),
                     classes="trial-grid"
                     # id=f"test-trial-{i}" # REMOVED ID
                 )

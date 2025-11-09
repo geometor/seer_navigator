@@ -1,4 +1,4 @@
-from photon_platform.sphinxilator.global_conf import *
+from photon_platform.publish.global_conf import *
 import geometor.seer_navigator as module
 
 version = module.__version__

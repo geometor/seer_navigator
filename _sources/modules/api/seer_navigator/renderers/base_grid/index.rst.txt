@@ -1,0 +1,45 @@
+seer_navigator.renderers.base_grid
+==================================
+
+.. py:module:: seer_navigator.renderers.base_grid
+
+.. autoapi-nested-parse::
+
+   Provides the BaseGrid class, the foundation for grid rendering widgets.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.renderers.base_grid.BaseGrid
+
+
+Module Contents
+---------------
+
+.. py:class:: BaseGrid(grid, **kwargs)
+
+   Bases: :py:obj:`textual.widgets.Static`
+
+
+   Base widget class for rendering the colored grid.
+
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: rows
+
+
+   .. py:attribute:: cols
+
+
+   .. py:method:: get_color(cell_value: int) -> textual.color.Color
+
+      Gets a Textual Color object for the given cell value.
+
+
+

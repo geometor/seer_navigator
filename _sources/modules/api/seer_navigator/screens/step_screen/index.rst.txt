@@ -1,0 +1,224 @@
+seer_navigator.screens.step_screen
+==================================
+
+.. py:module:: seer_navigator.screens.step_screen
+
+.. autoapi-nested-parse::
+
+   Defines the StepScreen for browsing files within a task step.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   seer_navigator.screens.step_screen.LANGUAGE_MAP
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.screens.step_screen.StepScreen
+
+
+Module Contents
+---------------
+
+.. py:data:: LANGUAGE_MAP
+
+.. py:class:: StepScreen(session_path: pathlib.Path, task_path: pathlib.Path, step_path: pathlib.Path)
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   Displays the files within a step folder and their content.
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             Screen {
+                 layers: base overlay;
+             }
+         
+             Horizontal {
+                 height: 1fr;
+             }
+         
+             #file-list-container {
+                 width: 30%;
+                 border-right: thick $accent;
+                 height: 1fr;
+                 overflow-y: auto; /* Ensure DataTable scrolls if needed */
+             }
+         
+             #file-content-container {
+                 width: 70%;
+                 height: 1fr;
+             }
+         
+             DataTable {
+                height: 100%; /* Make DataTable fill its container */
+                width: 100%;
+             }
+         
+             /* Ensure ContentSwitcher and its children fill the container */
+             ContentSwitcher {
+                 height: 1fr;
+             }
+             TextArea, #content-placeholder {
+                 height: 1fr;
+                 border: none; /* Remove default border if desired */
+             }
+             /* Center placeholder text */
+             #content-placeholder {
+                 content-align: center middle;
+                 color: $text-muted;
+             }
+         
+         
+             /* Style the focused row in the DataTable */
+             DataTable > .datatable--cursor {
+                 background: $accent;
+                 color: $text;
+             }
+             DataTable:focus > .datatable--cursor {
+                  background: $accent-darken-1;
+             }
+         
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+      Inline CSS, useful for quick scripts. Rules here take priority over CSS_PATH.
+
+      Note:
+          This CSS applies to the whole app.
+
+
+
+   .. py:attribute:: BINDINGS
+
+      A list of key bindings.
+
+
+
+   .. py:attribute:: file_paths
+
+
+   .. py:attribute:: selected_file_path
+
+
+   .. py:attribute:: session_path
+
+
+   .. py:attribute:: task_path
+
+
+   .. py:attribute:: step_path
+
+
+   .. py:attribute:: step_name
+
+
+   .. py:attribute:: task_name
+
+
+   .. py:attribute:: session_name
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+      Called by Textual to create child widgets.
+
+      This method is called when a widget is mounted or by setting `recompose=True` when
+      calling [`refresh()`][textual.widget.Widget.refresh].
+
+      Note that you don't typically need to explicitly call this method.
+
+      Example:
+          ```python
+          def compose(self) -> ComposeResult:
+              yield Header()
+              yield Label("Press the button below:")
+              yield Button()
+              yield Footer()
+          ```
+
+
+
+   .. py:method:: on_mount() -> None
+
+      Called when the screen is mounted.
+
+
+
+   .. py:method:: select_row_index(index: int)
+
+      Selects a row by index and triggers loading/display logic.
+
+
+
+   .. py:method:: watch_selected_file_path(old_path: pathlib.Path | None, new_path: pathlib.Path | None) -> None
+
+      Called when selected_file_path changes. Updates the content viewer.
+
+
+
+   .. py:method:: action_cursor_down() -> None
+
+      Move the cursor down in the DataTable.
+
+
+
+   .. py:method:: action_cursor_up() -> None
+
+      Move the cursor up in the DataTable.
+
+
+
+   .. py:method:: action_select_file() -> None
+
+      Action triggered by pressing Enter on the table.
+
+
+
+   .. py:method:: action_view_trial_split() -> None
+
+      Finds all trial files in the current step and pushes TrialSplitViewScreen.
+
+
+
+   .. py:method:: action_open_terminal() -> None
+
+      Opens a new terminal window in the current step directory.
+
+
+
+   .. py:method:: on_data_table_row_selected(event: textual.widgets.DataTable.RowSelected) -> None
+
+      Handle row selection in the DataTable (e.g., by clicking).
+
+
+
+   .. py:method:: refresh_content() -> None
+
+      Reloads the file list and the content of the selected file.
+
+
+

@@ -1,0 +1,29 @@
+seer_navigator.screens
+======================
+
+.. py:module:: seer_navigator.screens
+
+.. autoapi-nested-parse::
+
+   Screen definitions for the Seer Navigator application.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /modules/api/seer_navigator/screens/image_view_modal/index
+   /modules/api/seer_navigator/screens/session_screen/index
+   /modules/api/seer_navigator/screens/sessions_screen/index
+   /modules/api/seer_navigator/screens/sort_modal/index
+   /modules/api/seer_navigator/screens/step_screen/index
+   /modules/api/seer_navigator/screens/task_screen/index
+   /modules/api/seer_navigator/screens/task_sessions_screen/index
+   /modules/api/seer_navigator/screens/tasks_screen/index
+   /modules/api/seer_navigator/screens/trial_screen/index
+   /modules/api/seer_navigator/screens/trial_split_view_screen/index
+
+

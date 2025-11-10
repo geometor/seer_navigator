@@ -1,0 +1,120 @@
+seer_navigator.tasks_navigator
+==============================
+
+.. py:module:: seer_navigator.tasks_navigator
+
+.. autoapi-nested-parse::
+
+   Defines the main TasksNavigator Textual App class.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   seer_navigator.tasks_navigator.DEFAULT_RENDERER
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.tasks_navigator.DummyGrid
+   seer_navigator.tasks_navigator.TasksNavigator
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   seer_navigator.tasks_navigator.run
+
+
+Module Contents
+---------------
+
+.. py:class:: DummyGrid(grid_data: list, *args, **kwargs)
+
+   Bases: :py:obj:`textual.widgets.Static`
+
+
+   Placeholder widget used when real renderers fail to import.
+
+
+.. py:data:: DEFAULT_RENDERER
+
+.. py:class:: TasksNavigator(sessions_root: str = './sessions')
+
+   Bases: :py:obj:`textual.app.App`
+
+
+   A Textual app to navigate aggregated task data across sessions.
+
+
+   .. py:attribute:: BINDINGS
+
+      The default key bindings.
+
+
+
+   .. py:attribute:: sessions_root
+
+
+   .. py:attribute:: renderer
+      :type:  type[textual.widgets.Static]
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+      Yield the initial container for the app's default screen.
+
+
+
+   .. py:method:: on_mount() -> None
+
+      Called when the app is mounted.
+
+
+
+   .. py:method:: action_refresh_screen() -> None
+
+      Calls the refresh method on the current screen if it exists.
+
+
+
+   .. py:method:: action_sort_table() -> None
+
+      Pushes the SortModal screen to select a column for sorting.
+
+
+
+   .. py:method:: action_view_images() -> None
+
+      Pushes the image view modal screen.
+
+
+
+   .. py:method:: launch_sxiv(context_path: pathlib.Path, filter_type: str, task_id: str | None = None) -> None
+
+      Finds images based on filter and launches sxiv. Filters by task_id if provided.
+
+
+
+   .. py:method:: action_set_renderer(renderer_name: str) -> None
+
+      Sets the active grid renderer.
+
+
+
+   .. py:method:: action_quit() -> None
+
+      Quits the application
+
+
+
+.. py:function:: run()
+

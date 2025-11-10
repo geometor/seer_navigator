@@ -1,0 +1,731 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.screens.task_screen &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+        </div>
+        <div class="next">
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">Module code</a></span>
+          <span>/</span>
+        <span><a href="../../seer_navigator.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.screens.task_screen</span>
+      </nav>
+      <div class="content">
+          <h1>Source code for seer_navigator.screens.task_screen</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the TaskScreen for displaying steps and summary of a single task.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">Text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span> <span class="c1"># Import timedelta</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComposeResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">Screen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Static</span><span class="p">,</span> <span class="n">ListView</span><span class="p">,</span> <span class="n">ListItem</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">,</span> <span class="n">Header</span><span class="p">,</span> <span class="n">Footer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.reactive</span><span class="w"> </span><span class="kn">import</span> <span class="n">reactive</span> <span class="c1"># ADDED reactive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.containers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Horizontal</span><span class="p">,</span>
+    <span class="n">Vertical</span><span class="p">,</span>
+    <span class="n">Grid</span><span class="p">,</span> <span class="c1"># Import Grid</span>
+    <span class="n">ScrollableContainer</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.binding</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binding</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets._data_table</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnKey</span> <span class="c1"># ADDED ColumnKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span> <span class="c1"># ADDED import</span>
+<span class="c1"># REMOVED subprocess import</span>
+<span class="c1"># REMOVED shutil import</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer.session.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>  <span class="c1"># Import Level</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.step_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">StepScreen</span> <span class="c1"># IMPORT THE NEW SCREEN</span>
+<span class="c1"># Import the trial split view screen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.trial_split_view_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrialSplitViewScreen</span>
+
+
+<div class="viewcode-block" id="TaskScreen">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskScreen</span><span class="p">(</span><span class="n">Screen</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskScreen.CSS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.CSS">[docs]</a>
+    <span class="n">CSS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Screen &gt; Vertical {</span>
+<span class="s2">        grid-size: 2;</span>
+<span class="s2">        grid-rows: auto 1fr; /* Summary auto height, table takes rest */</span>
+<span class="s2">    }</span>
+<span class="s2">    #summary-grid {</span>
+<span class="s2">        grid-size: 3; /* Three columns for the summary tables */</span>
+<span class="s2">        grid-gutter: 1 2;</span>
+<span class="s2">        height: auto; /* Let the grid determine its height */</span>
+<span class="s2">        padding: 0 1; /* Add some horizontal padding */</span>
+<span class="s2">        margin-bottom: 1; /* Space below summary */</span>
+<span class="s2">    }</span>
+<span class="s2">    .summary-table {</span>
+<span class="s2">        height: auto; /* Fit content height */</span>
+<span class="s2">        border: none; /* No border for summary tables */</span>
+<span class="s2">    }</span>
+<span class="s2">    /* Ensure no focus border on summary tables */</span>
+<span class="s2">    .summary-table:focus {</span>
+<span class="s2">        border: none;</span>
+<span class="s2">    }</span>
+<span class="s2">    DataTable { /* Style for the main steps table */</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">    }</span>
+<span class="s2">    Vertical {height: 100%;}</span>
+<span class="s2">    &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="TaskScreen.BINDINGS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.BINDINGS">[docs]</a>
+    <span class="n">BINDINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;l,enter&quot;</span><span class="p">,</span> <span class="s2">&quot;select_row&quot;</span><span class="p">,</span> <span class="s2">&quot;Select&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="c1"># Added enter key</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;move_up&quot;</span><span class="p">,</span> <span class="s2">&quot;Cursor up&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;j&quot;</span><span class="p">,</span> <span class="s2">&quot;move_down&quot;</span><span class="p">,</span> <span class="s2">&quot;Cursor down&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;app.pop_screen&quot;</span><span class="p">,</span> <span class="s2">&quot;back&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;view_all_trials&quot;</span><span class="p">,</span> <span class="s2">&quot;View Trials&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="c1"># Add binding for viewing all trials</span>
+        <span class="c1"># REMOVED Binding(&quot;i&quot;, &quot;view_images&quot;, &quot;View Images&quot;, show=True),</span>
+        <span class="c1"># Binding(&quot;[&quot;, &quot;previous_sibling&quot;, &quot;Previous Sibling&quot;, show=True), # Handled by App</span>
+        <span class="c1"># Binding(&quot;]&quot;, &quot;next_sibling&quot;, &quot;Next Sibling&quot;, show=True),     # Handled by App</span>
+    <span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">task_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">step_dirs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+<div class="viewcode-block" id="TaskScreen.session_path">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.session_path">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_path</span> <span class="o">=</span> <span class="n">session_path</span></div>
+
+<div class="viewcode-block" id="TaskScreen.task_path">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.task_path">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_path</span> <span class="o">=</span> <span class="n">task_path</span></div>
+
+<div class="viewcode-block" id="TaskScreen.task_name">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.task_name">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span> <span class="o">=</span> <span class="n">task_path</span><span class="o">.</span><span class="n">name</span> <span class="c1"># Store task name</span></div>
+
+<div class="viewcode-block" id="TaskScreen.step_dirs">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.step_dirs">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span> <span class="o">=</span> <span class="n">step_dirs</span>  <span class="c1"># Receive step_dirs</span></div>
+
+<div class="viewcode-block" id="TaskScreen.step_index">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.step_index">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_index</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+        <span class="c1"># REMOVED sxiv check state attributes</span>
+<div class="viewcode-block" id="TaskScreen.current_sort_key">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.current_sort_key">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_key</span><span class="p">:</span> <span class="n">ColumnKey</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># ADDED sort state</span></div>
+
+<div class="viewcode-block" id="TaskScreen.current_sort_reverse">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.current_sort_reverse">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>      <span class="c1"># ADDED sort state</span></div>
+
+
+    <span class="c1"># REMOVED _check_sxiv method</span>
+
+<div class="viewcode-block" id="TaskScreen.compose">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.compose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComposeResult</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">DataTable</span><span class="p">()</span> <span class="c1"># Main steps table</span>
+        <span class="c1"># Add columns in the new requested order, including ERROR</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span>
+            <span class="s2">&quot;STEP&quot;</span><span class="p">,</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>     <span class="c1"># ADDED</span>
+            <span class="s2">&quot;TEST&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TRAIN&quot;</span><span class="p">,</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;SCORE&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;SIZE&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;PALETTE&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;COLORS&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;PIXELS&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TIME&quot;</span><span class="p">,</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;ATTEMPTS&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;IN&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;OUT&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;TOTAL&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;FILES&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_type</span> <span class="o">=</span> <span class="s2">&quot;row&quot;</span>
+
+        <span class="k">yield</span> <span class="n">Header</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">Vertical</span><span class="p">():</span>
+            <span class="c1"># Summary Grid with three DataTables</span>
+            <span class="k">with</span> <span class="n">Grid</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;summary-grid&quot;</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">DataTable</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;summary-table&quot;</span><span class="p">,</span> <span class="n">show_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cursor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;summary-table&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">DataTable</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;trials-table&quot;</span><span class="p">,</span> <span class="n">show_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cursor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;summary-table&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">DataTable</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tokens-table&quot;</span><span class="p">,</span> <span class="n">show_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cursor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;summary-table&quot;</span><span class="p">)</span>
+            <span class="c1"># Main steps table</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span>
+        <span class="k">yield</span> <span class="n">Footer</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TaskScreen.on_mount">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.on_mount">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> • </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Add columns to summary tables</span>
+        <span class="n">summary_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#summary-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span><span class="s2">&quot;Metric&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+        <span class="n">trials_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#trials-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span><span class="s2">&quot;Metric&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+        <span class="n">tokens_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#tokens-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span><span class="s2">&quot;Metric&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_steps</span><span class="p">()</span> <span class="c1"># Load main table data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_type</span> <span class="o">=</span> <span class="s2">&quot;row&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">focus</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_summary</span><span class="p">()</span> <span class="c1"># Populate summary tables</span>
+        <span class="c1"># Add sort key tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_reverse</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="TaskScreen.load_steps">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.load_steps">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads data into the main steps DataTable.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>  <span class="c1"># Clear before adding</span>
+        <span class="k">for</span> <span class="n">step_dir</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">:</span>  <span class="c1"># Use self.step_dirs</span>
+            <span class="n">summary_path</span> <span class="o">=</span> <span class="n">step_dir</span> <span class="o">/</span> <span class="s2">&quot;index.json&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">summary</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">num_files</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">step_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">is_file</span><span class="p">())</span> <span class="c1"># Count only files</span>
+
+                <span class="c1"># Use the updated _format_duration method</span>
+                <span class="n">time_str</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">Level</span><span class="o">.</span><span class="n">_format_duration</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;duration_seconds&quot;</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;duration_seconds&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="k">else</span> <span class="s2">&quot;-&quot;</span>
+                <span class="p">)</span>
+
+                <span class="c1"># --- START ERROR HANDLING ---</span>
+                <span class="n">has_errors</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_errors&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="c1"># Default to False if missing</span>
+                <span class="n">error_text</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;⚠&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bold #FFD700&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span> <span class="c1"># CHANGED character and style</span>
+                    <span class="k">if</span> <span class="n">has_errors</span>
+                    <span class="k">else</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="c1"># --- END ERROR HANDLING ---</span>
+
+                <span class="c1"># --- START RETRIES HANDLING ---</span>
+                <span class="n">attempts</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;attempts&quot;</span><span class="p">)</span>
+                <span class="n">attempts_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">attempts</span><span class="p">)</span> <span class="k">if</span> <span class="n">attempts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+                <span class="c1"># --- END RETRIES HANDLING ---</span>
+
+                <span class="c1"># --- START TOKEN HANDLING ---</span>
+                <span class="n">prompt_tokens</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">)</span>
+                <span class="n">candidates_tokens</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;candidates_tokens&quot;</span><span class="p">)</span>
+                <span class="n">total_tokens</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">)</span>
+
+                <span class="n">in_tokens_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">prompt_tokens</span><span class="p">)</span> <span class="k">if</span> <span class="n">prompt_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+                <span class="n">out_tokens_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">candidates_tokens</span><span class="p">)</span> <span class="k">if</span> <span class="n">candidates_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+                <span class="n">total_tokens_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">total_tokens</span><span class="p">)</span> <span class="k">if</span> <span class="n">total_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+                <span class="c1"># --- END TOKEN HANDLING ---</span>
+
+                <span class="c1"># --- START PASS/FAIL HANDLING ---</span>
+                <span class="k">if</span> <span class="s2">&quot;train_passed&quot;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span> <span class="c1"># Check if key exists</span>
+                    <span class="n">train_passed</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✔&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">summary</span><span class="p">[</span><span class="s2">&quot;train_passed&quot;</span><span class="p">]</span>
+                        <span class="k">else</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✘&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Default if key is missing</span>
+                    <span class="n">train_passed</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="s2">&quot;test_passed&quot;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span> <span class="c1"># Check if key exists</span>
+                    <span class="n">test_passed</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✔&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">summary</span><span class="p">[</span><span class="s2">&quot;test_passed&quot;</span><span class="p">]</span>
+                        <span class="k">else</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✘&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Default if key is missing</span>
+                    <span class="n">test_passed</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                <span class="c1"># --- END PASS/FAIL HANDLING ---</span>
+
+                <span class="c1"># --- START BEST SCORE HANDLING ---</span>
+                <span class="n">best_score_text</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;best_score&#39;</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_score&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="k">else</span> <span class="s2">&quot;-&quot;</span>
+                <span class="p">)</span>
+                <span class="n">best_score_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">best_score_text</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+                <span class="c1"># --- END BEST SCORE HANDLING ---</span>
+
+                <span class="c1"># --- START BEST TRIAL METRICS HANDLING ---</span>
+                <span class="c1"># Read metrics directly from the summary dictionary</span>
+                <span class="c1"># metrics = summary.get(&quot;best_trial_metrics&quot;, {}) # REMOVED - Read directly</span>
+
+                <span class="k">def</span><span class="w"> </span><span class="nf">format_bool_metric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✔&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✘&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Use the correct top-level keys from the summary</span>
+                <span class="n">size_correct_text</span> <span class="o">=</span> <span class="n">format_bool_metric</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;size_correct&quot;</span><span class="p">))</span>
+                <span class="n">palette_correct_text</span> <span class="o">=</span> <span class="n">format_bool_metric</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color_palette_correct&quot;</span><span class="p">))</span>
+                <span class="n">color_count_correct_text</span> <span class="o">=</span> <span class="n">format_bool_metric</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color_count_correct&quot;</span><span class="p">))</span>
+
+                <span class="c1"># Get TOTAL pixels off count directly from summary</span>
+                <span class="n">pixels_off_val</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pixels_off&quot;</span><span class="p">)</span>
+                <span class="c1"># Format as integer string</span>
+                <span class="n">pixels_off_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pixels_off_val</span><span class="p">)</span> <span class="k">if</span> <span class="n">pixels_off_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Get percent correct directly from summary</span>
+                <span class="n">percent_correct_val</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;percent_correct&quot;</span><span class="p">)</span>
+                <span class="n">percent_correct_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">percent_correct_val</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">percent_correct_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+                <span class="c1"># --- END BEST TRIAL METRICS HANDLING ---</span>
+
+
+                <span class="c1"># Add the row with arguments in the new order (16 columns total)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span>
+                    <span class="n">step_dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>             <span class="c1"># STEP</span>
+                    <span class="n">error_text</span><span class="p">,</span>                <span class="c1"># ERROR</span>
+                    <span class="n">test_passed</span><span class="p">,</span>               <span class="c1"># TEST</span>
+                    <span class="n">train_passed</span><span class="p">,</span>              <span class="c1"># TRAIN</span>
+                    <span class="n">best_score_text</span><span class="p">,</span>           <span class="c1"># SCORE</span>
+                    <span class="n">size_correct_text</span><span class="p">,</span>         <span class="c1"># SIZE</span>
+                    <span class="n">palette_correct_text</span><span class="p">,</span>      <span class="c1"># PALETTE</span>
+                    <span class="n">color_count_correct_text</span><span class="p">,</span>  <span class="c1"># COLORS</span>
+                    <span class="n">pixels_off_text</span><span class="p">,</span>           <span class="c1"># PIXELS</span>
+                    <span class="n">percent_correct_text</span><span class="p">,</span>      <span class="c1"># %</span>
+                    <span class="n">time_str</span><span class="p">,</span>                  <span class="c1"># TIME</span>
+                    <span class="n">attempts_text</span><span class="p">,</span>             <span class="c1"># ATTEMPTS</span>
+                    <span class="n">in_tokens_text</span><span class="p">,</span>            <span class="c1"># IN</span>
+                    <span class="n">out_tokens_text</span><span class="p">,</span>           <span class="c1"># OUT</span>
+                    <span class="n">total_tokens_text</span><span class="p">,</span>         <span class="c1"># TOTAL</span>
+                    <span class="n">num_files</span>                  <span class="c1"># FILES</span>
+                <span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="c1"># Update exception handling for 16 columns</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">step_dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                <span class="c1"># Update exception handling for 16 columns</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">step_dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_step_by_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TaskScreen.update_summary">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.update_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the three summary DataTables for the current task.&quot;&quot;&quot;</span>
+        <span class="n">summary_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#summary-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">trials_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#trials-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">tokens_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#tokens-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+
+        <span class="n">num_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">)</span>
+        <span class="c1"># train_passed_count = 0 # No longer needed for summary display</span>
+        <span class="c1"># test_passed_count = 0  # No longer needed for summary display</span>
+        <span class="n">error_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_duration_seconds</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">best_scores</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">total_prompt_tokens</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_candidates_tokens</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_tokens_all_steps</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_attempts</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># --- Read overall task summary ---</span>
+        <span class="n">task_summary_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_path</span> <span class="o">/</span> <span class="s2">&quot;index.json&quot;</span>
+        <span class="n">task_train_passed</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">task_test_passed</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">task_summary_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">task_summary_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">task_train_passed</span> <span class="o">=</span> <span class="n">task_summary_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;train_passed&quot;</span><span class="p">)</span>
+            <span class="n">task_test_passed</span> <span class="o">=</span> <span class="n">task_summary_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test_passed&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not read task summary </span><span class="si">{</span><span class="n">task_summary_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Keep task_train_passed and task_test_passed as None</span>
+
+        <span class="c1"># --- Aggregate step details ---</span>
+        <span class="k">for</span> <span class="n">step_dir</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">:</span>
+            <span class="n">summary_path</span> <span class="o">=</span> <span class="n">step_dir</span> <span class="o">/</span> <span class="s2">&quot;index.json&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">step_summary</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+                <span class="c1"># Aggregate errors, duration, score, attempts, tokens</span>
+                <span class="k">if</span> <span class="n">step_summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_errors&quot;</span><span class="p">):</span>
+                    <span class="n">error_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">duration</span> <span class="o">=</span> <span class="n">step_summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;duration_seconds&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">total_duration_seconds</span> <span class="o">+=</span> <span class="n">duration</span>
+
+                <span class="n">score</span> <span class="o">=</span> <span class="n">step_summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_score&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">best_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+                <span class="n">attempts</span> <span class="o">=</span> <span class="n">step_summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;attempts&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">attempts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">total_attempts</span> <span class="o">+=</span> <span class="n">attempts</span>
+
+                <span class="n">prompt_tokens</span> <span class="o">=</span> <span class="n">step_summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">)</span>
+                <span class="n">candidates_tokens</span> <span class="o">=</span> <span class="n">step_summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;candidates_tokens&quot;</span><span class="p">)</span>
+                <span class="n">total_tokens</span> <span class="o">=</span> <span class="n">step_summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">prompt_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">total_prompt_tokens</span> <span class="o">+=</span> <span class="n">prompt_tokens</span>
+                <span class="k">if</span> <span class="n">candidates_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">total_candidates_tokens</span> <span class="o">+=</span> <span class="n">candidates_tokens</span>
+                <span class="k">if</span> <span class="n">total_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">total_tokens_all_steps</span> <span class="o">+=</span> <span class="n">total_tokens</span>
+
+            <span class="k">except</span> <span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">):</span>
+                <span class="k">pass</span> <span class="c1"># Skip steps with missing/invalid index.json</span>
+
+        <span class="n">best_score_summary</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">best_scores</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">best_scores</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span>
+        <span class="p">)</span>
+        <span class="n">formatted_total_duration</span> <span class="o">=</span> <span class="n">Level</span><span class="o">.</span><span class="n">_format_duration</span><span class="p">(</span><span class="n">total_duration_seconds</span><span class="p">)</span>
+
+        <span class="c1"># --- Determine overall pass/fail status from task summary ---</span>
+        <span class="k">if</span> <span class="n">task_train_passed</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">overall_train_status</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✔&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">task_train_passed</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">overall_train_status</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✘&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># None or missing</span>
+            <span class="n">overall_train_status</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">task_test_passed</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">overall_test_status</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✔&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">task_test_passed</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">overall_test_status</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✘&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># None or missing</span>
+            <span class="n">overall_test_status</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+        <span class="c1"># --- End pass/fail status determination ---</span>
+
+
+        <span class="c1"># Clear and update summary table (right-align keys and values)</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;steps:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">num_steps</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;attempts:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">total_attempts</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span> <span class="c1"># Add attempts</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;time:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="n">formatted_total_duration</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;best:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="n">best_score_summary</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Clear and update trials table (right-align keys and values)</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="c1"># Use overall status from task summary</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;test:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">overall_test_status</span><span class="p">)</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;train:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">overall_train_status</span><span class="p">)</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;errors:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">error_count</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Clear and update tokens table (right-align keys and values, format with commas)</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;in:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">total_prompt_tokens</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;out:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">total_candidates_tokens</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;total:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">total_tokens_all_steps</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="TaskScreen.select_step_by_index">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.select_step_by_index">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select_step_by_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">step_index</span> <span class="o">=</span> <span class="n">index</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TaskScreen.previous_sibling">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.previous_sibling">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">previous_sibling</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_step_by_index</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">step_index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="TaskScreen.next_sibling">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.next_sibling">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">next_sibling</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_step_by_index</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">step_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="TaskScreen.action_move_up">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.action_move_up">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_move_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span>  <span class="c1"># Update index</span></div>
+
+
+<div class="viewcode-block" id="TaskScreen.action_move_down">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.action_move_down">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_move_down</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span>  <span class="c1"># Update index</span></div>
+
+
+<div class="viewcode-block" id="TaskScreen.action_select_row">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.action_select_row">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_select_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when a row is selected (Enter or &#39;l&#39;).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="c1"># No steps to select</span>
+
+        <span class="n">row_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span>
+        <span class="k">if</span> <span class="n">row_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">row_id</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">)):</span>
+             <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_row: Invalid row_id </span><span class="si">{</span><span class="n">row_id</span><span class="si">}</span><span class="s2"> or step_dirs empty.&quot;</span><span class="p">)</span>
+             <span class="k">return</span> <span class="c1"># Invalid selection</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get the data for the selected row</span>
+            <span class="n">row_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">get_row_at</span><span class="p">(</span><span class="n">row_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">row_data</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_row: Could not get row data for row </span><span class="si">{</span><span class="n">row_id</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Error selecting step row data.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># The first element is the step name (e.g., &quot;001_code&quot;)</span>
+            <span class="n">selected_step_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="c1"># Find the corresponding Path object in self.step_dirs</span>
+            <span class="n">step_path</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">selected_step_name</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">step_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_row: Could not find step path for name &#39;</span><span class="si">{</span><span class="n">selected_step_name</span><span class="si">}</span><span class="s2">&#39; in self.step_dirs.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error finding step directory: </span><span class="si">{</span><span class="n">selected_step_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Push the StepScreen with the correct path</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_row: Pushing StepScreen for </span><span class="si">{</span><span class="n">step_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">push_screen</span><span class="p">(</span><span class="n">StepScreen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_path</span><span class="p">,</span> <span class="n">step_path</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_row: IndexError accessing row data for row </span><span class="si">{</span><span class="n">row_id</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Error accessing step data.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_row: Error processing row </span><span class="si">{</span><span class="n">row_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Error selecting step.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># REMOVED action_view_images method</span>
+
+<div class="viewcode-block" id="TaskScreen.on_data_table_row_selected">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.on_data_table_row_selected">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_data_table_row_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">DataTable</span><span class="o">.</span><span class="n">RowSelected</span><span class="p">):</span>
+        <span class="c1"># kept for compatibility, triggers action_select_row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_select_row</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TaskScreen.refresh_content">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.refresh_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh_content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reloads step data for the task and updates the screen.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshing TaskScreen content for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="c1"># Store current cursor position</span>
+        <span class="n">current_cursor_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span>
+
+        <span class="c1"># Re-read step directories in case they changed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_steps</span><span class="p">()</span> <span class="c1"># Reloads table data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_summary</span><span class="p">()</span> <span class="c1"># Reloads summary data</span>
+
+        <span class="c1"># Restore cursor position if possible</span>
+        <span class="k">if</span> <span class="n">current_cursor_row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">current_cursor_row</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">row_count</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">current_cursor_row</span><span class="p">,</span> <span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">row_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Move to top if previous row is gone</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">focus</span><span class="p">()</span> <span class="c1"># Ensure table has focus</span></div>
+
+
+    <span class="c1"># --- START ADDED SORT METHOD ---</span>
+<div class="viewcode-block" id="TaskScreen.perform_sort">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.perform_sort">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">perform_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sort_key</span><span class="p">:</span> <span class="n">ColumnKey</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sorts the DataTable by the given column key.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Performing sort on TaskScreen by key: </span><span class="si">{</span><span class="n">sort_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Determine sort direction</span>
+        <span class="n">reverse</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_key</span> <span class="o">==</span> <span class="n">sort_key</span><span class="p">:</span>
+            <span class="c1"># If same key, toggle direction</span>
+            <span class="n">reverse</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_reverse</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If new key, default to descending</span>
+            <span class="n">reverse</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_key</span> <span class="o">=</span> <span class="n">sort_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_reverse</span> <span class="o">=</span> <span class="n">reverse</span>
+
+        <span class="c1"># Define key function: receives cell_data directly when sorting by one key</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_sort_key</span><span class="p">(</span><span class="n">cell_data</span><span class="p">):</span>
+            <span class="c1"># No need to find index or extract cell_data, it&#39;s passed directly.</span>
+            <span class="n">key_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sort_key</span><span class="p">)</span> <span class="c1"># Use string representation of the *column* key</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;STEP&quot;</span><span class="p">:</span>
+                <span class="c1"># Extract number from step name like &quot;001_...&quot;</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cell_data</span><span class="p">)</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\d+)&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="k">if</span> <span class="n">match</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span> <span class="s2">&quot;TEST&quot;</span><span class="p">,</span> <span class="s2">&quot;TRAIN&quot;</span><span class="p">,</span> <span class="s2">&quot;SIZE&quot;</span><span class="p">,</span> <span class="s2">&quot;PALETTE&quot;</span><span class="p">,</span> <span class="s2">&quot;COLORS&quot;</span><span class="p">]:</span>
+                <span class="c1"># Handle ✔ / ✘ / - / ⚠</span>
+                <span class="n">plain_text</span> <span class="o">=</span> <span class="n">cell_data</span><span class="o">.</span><span class="n">plain</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cell_data</span><span class="p">,</span> <span class="s1">&#39;plain&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">cell_data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">plain_text</span> <span class="o">==</span> <span class="s2">&quot;✔&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">plain_text</span> <span class="o">==</span> <span class="s2">&quot;✘&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="k">if</span> <span class="n">plain_text</span> <span class="o">==</span> <span class="s2">&quot;⚠&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="o">-</span><span class="mi">2</span> <span class="c1"># Sort errors before fails</span>
+                <span class="k">return</span> <span class="mi">0</span> <span class="c1"># Sort &#39;-&#39; in the middle</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;SCORE&quot;</span><span class="p">,</span> <span class="s2">&quot;PIXELS&quot;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;ATTEMPTS&quot;</span><span class="p">,</span> <span class="s2">&quot;IN&quot;</span><span class="p">,</span> <span class="s2">&quot;OUT&quot;</span><span class="p">,</span> <span class="s2">&quot;TOTAL&quot;</span><span class="p">,</span> <span class="s2">&quot;FILES&quot;</span><span class="p">]:</span>
+                <span class="c1"># Handle numbers (potentially in Text objects)</span>
+                <span class="n">plain_text</span> <span class="o">=</span> <span class="n">cell_data</span><span class="o">.</span><span class="n">plain</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cell_data</span><span class="p">,</span> <span class="s1">&#39;plain&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">cell_data</span><span class="p">)</span>
+                <span class="n">plain_text</span> <span class="o">=</span> <span class="n">plain_text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="c1"># Remove commas</span>
+                <span class="k">if</span> <span class="n">plain_text</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span> <span class="c1"># Sort &#39;-&#39; first</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">plain_text</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not convert &#39;</span><span class="si">{</span><span class="n">plain_text</span><span class="si">}</span><span class="s2">&#39; to float for sorting key &#39;</span><span class="si">{</span><span class="n">key_str</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span> <span class="c1"># Sort errors consistently first</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;TIME&quot;</span><span class="p">:</span>
+                <span class="c1"># Parse HH:MM:SS string into seconds</span>
+                <span class="n">time_str</span> <span class="o">=</span> <span class="n">cell_data</span><span class="o">.</span><span class="n">plain</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cell_data</span><span class="p">,</span> <span class="s1">&#39;plain&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">cell_data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">time_str</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">parts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">time_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)))</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="k">return</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3600</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not parse time string &#39;</span><span class="si">{</span><span class="n">time_str</span><span class="si">}</span><span class="s2">&#39; for sorting&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Fallback: Ensure a string is always returned for comparison</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">cell_data</span><span class="o">.</span><span class="n">plain</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cell_data</span><span class="p">,</span> <span class="s1">&#39;plain&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">cell_data</span><span class="p">)</span>
+
+        <span class="c1"># Perform the sort</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">sort_key</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">get_sort_key</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sorted by </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">sort_key</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;(desc)&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">reverse</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;(asc)&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during DataTable sort: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error sorting table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># --- END ADDED SORT METHOD ---</span>
+
+<div class="viewcode-block" id="TaskScreen.action_view_all_trials">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/task_screen/index.html#seer_navigator.screens.task_screen.TaskScreen.action_view_all_trials">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_view_all_trials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finds all trial files across all steps in this task and pushes TrialSplitViewScreen.&quot;&quot;&quot;</span>
+        <span class="n">all_trial_files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Searching for trial files across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">)</span><span class="si">}</span><span class="s2"> steps in task </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">step_dir</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_dirs</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">step_trials</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">step_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.trial.json&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;trials.json&quot;</span><span class="p">))</span>
+                    <span class="p">]</span>
+                    <span class="k">if</span> <span class="n">step_trials</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">step_trials</span><span class="p">)</span><span class="si">}</span><span class="s2"> trials in step </span><span class="si">{</span><span class="n">step_dir</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">all_trial_files</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">step_trials</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step directory not found while searching for trials: </span><span class="si">{</span><span class="n">step_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error searching for trials in step </span><span class="si">{</span><span class="n">step_dir</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">all_trial_files</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;No &#39;.trial.json&#39; files found in any steps of this task.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Sort combined list (optional, but nice - sort by full path which groups by step)</span>
+            <span class="n">all_trial_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found total </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_trial_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> trial files across task </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_name</span><span class="si">}</span><span class="s2">. Pushing TrialSplitViewScreen.&quot;</span><span class="p">)</span>
+            <span class="n">split_screen</span> <span class="o">=</span> <span class="n">TrialSplitViewScreen</span><span class="p">(</span>
+                <span class="n">trial_paths</span><span class="o">=</span><span class="n">all_trial_files</span><span class="p">,</span> <span class="c1"># Pass the combined list</span>
+                <span class="n">renderer_class_arg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">renderer</span> <span class="c1"># Pass the app&#39;s current renderer class</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">push_screen</span><span class="p">(</span><span class="n">split_screen</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error finding trial files: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+             <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error finding trial files across task </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

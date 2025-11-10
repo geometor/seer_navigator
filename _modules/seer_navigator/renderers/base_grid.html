@@ -1,0 +1,131 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.renderers.base_grid &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+        </div>
+        <div class="next">
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">Module code</a></span>
+          <span>/</span>
+        <span><a href="../../seer_navigator.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.renderers.base_grid</span>
+      </nav>
+      <div class="content">
+          <h1>Source code for seer_navigator.renderers.base_grid</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Provides the BaseGrid class, the foundation for grid rendering widgets.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Static</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.color</span><span class="w"> </span><span class="kn">import</span> <span class="n">Color</span>  <span class="c1"># Import the Color class</span>
+
+<span class="c1"># Import COLOR_MAP from the tasks.grid module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer.tasks.grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">COLOR_MAP</span>
+
+
+<div class="viewcode-block" id="BaseGrid">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/renderers/base_grid/index.html#seer_navigator.renderers.base_grid.BaseGrid">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseGrid</span><span class="p">(</span><span class="n">Static</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base widget class for rendering the colored grid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="viewcode-block" id="BaseGrid.grid">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/renderers/base_grid/index.html#seer_navigator.renderers.base_grid.BaseGrid.grid">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span></div>
+
+<div class="viewcode-block" id="BaseGrid.rows">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/renderers/base_grid/index.html#seer_navigator.renderers.base_grid.BaseGrid.rows">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseGrid.cols">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/renderers/base_grid/index.html#seer_navigator.renderers.base_grid.BaseGrid.cols">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.get_color">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/renderers/base_grid/index.html#seer_navigator.renderers.base_grid.BaseGrid.get_color">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Color</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets a Textual Color object for the given cell value.&quot;&quot;&quot;</span>
+        <span class="n">rgb_tuple</span> <span class="o">=</span> <span class="n">COLOR_MAP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cell_value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rgb_tuple</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Color</span><span class="p">(</span><span class="o">*</span><span class="n">rgb_tuple</span><span class="p">)</span><span class="o">.</span><span class="n">hex6</span>  <span class="c1"># Create a Color object from the RGB tuple</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">hex6</span>  <span class="c1"># Default to black if color not found</span></div>
+</div>
+
+
+</pre></div>
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.screens.task_sessions_screen &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+           <a href="../task_screen/index.html" class="prev" title="seer_navigator.screens.task_screen" >Prev</a>
+        </div>
+        <div class="next">
+          <a href="../tasks_screen/index.html" class="next" title="seer_navigator.screens.tasks_screen" >Next</a>
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../../index.html">API Reference</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">seer_navigator</a></span>
+          <span>/</span>
+        <span><a href="../index.html">seer_navigator.screens</a></span>
+        <span>/</span>
+        <span>seer_navigator.screens.task_sessions_screen</span>
+      </nav>
+      <div class="content">
+          <section id="module-seer_navigator.screens.task_sessions_screen">
+<span id="seer-navigator-screens-task-sessions-screen"></span><h1>seer_navigator.screens.task_sessions_screen<a class="headerlink" href="#module-seer_navigator.screens.task_sessions_screen" title="Link to this heading">¶</a></h1>
+<p>Defines the TaskSessionsScreen for viewing a specific task across sessions.</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen" title="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskSessionsScreen</span></code></a></p></td>
+<td><p>Displays instances of a specific task across multiple sessions.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seer_navigator.screens.task_sessions_screen.</span></span><span class="sig-name descname"><span class="pre">TaskSessionsScreen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sessions_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.9/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">textual.screen.Screen</span></code></p>
+<p>Displays instances of a specific task across multiple sessions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.CSS">
+<span class="sig-name descname"><span class="pre">CSS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Multiline-String</span></em><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.CSS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.CSS" title="Link to this definition">¶</a></dt>
+<dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Screen &gt; Vertical {</span>
+<span class="sd">        grid-size: 2;</span>
+<span class="sd">        grid-rows: auto 1fr; /* Summary auto height, table takes rest */</span>
+<span class="sd">    }</span>
+<span class="sd">    #summary-grid {</span>
+<span class="sd">        grid-size: 3; /* Three columns for the summary tables */</span>
+<span class="sd">        grid-gutter: 1 2;</span>
+<span class="sd">        height: auto; /* Let the grid determine its height */</span>
+<span class="sd">        padding: 0 1; /* Add some horizontal padding */</span>
+<span class="sd">        margin-bottom: 1; /* Space below summary */</span>
+<span class="sd">    }</span>
+<span class="sd">    .summary-table {</span>
+<span class="sd">        height: auto; /* Fit content height */</span>
+<span class="sd">        border: none; /* No border for summary tables */</span>
+<span class="sd">    }</span>
+<span class="sd">    /* Ensure no focus border on summary tables */</span>
+<span class="sd">    .summary-table:focus {</span>
+<span class="sd">        border: none;</span>
+<span class="sd">    }</span>
+<span class="sd">    DataTable { /* Style for the main tasks table */</span>
+<span class="sd">        height: 1fr;</span>
+<span class="sd">    }</span>
+<span class="sd">    Vertical {height: 100%;}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</details><p>Inline CSS, useful for quick scripts. Rules here take priority over CSS_PATH.</p>
+<dl class="simple">
+<dt>Note:</dt><dd><p>This CSS applies to the whole app.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.BINDINGS">
+<span class="sig-name descname"><span class="pre">BINDINGS</span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.BINDINGS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.BINDINGS" title="Link to this definition">¶</a></dt>
+<dd><p>A list of key bindings.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.sessions_root">
+<span class="sig-name descname"><span class="pre">sessions_root</span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.sessions_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.sessions_root" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.task_id">
+<span class="sig-name descname"><span class="pre">task_id</span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.task_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.task_id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.task_instances">
+<span class="sig-name descname"><span class="pre">task_instances</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.9/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.task_instances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.task_instances" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.instance_index">
+<span class="sig-name descname"><span class="pre">instance_index</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.instance_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.instance_index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.current_sort_key">
+<span class="sig-name descname"><span class="pre">current_sort_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">textual.widgets._data_table.ColumnKey</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.current_sort_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.current_sort_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.current_sort_reverse">
+<span class="sig-name descname"><span class="pre">current_sort_reverse</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.current_sort_reverse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.current_sort_reverse" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.compose">
+<span class="sig-name descname"><span class="pre">compose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">textual.app.ComposeResult</span></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.compose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.compose" title="Link to this definition">¶</a></dt>
+<dd><p>Called by Textual to create child widgets.</p>
+<p>This method is called when a widget is mounted or by setting <cite>recompose=True</cite> when
+calling [<cite>refresh()</cite>][textual.widget.Widget.refresh].</p>
+<p>Note that you don’t typically need to explicitly call this method.</p>
+<dl>
+<dt>Example:</dt><dd><p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
+def compose(self) -&gt; ComposeResult:</p>
+<blockquote>
+<div><p>yield Header()
+yield Label(“Press the button below:”)
+yield Button()
+yield Footer()</p>
+</div></blockquote>
+<p><a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.on_mount">
+<span class="sig-name descname"><span class="pre">on_mount</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.on_mount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.on_mount" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.load_task_instances">
+<span class="sig-name descname"><span class="pre">load_task_instances</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.load_task_instances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.load_task_instances" title="Link to this definition">¶</a></dt>
+<dd><p>Loads data for the specific task_id across all sessions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.update_summary">
+<span class="sig-name descname"><span class="pre">update_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.update_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.update_summary" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the summary tables for the specific task across displayed sessions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.select_instance_by_index">
+<span class="sig-name descname"><span class="pre">select_instance_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.select_instance_by_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.select_instance_by_index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.action_move_up">
+<span class="sig-name descname"><span class="pre">action_move_up</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.action_move_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.action_move_up" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.action_move_down">
+<span class="sig-name descname"><span class="pre">action_move_down</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.action_move_down"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.action_move_down" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.action_select_row">
+<span class="sig-name descname"><span class="pre">action_select_row</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.action_select_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.action_select_row" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.on_data_table_row_selected">
+<span class="sig-name descname"><span class="pre">on_data_table_row_selected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">textual.widgets.DataTable.RowSelected</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.on_data_table_row_selected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.on_data_table_row_selected" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.action_view_images">
+<span class="sig-name descname"><span class="pre">action_view_images</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.action_view_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.action_view_images" title="Link to this definition">¶</a></dt>
+<dd><p>Action to trigger viewing images for the current task across sessions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.refresh_content">
+<span class="sig-name descname"><span class="pre">refresh_content</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.refresh_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.refresh_content" title="Link to this definition">¶</a></dt>
+<dd><p>Reloads task instance data and updates the screen.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.perform_sort">
+<span class="sig-name descname"><span class="pre">perform_sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sort_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">textual.widgets._data_table.ColumnKey</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/task_sessions_screen.html#TaskSessionsScreen.perform_sort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.task_sessions_screen.TaskSessionsScreen.perform_sort" title="Link to this definition">¶</a></dt>
+<dd><p>Sorts the DataTable by the given column key.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+      <div class="rst-footer-buttons" role="navigation" aria-label="Footer Nav">
+          <a href="../task_screen/index.html" class="btn btn-neutral float-left" title="seer_navigator.screens.task_screen" accesskey="p" rel="prev"> Previous</a>
+          <a href="../tasks_screen/index.html" class="btn btn-neutral float-right" title="seer_navigator.screens.tasks_screen" accesskey="n" rel="next">Next </a>
+      </div>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

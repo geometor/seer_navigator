@@ -1,0 +1,128 @@
+seer_navigator.sessions_navigator
+=================================
+
+.. py:module:: seer_navigator.sessions_navigator
+
+.. autoapi-nested-parse::
+
+   Defines the main SessionsNavigator Textual App class.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   seer_navigator.sessions_navigator.RENDERERS
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.sessions_navigator.DummyGrid
+   seer_navigator.sessions_navigator.SessionsNavigator
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   seer_navigator.sessions_navigator.run
+
+
+Module Contents
+---------------
+
+.. py:class:: DummyGrid(grid_data: list, *args, **kwargs)
+
+   Bases: :py:obj:`textual.widgets.Static`
+
+
+   Placeholder widget used when real renderers fail to import.
+
+
+.. py:data:: RENDERERS
+
+.. py:class:: SessionsNavigator(sessions_root: str = './sessions')
+
+   Bases: :py:obj:`textual.app.App`
+
+
+   The base class for Textual Applications.
+
+
+   .. py:attribute:: BINDINGS
+
+      The default key bindings.
+
+
+
+   .. py:attribute:: sessions_root
+
+
+   .. py:attribute:: renderer
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+      Yield the initial container for the app's default screen.
+
+
+
+   .. py:method:: on_mount() -> None
+
+
+   .. py:method:: action_previous_sibling() -> None
+
+      Navigate to the previous sibling directory.
+
+
+
+   .. py:method:: action_next_sibling() -> None
+
+      Navigate to the next sibling directory.
+
+
+
+   .. py:method:: action_set_renderer(renderer_name: str) -> None
+
+      Sets the grid renderer and refreshes the TrialScreen if active.
+
+
+
+   .. py:method:: action_refresh_screen() -> None
+
+      Calls the refresh method on the current screen if it exists.
+
+
+
+   .. py:method:: action_view_images() -> None
+
+      Pushes the image view modal screen.
+
+
+
+   .. py:method:: launch_sxiv(context_path: pathlib.Path, filter_type: str, task_id: str | None = None) -> None
+
+      Finds images based on filter and launches sxiv. task_id is ignored in this navigator.
+
+
+
+   .. py:method:: action_sort_table() -> None
+
+      Pushes the SortModal screen to select a column for sorting.
+
+
+
+   .. py:method:: action_quit() -> None
+
+      Quits the application
+
+
+
+.. py:function:: run()
+

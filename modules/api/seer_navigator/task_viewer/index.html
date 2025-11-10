@@ -1,0 +1,206 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.task_viewer &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+           <a href="../sessions_navigator/index.html" class="prev" title="seer_navigator.sessions_navigator" >Prev</a>
+        </div>
+        <div class="next">
+          <a href="../tasks_navigator/index.html" class="next" title="seer_navigator.tasks_navigator" >Next</a>
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">API Reference</a></span>
+          <span>/</span>
+        <span><a href="../index.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.task_viewer</span>
+      </nav>
+      <div class="content">
+          <section id="module-seer_navigator.task_viewer">
+<span id="seer-navigator-task-viewer"></span><h1>seer_navigator.task_viewer<a class="headerlink" href="#module-seer_navigator.task_viewer" title="Link to this heading">¶</a></h1>
+<p>A Textual app that displays ARC-style colored grids with grid lines separating the cells.
+It demonstrates several rendering methods (image-based, Unicode block, and half-block) with grid lines.</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#seer_navigator.task_viewer.Navigator" title="seer_navigator.task_viewer.Navigator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Navigator</span></code></a></p></td>
+<td><p>The base class for Textual Applications.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#seer_navigator.task_viewer.main" title="seer_navigator.task_viewer.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>()</p></td>
+<td><p>Loads tasks from the specified directory and runs the Navigator to display them.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seer_navigator.task_viewer.</span></span><span class="sig-name descname"><span class="pre">Navigator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><span class="pre">list</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">renderer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SolidGrid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">textual.app.App</span></code></p>
+<p>The base class for Textual Applications.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.CSS_PATH">
+<span class="sig-name descname"><span class="pre">CSS_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'navigator.tcss'</span></em><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.CSS_PATH"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.CSS_PATH" title="Link to this definition">¶</a></dt>
+<dd><p>File paths to load CSS from.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.BINDINGS">
+<span class="sig-name descname"><span class="pre">BINDINGS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('q',</span> <span class="pre">'quit',</span> <span class="pre">'Quit'),</span> <span class="pre">('s',</span> <span class="pre">'set_renderer_solid',</span> <span class="pre">'Solid'),</span> <span class="pre">('c',</span> <span class="pre">'set_renderer_char',...</span></em><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.BINDINGS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.BINDINGS" title="Link to this definition">¶</a></dt>
+<dd><p>The default key bindings.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.tasks">
+<span class="sig-name descname"><span class="pre">tasks</span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.tasks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.tasks" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.renderer">
+<span class="sig-name descname"><span class="pre">renderer</span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.renderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.renderer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.compose">
+<span class="sig-name descname"><span class="pre">compose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">textual.app.ComposeResult</span></span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.compose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.compose" title="Link to this definition">¶</a></dt>
+<dd><p>Create the UI layout.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.on_mount">
+<span class="sig-name descname"><span class="pre">on_mount</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.on_mount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.on_mount" title="Link to this definition">¶</a></dt>
+<dd><p>Populate the list view after mounting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.on_list_view_highlighted">
+<span class="sig-name descname"><span class="pre">on_list_view_highlighted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">textual.widgets.ListView.Highlighted</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.on_list_view_highlighted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.on_list_view_highlighted" title="Link to this definition">¶</a></dt>
+<dd><p>Event handler for list view selection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.display_task">
+<span class="sig-name descname"><span class="pre">display_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.display_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.display_task" title="Link to this definition">¶</a></dt>
+<dd><p>Display the selected task.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.action_set_renderer_solid">
+<span class="sig-name descname"><span class="pre">action_set_renderer_solid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.action_set_renderer_solid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.action_set_renderer_solid" title="Link to this definition">¶</a></dt>
+<dd><p>Set the renderer to SolidGrid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.action_set_renderer_char">
+<span class="sig-name descname"><span class="pre">action_set_renderer_char</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.action_set_renderer_char"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.action_set_renderer_char" title="Link to this definition">¶</a></dt>
+<dd><p>Set the renderer to CharGrid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.action_set_renderer_block">
+<span class="sig-name descname"><span class="pre">action_set_renderer_block</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.action_set_renderer_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.action_set_renderer_block" title="Link to this definition">¶</a></dt>
+<dd><p>Set the renderer to BlockGrid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.Navigator.action_set_renderer_tiny">
+<span class="sig-name descname"><span class="pre">action_set_renderer_tiny</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#Navigator.action_set_renderer_tiny"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.Navigator.action_set_renderer_tiny" title="Link to this definition">¶</a></dt>
+<dd><p>Set the renderer to TinyGrid.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="seer_navigator.task_viewer.main">
+<span class="sig-prename descclassname"><span class="pre">seer_navigator.task_viewer.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/seer_navigator/task_viewer.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.task_viewer.main" title="Link to this definition">¶</a></dt>
+<dd><p>Loads tasks from the specified directory and runs the Navigator to display them.</p>
+</dd></dl>
+
+</section>
+</section>
+
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+      <div class="rst-footer-buttons" role="navigation" aria-label="Footer Nav">
+          <a href="../sessions_navigator/index.html" class="btn btn-neutral float-left" title="seer_navigator.sessions_navigator" accesskey="p" rel="prev"> Previous</a>
+          <a href="../tasks_navigator/index.html" class="btn btn-neutral float-right" title="seer_navigator.tasks_navigator" accesskey="n" rel="next">Next </a>
+      </div>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

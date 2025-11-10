@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.screens.trial_screen &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+        </div>
+        <div class="next">
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">Module code</a></span>
+          <span>/</span>
+        <span><a href="../../seer_navigator.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.screens.trial_screen</span>
+      </nav>
+      <div class="content">
+          <h1>Source code for seer_navigator.screens.trial_screen</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the TrialViewer widget for displaying trial input/output grids.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">Text</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComposeResult</span>
+<span class="c1"># Alias textual.containers.Grid to avoid name collision</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScrollableContainer</span><span class="p">,</span> <span class="n">Grid</span> <span class="k">as</span> <span class="n">TextualGrid</span><span class="p">,</span> <span class="n">VerticalScroll</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Static</span><span class="p">,</span> <span class="n">DataTable</span> <span class="c1"># Removed Header, Footer, Screen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span>
+<span class="c1"># Removed Binding import</span>
+
+<span class="c1"># Import renderers (assuming they are accessible)</span>
+<span class="c1"># Adjust the import path if necessary based on your project structure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer.tasks.grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">string_to_grid</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">SolidGrid</span><span class="p">,</span>
+        <span class="n">BlockGrid</span><span class="p">,</span>
+        <span class="n">CharGrid</span><span class="p">,</span>
+        <span class="n">TinyGrid</span><span class="p">,</span>
+    <span class="p">)</span>
+<div class="viewcode-block" id="RENDERERS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.RENDERERS">[docs]</a>
+    <span class="n">RENDERERS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;solid&quot;</span><span class="p">:</span> <span class="n">SolidGrid</span><span class="p">,</span>
+        <span class="s2">&quot;block&quot;</span><span class="p">:</span> <span class="n">BlockGrid</span><span class="p">,</span>
+        <span class="s2">&quot;char&quot;</span><span class="p">:</span> <span class="n">CharGrid</span><span class="p">,</span>
+        <span class="s2">&quot;tiny&quot;</span><span class="p">:</span> <span class="n">TinyGrid</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not import grid renderers. Grid visualization will fail.&quot;</span><span class="p">)</span>
+    <span class="n">RENDERERS</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Define dummy classes if import fails to prevent NameErrors later</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">DummyGrid</span><span class="p">(</span><span class="n">Static</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid_data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;Renderer Error&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">SolidGrid</span> <span class="o">=</span> <span class="n">BlockGrid</span> <span class="o">=</span> <span class="n">CharGrid</span> <span class="o">=</span> <span class="n">TinyGrid</span> <span class="o">=</span> <span class="n">DummyGrid</span>
+
+
+<span class="c1"># Helper function to parse grid strings</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_grid_string</span><span class="p">(</span><span class="n">grid_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses a string like &#39;0 1\n2 3&#39; into a list of lists of ints.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">grid_str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">grid_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)]</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse grid string: </span><span class="si">{</span><span class="n">grid_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span> <span class="c1"># Return empty list on parsing error</span>
+
+<div class="viewcode-block" id="TrialViewer">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrialViewer</span><span class="p">(</span><span class="n">ScrollableContainer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Displays the input, expected output, and actual output grids from a trial.json file.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TrialViewer.DEFAULT_CSS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.DEFAULT_CSS">[docs]</a>
+    <span class="n">DEFAULT_CSS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    TrialViewer {</span>
+<span class="s2">        /* Inherit background from parent */</span>
+<span class="s2">    }</span>
+<span class="s2">    .trial-grid {</span>
+<span class="s2">        grid-size: 4; /* Details, Input, Expected, Actual */</span>
+<span class="s2">        grid-gutter: 1 2;</span>
+<span class="s2">        grid-rows: auto;</span>
+<span class="s2">        padding: 1 2;</span>
+<span class="s2">        align: center top;</span>
+<span class="s2">        border-bottom: thick $accent-darken-1;</span>
+<span class="s2">        height: auto; /* Fit content height */</span>
+<span class="s2">        margin-bottom: 1;</span>
+<span class="s2">    }</span>
+<span class="s2">    .trial-details-table {</span>
+<span class="s2">        height: auto; /* Fit content height */</span>
+<span class="s2">        border: none; /* No border for summary tables */</span>
+<span class="s2">        width: auto; /* Fit content width */</span>
+<span class="s2">    }</span>
+<span class="s2">    /* Ensure no focus border on summary tables */</span>
+<span class="s2">    .trial-details-table:focus {</span>
+<span class="s2">        border: none;</span>
+<span class="s2">    }</span>
+<span class="s2">    .trial-set-label {</span>
+<span class="s2">        width: 100%;</span>
+<span class="s2">        text-align: center;</span>
+<span class="s2">        text-style: bold underline;</span>
+<span class="s2">        margin-top: 2;</span>
+<span class="s2">        margin-bottom: 1;</span>
+<span class="s2">    }</span>
+<span class="s2">    /* Style for grid labels (optional, if needed above each grid) */</span>
+<span class="s2">    .grid-label {</span>
+<span class="s2">        text-style: bold;</span>
+<span class="s2">        text-align: center;</span>
+<span class="s2">        margin-bottom: 1;</span>
+<span class="s2">    }</span>
+<span class="s2">    /* Add style for the individual grid renderer cells */</span>
+<span class="s2">    .grid-renderer-cell {</span>
+<span class="s2">        overflow-x: scroll; /* Enable horizontal scrolling */</span>
+<span class="s2">        overflow-y: hidden; /* Prevent vertical scrolling within the cell */</span>
+<span class="s2">        height: auto; /* Let content determine height */</span>
+<span class="s2">        /* The TextualGrid layout will determine the width */</span>
+<span class="s2">    }</span>
+<span class="s2">    &quot;&quot;&quot;</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">renderer</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Static</span><span class="p">]</span> <span class="o">=</span> <span class="n">SolidGrid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="viewcode-block" id="TrialViewer.trial_path">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.trial_path">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span> <span class="o">=</span> <span class="n">trial_path</span></div>
+
+<div class="viewcode-block" id="TrialViewer.renderer">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.renderer">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">renderer</span></div>
+
+<div class="viewcode-block" id="TrialViewer.trial_data">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.trial_data">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trial_data</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+        <span class="c1"># Container to hold all trial grids</span>
+<div class="viewcode-block" id="TrialViewer.trials_container">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.trials_container">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span> <span class="o">=</span> <span class="n">VerticalScroll</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;trials-container&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TrialViewer.compose">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.compose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComposeResult</span><span class="p">:</span>
+        <span class="c1"># Yield the container that will hold the trial grids</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span></div>
+
+
+<div class="viewcode-block" id="TrialViewer.on_mount">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.on_mount">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load data and display trials when the widget is mounted or path changes.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_and_display</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TrialViewer.load_and_display">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.load_and_display">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_and_display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads the trial JSON and populates the trials container.&quot;&quot;&quot;</span>
+        <span class="c1"># Clear previous content first</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">remove_children</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">Static</span><span class="p">(</span><span class="s2">&quot;No trial file specified.&quot;</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trial_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trial file not found: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">Static</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: File not found</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error decoding JSON from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">Static</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Invalid JSON file</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An unexpected error occurred loading </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">Static</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Could not load file</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_path</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_trials</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_home</span><span class="p">(</span><span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Scroll viewer to top</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_details_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataTable</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a DataTable widget for a single trial&#39;s details.&quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">DataTable</span><span class="p">(</span>
+                <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;trial-details-table&quot;</span><span class="p">,</span> 
+                <span class="n">show_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                <span class="n">cursor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span><span class="s2">&quot;Metric&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">format_bool</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span> <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✔&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span> <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;✘&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">format_float</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">format_int</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+        <span class="n">details</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;Match&quot;</span><span class="p">,</span> <span class="n">format_bool</span><span class="p">(</span><span class="n">trial_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;match&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;Score&quot;</span><span class="p">,</span> <span class="n">format_int</span><span class="p">(</span><span class="n">trial_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;score&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;Size OK&quot;</span><span class="p">,</span> <span class="n">format_bool</span><span class="p">(</span><span class="n">trial_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;size_correct&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;Palette OK&quot;</span><span class="p">,</span> <span class="n">format_bool</span><span class="p">(</span><span class="n">trial_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color_palette_correct&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;Count OK&quot;</span><span class="p">,</span> <span class="n">format_bool</span><span class="p">(</span><span class="n">trial_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color_count_correct&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;Pixels Off&quot;</span><span class="p">,</span> <span class="n">format_int</span><span class="p">(</span><span class="n">trial_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pixels_off&quot;</span><span class="p">))),</span>
+            <span class="p">(</span><span class="s2">&quot;% Correct&quot;</span><span class="p">,</span> <span class="n">format_float</span><span class="p">(</span><span class="n">trial_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;percent_correct&quot;</span><span class="p">))),</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">details</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">table</span>
+
+<div class="viewcode-block" id="TrialViewer.display_trials">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.display_trials">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_trials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clears and repopulates the trials container with trial data using the current renderer.&quot;&quot;&quot;</span>
+        <span class="c1"># Clear previous content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">remove_children</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">Static</span><span class="p">(</span><span class="s2">&quot;No trial data loaded.&quot;</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">RENDERERS</span><span class="p">:</span>
+             <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Renderers failed to import.&quot;</span><span class="p">)</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">Static</span><span class="p">(</span><span class="s2">&quot;Error: Grid renderer not available.&quot;</span><span class="p">))</span>
+             <span class="k">return</span>
+
+        <span class="n">current_renderer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="c1"># Use the renderer passed during init or updated</span>
+
+        <span class="n">widgets_to_mount</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Process Train trials</span>
+        <span class="c1"># Use `or {}` to handle cases where the key exists but the value is None</span>
+        <span class="n">train_trials</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;trials&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">train_trials</span><span class="p">:</span>
+            <span class="n">widgets_to_mount</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Static</span><span class="p">(</span><span class="s2">&quot;Train Set&quot;</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;trial-set-label&quot;</span><span class="p">))</span>
+            <span class="c1"># Optional: Add labels above the grid columns if desired</span>
+            <span class="c1"># widgets_to_mount.append(Grid(</span>
+            <span class="c1">#     Static(&quot;Details&quot;, classes=&quot;grid-label&quot;),</span>
+            <span class="c1">#     Static(&quot;Input&quot;, classes=&quot;grid-label&quot;),</span>
+            <span class="c1">#     Static(&quot;Expected&quot;, classes=&quot;grid-label&quot;),</span>
+            <span class="c1">#     Static(&quot;Actual&quot;, classes=&quot;grid-label&quot;),</span>
+            <span class="c1">#     classes=&quot;trial-grid-labels&quot; # Add specific class if needed</span>
+            <span class="c1"># ))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_trials</span><span class="p">):</span>
+                <span class="c1"># Use string_to_grid and extract the numpy array or use []</span>
+                <span class="n">input_grid_obj</span> <span class="o">=</span> <span class="n">string_to_grid</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                <span class="n">input_grid_data</span> <span class="o">=</span> <span class="n">input_grid_obj</span><span class="o">.</span><span class="n">grid</span> <span class="k">if</span> <span class="n">input_grid_obj</span> <span class="k">else</span> <span class="p">[]</span>
+                <span class="n">expected_grid_obj</span> <span class="o">=</span> <span class="n">string_to_grid</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;expected_output&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                <span class="n">expected_grid_data</span> <span class="o">=</span> <span class="n">expected_grid_obj</span><span class="o">.</span><span class="n">grid</span> <span class="k">if</span> <span class="n">expected_grid_obj</span> <span class="k">else</span> <span class="p">[]</span>
+                <span class="n">actual_grid_obj</span> <span class="o">=</span> <span class="n">string_to_grid</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;transformed_output&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                <span class="n">actual_grid_data</span> <span class="o">=</span> <span class="n">actual_grid_obj</span><span class="o">.</span><span class="n">grid</span> <span class="k">if</span> <span class="n">actual_grid_obj</span> <span class="k">else</span> <span class="p">[]</span>
+
+                <span class="c1"># Use the aliased TextualGrid for layout</span>
+                <span class="n">trial_grid</span> <span class="o">=</span> <span class="n">TextualGrid</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_create_details_table</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span>
+                    <span class="c1"># Add the &#39;grid-renderer-cell&#39; class here</span>
+                    <span class="n">current_renderer</span><span class="p">(</span><span class="n">input_grid_data</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;grid-renderer-cell&quot;</span><span class="p">),</span>
+                    <span class="n">current_renderer</span><span class="p">(</span><span class="n">expected_grid_data</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;grid-renderer-cell&quot;</span><span class="p">),</span>
+                    <span class="n">current_renderer</span><span class="p">(</span><span class="n">actual_grid_data</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;grid-renderer-cell&quot;</span><span class="p">),</span>
+                    <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;trial-grid&quot;</span>
+                    <span class="c1"># id=f&quot;train-trial-{i}&quot; # REMOVED ID</span>
+                <span class="p">)</span>
+                <span class="n">widgets_to_mount</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trial_grid</span><span class="p">)</span>
+
+        <span class="c1"># Process Test trials</span>
+        <span class="c1"># Use `or {}` to handle cases where the key exists but the value is None</span>
+        <span class="n">test_trials</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;trials&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">test_trials</span><span class="p">:</span>
+            <span class="n">widgets_to_mount</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Static</span><span class="p">(</span><span class="s2">&quot;Test Set&quot;</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;trial-set-label&quot;</span><span class="p">))</span>
+            <span class="c1"># Optional: Add labels above the grid columns if desired</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_trials</span><span class="p">):</span>
+                <span class="c1"># Use string_to_grid and extract the numpy array or use []</span>
+                <span class="n">input_grid_obj</span> <span class="o">=</span> <span class="n">string_to_grid</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                <span class="n">input_grid_data</span> <span class="o">=</span> <span class="n">input_grid_obj</span><span class="o">.</span><span class="n">grid</span> <span class="k">if</span> <span class="n">input_grid_obj</span> <span class="k">else</span> <span class="p">[]</span>
+                <span class="n">expected_grid_obj</span> <span class="o">=</span> <span class="n">string_to_grid</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;expected_output&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                <span class="n">expected_grid_data</span> <span class="o">=</span> <span class="n">expected_grid_obj</span><span class="o">.</span><span class="n">grid</span> <span class="k">if</span> <span class="n">expected_grid_obj</span> <span class="k">else</span> <span class="p">[]</span>
+                <span class="n">actual_grid_obj</span> <span class="o">=</span> <span class="n">string_to_grid</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;transformed_output&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                <span class="n">actual_grid_data</span> <span class="o">=</span> <span class="n">actual_grid_obj</span><span class="o">.</span><span class="n">grid</span> <span class="k">if</span> <span class="n">actual_grid_obj</span> <span class="k">else</span> <span class="p">[]</span>
+
+                <span class="c1"># Use the aliased TextualGrid for layout</span>
+                <span class="n">trial_grid</span> <span class="o">=</span> <span class="n">TextualGrid</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_create_details_table</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span>
+                    <span class="c1"># Add the &#39;grid-renderer-cell&#39; class here</span>
+                    <span class="n">current_renderer</span><span class="p">(</span><span class="n">input_grid_data</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;grid-renderer-cell&quot;</span><span class="p">),</span>
+                    <span class="n">current_renderer</span><span class="p">(</span><span class="n">expected_grid_data</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;grid-renderer-cell&quot;</span><span class="p">),</span>
+                    <span class="n">current_renderer</span><span class="p">(</span><span class="n">actual_grid_data</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;grid-renderer-cell&quot;</span><span class="p">),</span>
+                    <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;trial-grid&quot;</span>
+                    <span class="c1"># id=f&quot;test-trial-{i}&quot; # REMOVED ID</span>
+                <span class="p">)</span>
+                <span class="n">widgets_to_mount</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trial_grid</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">widgets_to_mount</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">Static</span><span class="p">(</span><span class="s2">&quot;No trial data found in file.&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trials_container</span><span class="o">.</span><span class="n">mount_all</span><span class="p">(</span><span class="n">widgets_to_mount</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TrialViewer.refresh_display">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_screen/index.html#seer_navigator.screens.trial_screen.TrialViewer.refresh_display">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh_display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Refreshes the grid display using the current renderer.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshing TrialViewer display with renderer: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Reload and display data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_and_display</span><span class="p">()</span></div>
+</div>
+
+
+</pre></div>
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

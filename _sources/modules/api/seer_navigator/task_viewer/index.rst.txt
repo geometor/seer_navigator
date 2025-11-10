@@ -1,0 +1,114 @@
+seer_navigator.task_viewer
+==========================
+
+.. py:module:: seer_navigator.task_viewer
+
+.. autoapi-nested-parse::
+
+   A Textual app that displays ARC-style colored grids with grid lines separating the cells.
+   It demonstrates several rendering methods (image-based, Unicode block, and half-block) with grid lines.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.task_viewer.Navigator
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   seer_navigator.task_viewer.main
+
+
+Module Contents
+---------------
+
+.. py:class:: Navigator(tasks: list, renderer=SolidGrid, **kwargs)
+
+   Bases: :py:obj:`textual.app.App`
+
+
+   The base class for Textual Applications.
+
+
+   .. py:attribute:: CSS_PATH
+      :value: 'navigator.tcss'
+
+
+      File paths to load CSS from.
+
+
+
+   .. py:attribute:: BINDINGS
+      :value: [('q', 'quit', 'Quit'), ('s', 'set_renderer_solid', 'Solid'), ('c', 'set_renderer_char',...
+
+
+      The default key bindings.
+
+
+
+   .. py:attribute:: tasks
+
+
+   .. py:attribute:: renderer
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+      Create the UI layout.
+
+
+
+   .. py:method:: on_mount() -> None
+
+      Populate the list view after mounting.
+
+
+
+   .. py:method:: on_list_view_highlighted(event: textual.widgets.ListView.Highlighted) -> None
+
+      Event handler for list view selection.
+
+
+
+   .. py:method:: display_task(task_id: str) -> None
+
+      Display the selected task.
+
+
+
+   .. py:method:: action_set_renderer_solid() -> None
+
+      Set the renderer to SolidGrid.
+
+
+
+   .. py:method:: action_set_renderer_char() -> None
+
+      Set the renderer to CharGrid.
+
+
+
+   .. py:method:: action_set_renderer_block() -> None
+
+      Set the renderer to BlockGrid.
+
+
+
+   .. py:method:: action_set_renderer_tiny() -> None
+
+      Set the renderer to TinyGrid.
+
+
+
+.. py:function:: main()
+
+   Loads tasks from the specified directory and runs the Navigator to display them.
+
+

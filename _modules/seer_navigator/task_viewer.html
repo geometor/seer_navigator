@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.task_viewer &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+        </div>
+        <div class="next">
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../index.html">Module code</a></span>
+          <span>/</span>
+        <span><a href="../seer_navigator.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.task_viewer</span>
+      </nav>
+      <div class="content">
+          <h1>Source code for seer_navigator.task_viewer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A Textual app that displays ARC-style colored grids with grid lines separating the cells.</span>
+<span class="sd">It demonstrates several rendering methods (image-based, Unicode block, and half-block) with grid lines.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">App</span><span class="p">,</span> <span class="n">ComposeResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Horizontal</span><span class="p">,</span> <span class="n">Vertical</span><span class="p">,</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">ScrollableContainer</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">ListView</span><span class="p">,</span> <span class="n">ListItem</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Footer</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CharGrid</span><span class="p">,</span>
+    <span class="n">BlockGrid</span><span class="p">,</span>
+    <span class="n">SolidGrid</span><span class="p">,</span>
+    <span class="n">TinyGrid</span><span class="p">,</span>  <span class="c1"># Import the new renderer</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer.tasks.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span>  
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<div class="viewcode-block" id="Navigator">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Navigator</span><span class="p">(</span><span class="n">App</span><span class="p">):</span>
+<div class="viewcode-block" id="Navigator.CSS_PATH">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.CSS_PATH">[docs]</a>
+    <span class="n">CSS_PATH</span> <span class="o">=</span> <span class="s2">&quot;navigator.tcss&quot;</span>  </div>
+
+<div class="viewcode-block" id="Navigator.BINDINGS">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.BINDINGS">[docs]</a>
+    <span class="n">BINDINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span> <span class="s2">&quot;Quit&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer_solid&quot;</span><span class="p">,</span> <span class="s2">&quot;Solid&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer_char&quot;</span><span class="p">,</span> <span class="s2">&quot;Char&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer_block&quot;</span><span class="p">,</span> <span class="s2">&quot;Block&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer_tiny&quot;</span><span class="p">,</span> <span class="s2">&quot;Tiny&quot;</span><span class="p">),</span>  <span class="c1"># Add the new binding</span>
+    <span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="n">SolidGrid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="viewcode-block" id="Navigator.tasks">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.tasks">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span></div>
+
+<div class="viewcode-block" id="Navigator.renderer">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.renderer">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">SolidGrid</span></div>
+
+
+<div class="viewcode-block" id="Navigator.compose">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.compose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComposeResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the UI layout.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">Horizontal</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">Vertical</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;task-selection&quot;</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">Static</span><span class="p">(</span><span class="s2">&quot;Select a Task:&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;task_title&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">list_view</span> <span class="o">=</span> <span class="n">ListView</span><span class="p">()</span>  
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_view</span>
+            <span class="k">with</span> <span class="n">ScrollableContainer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;grid-display&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">grid_container</span> <span class="o">=</span> <span class="n">Grid</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;grid-container&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_container</span>  
+            <span class="k">yield</span> <span class="n">Footer</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Navigator.on_mount">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.on_mount">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate the list view after mounting.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>  
+            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">list_view</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">ListItem</span><span class="p">(</span><span class="n">Label</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">)),</span> <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;task_</span><span class="si">{</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_task_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_task_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Navigator.on_list_view_highlighted">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.on_list_view_highlighted">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_list_view_highlighted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">ListView</span><span class="o">.</span><span class="n">Highlighted</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Event handler for list view selection.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_task_id</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;task_&quot;</span><span class="p">)</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;task_&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Navigator.display_task">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.display_task">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display the selected task.&quot;&quot;&quot;</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">task_id</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid_container</span><span class="o">.</span><span class="n">remove_children</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid_container</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">grid_size_rows</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid_container</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">grid_size_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">train</span><span class="p">)</span>
+
+        <span class="c1"># Add train grids</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">task_pair</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">train</span><span class="p">):</span>
+            <span class="n">input_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="p">(</span><span class="n">task_pair</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_container</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">input_grid</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">task_pair</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">train</span><span class="p">):</span>
+            <span class="n">output_grid</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="p">(</span><span class="n">task_pair</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span> <span class="k">if</span> <span class="n">task_pair</span><span class="o">.</span><span class="n">output</span> <span class="k">else</span> <span class="n">Static</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_container</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">output_grid</span><span class="p">)</span>
+
+        <span class="c1"># Add test grids, if they exist</span>
+        <span class="c1">#  if task.test:</span>
+            <span class="c1">#  j = 0  # counter for output grids</span>
+            <span class="c1">#  for i, task_pair in enumerate(task.test):</span>
+                <span class="c1">#  input_grid = self.renderer(task_pair.input.grid)</span>
+                <span class="c1">#  self.grid_container.place(input_grid, area=f&quot;test_input_{i}&quot;)</span>
+
+                <span class="c1">#  if task_pair.output:</span>
+                    <span class="c1">#  output_grid = self.renderer(task_pair.output.grid)</span>
+                    <span class="c1">#  self.grid_container.place(output_grid, area=f&quot;test_output_{j}&quot;)</span>
+                    <span class="c1">#  j += 1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid_container</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Navigator.action_set_renderer_solid">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.action_set_renderer_solid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_set_renderer_solid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the renderer to SolidGrid.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">SolidGrid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_task_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Navigator.action_set_renderer_char">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.action_set_renderer_char">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_set_renderer_char</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the renderer to CharGrid.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">CharGrid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_task_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Navigator.action_set_renderer_block">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.action_set_renderer_block">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_set_renderer_block</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the renderer to BlockGrid.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">BlockGrid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_task_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Navigator.action_set_renderer_tiny">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.Navigator.action_set_renderer_tiny">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_set_renderer_tiny</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the renderer to TinyGrid.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">TinyGrid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_task_id</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/task_viewer/index.html#seer_navigator.task_viewer.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads tasks from the specified directory and runs the Navigator to display them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer.tasks.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tasks</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.navigator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Navigator</span>
+
+    <span class="c1"># --- Configuration ---</span>
+    <span class="c1">#  TASKS_DIR = Path(&quot;/home/phi/PROJECTS/geometor/seer_sessions/run/tasks/ARC/training&quot;)</span>
+    <span class="n">TASKS_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/home/phi/PROJECTS/geometor/_ARC-AGI-2/data/evaluation&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 1. Load tasks</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">TASKS_DIR</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Tasks directory &#39;</span><span class="si">{</span><span class="n">TASKS_DIR</span><span class="si">}</span><span class="s2">&#39; not found.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please create a &#39;tasks&#39; directory and place your JSON task files in it.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="n">Tasks</span><span class="p">(</span><span class="n">TASKS_DIR</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading tasks: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tasks</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No tasks found in the &#39;tasks&#39; directory.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">get_ordered_tasks</span><span class="p">()</span>
+
+    <span class="c1"># 2. Create and run the Navigator app</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Navigator</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>  <span class="c1"># Limit to 5 tasks for demonstration</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

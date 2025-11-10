@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.screens.trial_split_view_screen &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+        </div>
+        <div class="next">
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">Module code</a></span>
+          <span>/</span>
+        <span><a href="../../seer_navigator.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.screens.trial_split_view_screen</span>
+      </nav>
+      <div class="content">
+          <h1>Source code for seer_navigator.screens.trial_split_view_screen</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the TrialSplitViewScreen for showing code alongside trial grids.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="c1"># import json # Removed unused import</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComposeResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.binding</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binding</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Horizontal</span><span class="p">,</span> <span class="n">Container</span> <span class="c1"># Use Container for flexible sizing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.reactive</span><span class="w"> </span><span class="kn">import</span> <span class="n">var</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">Screen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Header</span><span class="p">,</span> <span class="n">Footer</span><span class="p">,</span> <span class="n">TextArea</span><span class="p">,</span> <span class="n">Static</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span>
+
+<span class="c1"># Import the TrialViewer widget which will handle the grid rendering</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.trial_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrialViewer</span>
+<span class="c1"># Import a default renderer if needed, or rely on the one passed from the app</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.renderers.solid_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">SolidGrid</span>
+
+<div class="viewcode-block" id="TrialSplitViewScreen">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrialSplitViewScreen</span><span class="p">(</span><span class="n">Screen</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A screen that displays Python source code side-by-side with the</span>
+<span class="sd">    rendered TrialViewer grid for a set of trials, allowing navigation between them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TrialSplitViewScreen.BINDINGS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.BINDINGS">[docs]</a>
+    <span class="n">BINDINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;h,escape,q&quot;</span><span class="p">,</span> <span class="s2">&quot;app.pop_screen&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;j,down&quot;</span><span class="p">,</span> <span class="s2">&quot;next_trial&quot;</span><span class="p">,</span> <span class="s2">&quot;Next Trial&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;k,up&quot;</span><span class="p">,</span> <span class="s2">&quot;previous_trial&quot;</span><span class="p">,</span> <span class="s2">&quot;Previous Trial&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;ctrl+s&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer(&#39;solid&#39;)&quot;</span><span class="p">,</span> <span class="s2">&quot;Solid&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;ctrl+c&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer(&#39;char&#39;)&quot;</span><span class="p">,</span> <span class="s2">&quot;Char&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;ctrl+b&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer(&#39;block&#39;)&quot;</span><span class="p">,</span> <span class="s2">&quot;Block&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;ctrl+t&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer(&#39;tiny&#39;)&quot;</span><span class="p">,</span> <span class="s2">&quot;Tiny&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TrialSplitViewScreen.CSS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.CSS">[docs]</a>
+    <span class="n">CSS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    TrialSplitViewScreen &gt; Horizontal {</span>
+<span class="s2">        height: 1fr; /* Make horizontal fill the screen */</span>
+<span class="s2">    }</span>
+
+<span class="s2">    #json-container {</span>
+<span class="s2">        width: 50%;</span>
+<span class="s2">        border-right: thick $accent;</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    #trial-viewer-container {</span>
+<span class="s2">        width: 50%;</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    /* Ensure children fill their containers */</span>
+<span class="s2">    #json-text-area {</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">        border: none;</span>
+<span class="s2">    }</span>
+<span class="s2">    #trial-viewer-widget {</span>
+<span class="s2">       /* TrialViewer is scrollable, let it manage its own height/scrolling */</span>
+<span class="s2">       height: 1fr;</span>
+<span class="s2">    }</span>
+<span class="s2">    &quot;&quot;&quot;</span></div>
+
+
+    <span class="c1"># Store the list of trial paths and current index</span>
+<div class="viewcode-block" id="TrialSplitViewScreen.trial_paths">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.trial_paths">[docs]</a>
+    <span class="n">trial_paths</span><span class="p">:</span> <span class="n">var</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="n">var</span><span class="p">([])</span></div>
+
+<div class="viewcode-block" id="TrialSplitViewScreen.current_index">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.current_index">[docs]</a>
+    <span class="n">current_index</span><span class="p">:</span> <span class="n">var</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+    <span class="c1"># Store the derived python path for the *current* trial</span>
+<div class="viewcode-block" id="TrialSplitViewScreen.current_python_path">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.current_python_path">[docs]</a>
+    <span class="n">current_python_path</span><span class="p">:</span> <span class="n">var</span><span class="p">[</span><span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+
+    <span class="c1"># Store the renderer class</span>
+<div class="viewcode-block" id="TrialSplitViewScreen.renderer">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.renderer">[docs]</a>
+    <span class="n">renderer</span><span class="p">:</span> <span class="n">var</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="n">Static</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">renderer_class_arg</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Static</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TrialSplitViewScreen.__init__: Received </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trial_paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> trial paths. Renderer: </span><span class="si">{</span><span class="n">renderer_class_arg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">trial_paths</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;TrialSplitViewScreen initialized with no trial paths!&quot;</span><span class="p">)</span>
+            <span class="c1"># Handle this case gracefully, maybe pop screen or show error message</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trial_paths</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># Consider popping the screen immediately or showing an error static widget</span>
+            <span class="c1"># self.app.pop_screen()</span>
+            <span class="c1"># self.app.notify(&quot;No trial files found to view.&quot;, severity=&quot;error&quot;, timeout=5)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">trial_paths</span> <span class="o">=</span> <span class="n">trial_paths</span> <span class="c1"># Store the list</span>
+
+        <span class="c1"># Validate and store the renderer class</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">renderer_class_arg</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">renderer_class_arg</span><span class="p">,</span> <span class="n">Static</span><span class="p">):</span>
+             <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TrialSplitViewScreen received invalid renderer: </span><span class="si">{</span><span class="n">renderer_class_arg</span><span class="si">}</span><span class="s2">. Falling back to SolidGrid.&quot;</span><span class="p">)</span>
+             <span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.renderers.solid_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">SolidGrid</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">SolidGrid</span>
+        <span class="k">else</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">renderer_class_arg</span>
+
+        <span class="c1"># Initial setup will be handled by watch_current_index or on_mount calling load_current_trial</span>
+        <span class="c1"># self.current_index is already 0 by default</span>
+
+<div class="viewcode-block" id="TrialSplitViewScreen.compose">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.compose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComposeResult</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">Header</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">Horizontal</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">Container</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;json-container&quot;</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">TextArea</span><span class="o">.</span><span class="n">code_editor</span><span class="p">(</span>
+                    <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">show_line_numbers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># Enable soft wrapping</span>
+                    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="c1"># Default to python, will be updated in load_content</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;code-text-area&quot;</span> <span class="c1"># Keep ID</span>
+                <span class="p">)</span>
+            <span class="k">with</span> <span class="n">Container</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;trial-viewer-container&quot;</span><span class="p">):</span>
+                <span class="c1"># Instantiate TrialViewer here. It will be configured by load_current_trial</span>
+                <span class="c1"># Pass the initial renderer class. Path will be set dynamically.</span>
+                <span class="k">yield</span> <span class="n">TrialViewer</span><span class="p">(</span>
+                    <span class="n">trial_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># Initial path is None, set by load_current_trial</span>
+                    <span class="n">renderer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="p">,</span> <span class="c1"># Pass the class stored on the screen</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;trial-viewer-widget&quot;</span>
+                <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">Footer</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TrialSplitViewScreen.on_mount">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.on_mount">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the initial trial content when the screen is mounted.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_paths</span><span class="p">:</span>
+             <span class="c1"># If initialized with no paths, show error and potentially pop</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#code-text-area&quot;</span><span class="p">,</span> <span class="n">TextArea</span><span class="p">)</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="s2">&quot;Error: No trial files were provided.&quot;</span><span class="p">)</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;No trial files found to view.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+             <span class="c1"># Consider adding a placeholder to the TrialViewer side as well</span>
+             <span class="c1"># self.app.call_later(self.app.pop_screen, delay=1.0) # Optionally auto-close</span>
+             <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_current_trial</span><span class="p">()</span> <span class="c1"># Load content for index 0</span></div>
+
+
+<div class="viewcode-block" id="TrialSplitViewScreen.watch_current_index">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.watch_current_index">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">watch_current_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">new_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when current_index changes. Reloads the content.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Index changed from </span><span class="si">{</span><span class="n">old_index</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_index</span><span class="si">}</span><span class="s2">. Reloading trial.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">new_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_paths</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_current_trial</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attempted to switch to invalid index: </span><span class="si">{</span><span class="n">new_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Optionally reset index or show error</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_index</span> <span class="o">=</span> <span class="n">old_index</span> <span class="c1"># Revert to old index</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_derive_python_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Derives the corresponding python file path from a trial path.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">trial_path</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.py.trial.json&quot;</span><span class="p">):</span>
+            <span class="n">python_filename</span> <span class="o">=</span> <span class="n">trial_path</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;.trial.json&quot;</span><span class="p">)]</span>
+            <span class="n">py_path</span> <span class="o">=</span> <span class="n">trial_path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">python_filename</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Derived Python path </span><span class="si">{</span><span class="n">py_path</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">trial_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">py_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not derive Python filename from </span><span class="si">{</span><span class="n">trial_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. Cannot display source.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="TrialSplitViewScreen.load_current_trial">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.load_current_trial">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_current_trial</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads the Python code and TrialViewer grid for the current index.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_paths</span> <span class="ow">or</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_paths</span><span class="p">)):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;load_current_trial called with invalid index </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_index</span><span class="si">}</span><span class="s2"> or empty paths.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">current_trial_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_paths</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_derive_python_path</span><span class="p">(</span><span class="n">current_trial_path</span><span class="p">)</span>
+
+        <span class="c1"># Update Title</span>
+        <span class="n">total_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_paths</span><span class="p">)</span>
+        <span class="n">display_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span> <span class="k">else</span> <span class="n">current_trial_path</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Trial (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total_trials</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">display_name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># --- Load Code into TextArea ---</span>
+        <span class="n">code_viewer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#code-text-area&quot;</span><span class="p">,</span> <span class="n">TextArea</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+                <span class="n">code_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+                <span class="n">code_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s2">&quot;python&quot;</span>
+                <span class="n">code_viewer</span><span class="o">.</span><span class="n">scroll_home</span><span class="p">(</span><span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded code from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading Python file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">code_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# Error loading file:</span><span class="se">\n</span><span class="s2"># </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">code_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span><span class="p">:</span>
+            <span class="c1"># Derived path exists but file doesn&#39;t</span>
+             <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python file not found: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+             <span class="n">code_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# Python file not found:</span><span class="se">\n</span><span class="s2"># </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_python_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+             <span class="n">code_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Could not derive python path</span>
+            <span class="n">code_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# Could not determine Python source for:</span><span class="se">\n</span><span class="s2"># </span><span class="si">{</span><span class="n">current_trial_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">code_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+        <span class="c1"># --- Load Grid into TrialViewer ---</span>
+        <span class="n">trial_viewer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#trial-viewer-widget&quot;</span><span class="p">,</span> <span class="n">TrialViewer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_trial_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Update the path and renderer class on the existing TrialViewer instance</span>
+                <span class="n">trial_viewer</span><span class="o">.</span><span class="n">trial_path</span> <span class="o">=</span> <span class="n">current_trial_path</span>
+                <span class="n">trial_viewer</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="c1"># Ensure it has the correct class</span>
+                <span class="n">trial_viewer</span><span class="o">.</span><span class="n">load_and_display</span><span class="p">()</span> <span class="c1"># Tell it to reload based on new path/renderer</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded trial grid from </span><span class="si">{</span><span class="n">current_trial_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                 <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading TrialViewer for </span><span class="si">{</span><span class="n">current_trial_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading grid view: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                 <span class="c1"># Optionally display an error within the TrialViewer widget itself (e.g., clear it)</span>
+                 <span class="c1"># trial_viewer.clear_display() # Assuming such a method exists</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trial file </span><span class="si">{</span><span class="n">current_trial_path</span><span class="si">}</span><span class="s2"> not found for TrialViewer.&quot;</span><span class="p">)</span></div>
+
+            <span class="c1"># Optionally clear TrialViewer or show error state</span>
+            <span class="c1"># trial_viewer.clear_display()</span>
+
+<div class="viewcode-block" id="TrialSplitViewScreen.action_next_trial">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.action_next_trial">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_next_trial</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Go to the next trial in the list.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_paths</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">bell</span><span class="p">()</span> <span class="c1"># Optional feedback</span></div>
+
+
+<div class="viewcode-block" id="TrialSplitViewScreen.action_previous_trial">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.action_previous_trial">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_previous_trial</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Go to the previous trial in the list.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_index</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">bell</span><span class="p">()</span> <span class="c1"># Optional feedback</span></div>
+
+
+    <span class="c1"># --- Renderer Cycling Actions --- (Keep as is, but ensure TrialViewer uses self.renderer)</span>
+    <span class="c1"># These actions allow changing the renderer within the split view</span>
+<div class="viewcode-block" id="TrialSplitViewScreen.action_set_renderer">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/trial_split_view_screen/index.html#seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen.action_set_renderer">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_set_renderer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">renderer_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the grid renderer type for the TrialViewer.&quot;&quot;&quot;</span>
+        <span class="c1"># Map name to actual class (similar to how SessionsNavigator might do it)</span>
+        <span class="c1"># You might need to import these at the top</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SolidGrid</span><span class="p">,</span> <span class="n">CharGrid</span><span class="p">,</span> <span class="n">BlockGrid</span><span class="p">,</span> <span class="n">TinyGrid</span>
+        <span class="n">renderer_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;solid&quot;</span><span class="p">:</span> <span class="n">SolidGrid</span><span class="p">,</span>
+            <span class="s2">&quot;char&quot;</span><span class="p">:</span> <span class="n">CharGrid</span><span class="p">,</span>
+            <span class="s2">&quot;block&quot;</span><span class="p">:</span> <span class="n">BlockGrid</span><span class="p">,</span>
+            <span class="s2">&quot;tiny&quot;</span><span class="p">:</span> <span class="n">TinyGrid</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">new_renderer_class</span> <span class="o">=</span> <span class="n">renderer_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">renderer_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">new_renderer_class</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting renderer to </span><span class="si">{</span><span class="n">renderer_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">new_renderer_class</span> <span class="c1"># Update the screen&#39;s reactive var</span>
+            <span class="n">trial_viewer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#trial-viewer-widget&quot;</span><span class="p">,</span> <span class="n">TrialViewer</span><span class="p">)</span>
+            <span class="c1"># Update the &#39;renderer&#39; attribute (which holds the class) within the TrialViewer instance</span>
+            <span class="n">trial_viewer</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">new_renderer_class</span>
+            <span class="c1"># Trigger a refresh of the TrialViewer&#39;s display</span>
+            <span class="n">trial_viewer</span><span class="o">.</span><span class="n">refresh_display</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Renderer set to: </span><span class="si">{</span><span class="n">renderer_name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown renderer name: </span><span class="si">{</span><span class="n">renderer_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown renderer: </span><span class="si">{</span><span class="n">renderer_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

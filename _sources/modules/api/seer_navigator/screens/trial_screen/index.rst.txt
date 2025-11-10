@@ -1,0 +1,164 @@
+seer_navigator.screens.trial_screen
+===================================
+
+.. py:module:: seer_navigator.screens.trial_screen
+
+.. autoapi-nested-parse::
+
+   Defines the TrialViewer widget for displaying trial input/output grids.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   seer_navigator.screens.trial_screen.RENDERERS
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.screens.trial_screen.TrialViewer
+
+
+Module Contents
+---------------
+
+.. py:data:: RENDERERS
+
+.. py:class:: TrialViewer(trial_path: pathlib.Path | None = None, renderer: type[textual.widgets.Static] = SolidGrid, **kwargs)
+
+   Bases: :py:obj:`textual.containers.ScrollableContainer`
+
+
+   Displays the input, expected output, and actual output grids from a trial.json file.
+
+
+   .. py:attribute:: DEFAULT_CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             TrialViewer {
+                 /* Inherit background from parent */
+             }
+             .trial-grid {
+                 grid-size: 4; /* Details, Input, Expected, Actual */
+                 grid-gutter: 1 2;
+                 grid-rows: auto;
+                 padding: 1 2;
+                 align: center top;
+                 border-bottom: thick $accent-darken-1;
+                 height: auto; /* Fit content height */
+                 margin-bottom: 1;
+             }
+             .trial-details-table {
+                 height: auto; /* Fit content height */
+                 border: none; /* No border for summary tables */
+                 width: auto; /* Fit content width */
+             }
+             /* Ensure no focus border on summary tables */
+             .trial-details-table:focus {
+                 border: none;
+             }
+             .trial-set-label {
+                 width: 100%;
+                 text-align: center;
+                 text-style: bold underline;
+                 margin-top: 2;
+                 margin-bottom: 1;
+             }
+             /* Style for grid labels (optional, if needed above each grid) */
+             .grid-label {
+                 text-style: bold;
+                 text-align: center;
+                 margin-bottom: 1;
+             }
+             /* Add style for the individual grid renderer cells */
+             .grid-renderer-cell {
+                 overflow-x: scroll; /* Enable horizontal scrolling */
+                 overflow-y: hidden; /* Prevent vertical scrolling within the cell */
+                 height: auto; /* Let content determine height */
+                 /* The TextualGrid layout will determine the width */
+             }
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+      Default TCSS.
+
+
+
+   .. py:attribute:: trial_path
+      :value: None
+
+
+
+   .. py:attribute:: renderer
+
+
+   .. py:attribute:: trial_data
+      :value: None
+
+
+
+   .. py:attribute:: trials_container
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+      Called by Textual to create child widgets.
+
+      This method is called when a widget is mounted or by setting `recompose=True` when
+      calling [`refresh()`][textual.widget.Widget.refresh].
+
+      Note that you don't typically need to explicitly call this method.
+
+      Example:
+          ```python
+          def compose(self) -> ComposeResult:
+              yield Header()
+              yield Label("Press the button below:")
+              yield Button()
+              yield Footer()
+          ```
+
+
+
+   .. py:method:: on_mount() -> None
+
+      Load data and display trials when the widget is mounted or path changes.
+
+
+
+   .. py:method:: load_and_display()
+
+      Loads the trial JSON and populates the trials container.
+
+
+
+   .. py:method:: display_trials() -> None
+
+      Clears and repopulates the trials container with trial data using the current renderer.
+
+
+
+   .. py:method:: refresh_display() -> None
+
+      Refreshes the grid display using the current renderer.
+
+
+

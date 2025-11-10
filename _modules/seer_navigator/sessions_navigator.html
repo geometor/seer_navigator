@@ -1,0 +1,477 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.sessions_navigator &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+        </div>
+        <div class="next">
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../index.html">Module code</a></span>
+          <span>/</span>
+        <span><a href="../seer_navigator.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.sessions_navigator</span>
+      </nav>
+      <div class="content">
+          <h1>Source code for seer_navigator.sessions_navigator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the main SessionsNavigator Textual App class.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">App</span><span class="p">,</span> <span class="n">ComposeResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Static</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Container</span> <span class="c1"># Import Container</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span> <span class="c1"># ADDED import</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span> <span class="c1"># ADDED import</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span> <span class="c1"># Added log</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.binding</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binding</span> <span class="c1"># Added Binding</span>
+
+<span class="c1"># Import screens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.sessions_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionsScreen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.session_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionScreen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.task_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskScreen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.step_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">StepScreen</span>
+<span class="c1"># Import TrialViewer instead of TrialScreen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.trial_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrialViewer</span>
+<span class="c1"># Import the modal screens</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.image_view_modal</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageViewModal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.sort_modal</span><span class="w"> </span><span class="kn">import</span> <span class="n">SortModal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets._data_table</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnKey</span> <span class="c1"># Ensure ColumnKey is imported</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">Screen</span> <span class="c1"># Import Screen for type hinting</span>
+
+<span class="c1"># Define DummyGrid first so it&#39;s always available</span>
+<div class="viewcode-block" id="DummyGrid">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.DummyGrid">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DummyGrid</span><span class="p">(</span><span class="n">Static</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Placeholder widget used when real renderers fail to import.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid_data</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;Renderer Import Error&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;DummyGrid used - real renderer import failed.&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># Import renderers (adjust path if needed)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">SolidGrid</span><span class="p">,</span>
+        <span class="n">BlockGrid</span><span class="p">,</span>
+        <span class="n">CharGrid</span><span class="p">,</span>
+        <span class="n">TinyGrid</span><span class="p">,</span>
+    <span class="p">)</span>
+<div class="viewcode-block" id="RENDERERS">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.RENDERERS">[docs]</a>
+    <span class="n">RENDERERS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;solid&quot;</span><span class="p">:</span> <span class="n">SolidGrid</span><span class="p">,</span>
+        <span class="s2">&quot;block&quot;</span><span class="p">:</span> <span class="n">BlockGrid</span><span class="p">,</span>
+        <span class="s2">&quot;char&quot;</span><span class="p">:</span> <span class="n">CharGrid</span><span class="p">,</span>
+        <span class="s2">&quot;tiny&quot;</span><span class="p">:</span> <span class="n">TinyGrid</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not import grid renderers. Grid visualization will fail.&quot;</span><span class="p">)</span>
+    <span class="n">RENDERERS</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Assign the already defined DummyGrid in case of import failure</span>
+    <span class="n">SolidGrid</span> <span class="o">=</span> <span class="n">BlockGrid</span> <span class="o">=</span> <span class="n">CharGrid</span> <span class="o">=</span> <span class="n">TinyGrid</span> <span class="o">=</span> <span class="n">DummyGrid</span>
+
+
+<div class="viewcode-block" id="SessionsNavigator">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SessionsNavigator</span><span class="p">(</span><span class="n">App</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SessionsNavigator.BINDINGS">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.BINDINGS">[docs]</a>
+    <span class="n">BINDINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span> <span class="s2">&quot;Quit&quot;</span><span class="p">),</span>
+        <span class="c1">#  Binding(&quot;[&quot;, &quot;previous_sibling&quot;, &quot;Previous Sibling&quot;),</span>
+        <span class="c1">#  Binding(&quot;]&quot;, &quot;next_sibling&quot;, &quot;Next Sibling&quot;),</span>
+        <span class="c1"># Add renderer bindings (using Ctrl+ to avoid conflict with sort &#39;s&#39;)</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;ctrl+s&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer(&#39;solid&#39;)&quot;</span><span class="p">,</span> <span class="s2">&quot;Solid&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;ctrl+c&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer(&#39;char&#39;)&quot;</span><span class="p">,</span> <span class="s2">&quot;Char&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;ctrl+b&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer(&#39;block&#39;)&quot;</span><span class="p">,</span> <span class="s2">&quot;Block&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;ctrl+t&quot;</span><span class="p">,</span> <span class="s2">&quot;set_renderer(&#39;tiny&#39;)&quot;</span><span class="p">,</span> <span class="s2">&quot;Tiny&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;refresh_screen&quot;</span><span class="p">,</span> <span class="s2">&quot;Refresh&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;view_images&quot;</span><span class="p">,</span> <span class="s2">&quot;View Images&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="c1"># ADDED image view binding</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="s2">&quot;sort_table&quot;</span><span class="p">,</span> <span class="s2">&quot;Sort Table&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>   <span class="c1"># ADDED sort binding (plain &#39;s&#39;)</span>
+    <span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sessions_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;./sessions&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+<div class="viewcode-block" id="SessionsNavigator.sessions_root">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.sessions_root">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">sessions_root</span><span class="p">)</span></div>
+
+        <span class="c1"># Initialize renderer state - DummyGrid is now guaranteed to be defined</span>
+<div class="viewcode-block" id="SessionsNavigator.renderer">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.renderer">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">RENDERERS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tiny&quot;</span><span class="p">,</span> <span class="n">DummyGrid</span><span class="p">)</span> <span class="c1"># Default to TinyGrid or Dummy</span></div>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initial renderer set to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># Log the actual default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sxiv_checked</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># ADDED sxiv check state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sxiv_path</span> <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># ADDED sxiv path cache</span>
+
+
+<div class="viewcode-block" id="SessionsNavigator.compose">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.compose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComposeResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield the initial container for the app&#39;s default screen.&quot;&quot;&quot;</span>
+        <span class="c1"># Yield an empty container to satisfy compose requirement.</span>
+        <span class="c1"># The actual content is managed by pushing screens in on_mount.</span>
+        <span class="k">yield</span> <span class="n">Container</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SessionsNavigator.on_mount">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.on_mount">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Push the initial screen</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">push_screen</span><span class="p">(</span><span class="n">SessionsScreen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span><span class="p">))</span></div>
+
+
+    <span class="c1"># --- START ADDED SXIV CHECK ---</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_sxiv</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if sxiv exists and cache the path.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sxiv_checked</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sxiv_path</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">&quot;sxiv&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sxiv_checked</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sxiv_path</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;&#39;sxiv&#39; command not found in PATH. Cannot open images externally.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;sxiv not found. Cannot open images.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sxiv_path</span>
+    <span class="c1"># --- END ADDED SXIV CHECK ---</span>
+
+<div class="viewcode-block" id="SessionsNavigator.action_previous_sibling">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.action_previous_sibling">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_previous_sibling</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Navigate to the previous sibling directory.&quot;&quot;&quot;</span>
+        <span class="n">current_screen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">current_screen</span><span class="p">,</span> <span class="s2">&quot;previous_sibling&quot;</span><span class="p">):</span>
+            <span class="n">current_screen</span><span class="o">.</span><span class="n">previous_sibling</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="SessionsNavigator.action_next_sibling">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.action_next_sibling">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_next_sibling</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Navigate to the next sibling directory.&quot;&quot;&quot;</span>
+        <span class="n">current_screen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">current_screen</span><span class="p">,</span> <span class="s2">&quot;next_sibling&quot;</span><span class="p">):</span>
+            <span class="n">current_screen</span><span class="o">.</span><span class="n">next_sibling</span><span class="p">()</span></div>
+
+
+    <span class="c1"># Action to switch renderer</span>
+<div class="viewcode-block" id="SessionsNavigator.action_set_renderer">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.action_set_renderer">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_set_renderer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">renderer_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the grid renderer and refreshes the TrialScreen if active.&quot;&quot;&quot;</span>
+        <span class="n">new_renderer</span> <span class="o">=</span> <span class="n">RENDERERS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">renderer_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_renderer</span> <span class="ow">and</span> <span class="n">new_renderer</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">new_renderer</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Renderer changed to: </span><span class="si">{</span><span class="n">renderer_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Renderer: </span><span class="si">{</span><span class="n">renderer_name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># If the current screen is StepScreen, find the TrialViewer and refresh it</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span> <span class="n">StepScreen</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Find the TrialViewer widget within the StepScreen</span>
+                    <span class="n">trial_viewer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="n">TrialViewer</span><span class="p">)</span>
+                    <span class="c1"># Update its renderer attribute</span>
+                    <span class="n">trial_viewer</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">new_renderer</span>
+                    <span class="c1"># Refresh its display if it&#39;s the currently active view in the switcher</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;ContentSwitcher&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">current</span> <span class="o">==</span> <span class="s2">&quot;trial-viewer&quot;</span><span class="p">:</span>
+                        <span class="n">trial_viewer</span><span class="o">.</span><span class="n">refresh_display</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># Catch potential errors if TrialViewer isn&#39;t found or refresh fails</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error refreshing TrialViewer in StepScreen: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">new_renderer</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown renderer name: </span><span class="si">{</span><span class="n">renderer_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionsNavigator.action_refresh_screen">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.action_refresh_screen">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_refresh_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls the refresh method on the current screen if it exists.&quot;&quot;&quot;</span>
+        <span class="n">current_screen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">current_screen</span><span class="p">,</span> <span class="s2">&quot;refresh_content&quot;</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshing screen: </span><span class="si">{</span><span class="n">current_screen</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">current_screen</span><span class="o">.</span><span class="n">refresh_content</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Screen refreshed&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Screen </span><span class="si">{</span><span class="n">current_screen</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no refresh_content method.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Refresh not supported on this screen&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># --- START ADDED IMAGE VIEWING ACTIONS ---</span>
+<div class="viewcode-block" id="SessionsNavigator.action_view_images">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.action_view_images">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_view_images</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pushes the image view modal screen.&quot;&quot;&quot;</span>
+        <span class="n">current_screen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span>
+        <span class="n">context_path</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Determine context path based on the current screen</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_screen</span><span class="p">,</span> <span class="n">SessionsScreen</span><span class="p">):</span>
+            <span class="n">context_path</span> <span class="o">=</span> <span class="n">current_screen</span><span class="o">.</span><span class="n">sessions_root</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_screen</span><span class="p">,</span> <span class="n">SessionScreen</span><span class="p">):</span>
+            <span class="n">context_path</span> <span class="o">=</span> <span class="n">current_screen</span><span class="o">.</span><span class="n">session_path</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_screen</span><span class="p">,</span> <span class="n">TaskScreen</span><span class="p">):</span>
+            <span class="n">context_path</span> <span class="o">=</span> <span class="n">current_screen</span><span class="o">.</span><span class="n">task_path</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_screen</span><span class="p">,</span> <span class="n">StepScreen</span><span class="p">):</span>
+            <span class="n">context_path</span> <span class="o">=</span> <span class="n">current_screen</span><span class="o">.</span><span class="n">step_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Image viewing not supported on screen: </span><span class="si">{</span><span class="n">current_screen</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Image viewing not supported here.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">context_path</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pushing ImageViewModal with context: </span><span class="si">{</span><span class="n">context_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">push_screen</span><span class="p">(</span><span class="n">ImageViewModal</span><span class="p">(</span><span class="n">context_path</span><span class="o">=</span><span class="n">context_path</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not determine context path for image viewing.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Error determining context for image viewing.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># Added task_id parameter to match the call signature from ImageViewModal</span>
+<div class="viewcode-block" id="SessionsNavigator.launch_sxiv">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.launch_sxiv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">launch_sxiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">filter_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finds images based on filter and launches sxiv. task_id is ignored in this navigator.&quot;&quot;&quot;</span>
+        <span class="c1"># Log the received task_id, even if unused, for debugging</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;launch_sxiv called in SessionsNavigator with context=</span><span class="si">{</span><span class="n">context_path</span><span class="si">}</span><span class="s2">, filter=</span><span class="si">{</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">, task_id=</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">sxiv_cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_sxiv</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sxiv_cmd</span><span class="p">:</span>
+            <span class="k">return</span> <span class="c1"># sxiv not found, notification already shown</span>
+
+        <span class="n">all_found_files</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># Store all initially found files</span>
+        <span class="n">unique_task_images</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># Dict to store {task_id: first_image_path}</span>
+        <span class="n">final_image_files</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># List to pass to sxiv</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Searching for images in </span><span class="si">{</span><span class="n">context_path</span><span class="si">}</span><span class="s2"> with filter: </span><span class="si">{</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># --- Step 1: Find all potentially relevant files ---</span>
+            <span class="k">if</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+                <span class="n">all_found_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">context_path</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*.png&quot;</span><span class="p">)))</span>
+                <span class="n">final_image_files</span> <span class="o">=</span> <span class="n">all_found_files</span> <span class="c1"># No uniqueness needed for &#39;all&#39;</span>
+            <span class="k">elif</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;tasks&quot;</span><span class="p">:</span>
+                <span class="n">all_found_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">context_path</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;**/task.png&quot;</span><span class="p">)))</span> <span class="c1"># Use **/ to ensure we get task dir</span>
+            <span class="k">elif</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;trials&quot;</span><span class="p">:</span>
+                <span class="n">all_found_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">context_path</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*trial.png&quot;</span><span class="p">)))</span>
+                <span class="n">final_image_files</span> <span class="o">=</span> <span class="n">all_found_files</span> <span class="c1"># No uniqueness needed for &#39;trials&#39;</span>
+            <span class="k">elif</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;passed_trials&quot;</span><span class="p">:</span>
+                <span class="n">passed_trial_files</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">json_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">context_path</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*trial.json&quot;</span><span class="p">))</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">json_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> *trial.json files for passed_trials filter.&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">json_file</span> <span class="ow">in</span> <span class="n">json_files</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                            <span class="n">trial_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                        <span class="c1"># Check if &#39;test&#39; trials exist and any have &quot;match&quot;: true</span>
+                        <span class="n">test_trials</span> <span class="o">=</span> <span class="p">(</span><span class="n">trial_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;trials&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;match&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">test_trials</span><span class="p">):</span>
+                            <span class="c1"># Construct the expected PNG filename</span>
+                            <span class="n">png_filename</span> <span class="o">=</span> <span class="n">json_file</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span> <span class="c1"># e.g., &quot;code_00_trial.json&quot; -&gt; &quot;code_00_trial.png&quot;</span>
+                            <span class="n">png_path</span> <span class="o">=</span> <span class="n">json_file</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">png_filename</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">png_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                                <span class="n">passed_trial_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">png_path</span><span class="p">)</span> <span class="c1"># Use the correct list name</span>
+                                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adding passed trial image: </span><span class="si">{</span><span class="n">png_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Passed trial JSON found (</span><span class="si">{</span><span class="n">json_file</span><span class="si">}</span><span class="s2">), but corresponding PNG not found: </span><span class="si">{</span><span class="n">png_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not decode JSON for passed_trials filter: </span><span class="si">{</span><span class="n">json_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error processing </span><span class="si">{</span><span class="n">json_file</span><span class="si">}</span><span class="s2"> for passed_trials filter: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">all_found_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">passed_trial_files</span><span class="p">)</span> <span class="c1"># Store all passed trial images</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown image filter type: </span><span class="si">{</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown image filter: </span><span class="si">{</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># --- Step 2: Apply uniqueness filter if needed ---</span>
+            <span class="k">if</span> <span class="n">filter_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;tasks&quot;</span><span class="p">,</span> <span class="s2">&quot;passed_trials&quot;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">img_path</span> <span class="ow">in</span> <span class="n">all_found_files</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># Assuming structure .../session_id/task_id/...</span>
+                        <span class="n">task_id_dir</span> <span class="o">=</span> <span class="n">img_path</span><span class="o">.</span><span class="n">parent</span> <span class="c1"># For task.png, parent is task_id dir</span>
+                        <span class="k">if</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;passed_trials&quot;</span><span class="p">:</span>
+                            <span class="c1"># For *trial.png, parent is step dir, grandparent is task_id dir</span>
+                            <span class="n">task_id_dir</span> <span class="o">=</span> <span class="n">img_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+                        <span class="n">task_id_str</span> <span class="o">=</span> <span class="n">task_id_dir</span><span class="o">.</span><span class="n">name</span>
+                        <span class="k">if</span> <span class="n">task_id_str</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_task_images</span><span class="p">:</span>
+                            <span class="n">unique_task_images</span><span class="p">[</span><span class="n">task_id_str</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_path</span>
+                            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adding unique image for task &#39;</span><span class="si">{</span><span class="n">task_id_str</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">img_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not determine task ID for image path: </span><span class="si">{</span><span class="n">img_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error extracting task ID for uniqueness filter on </span><span class="si">{</span><span class="n">img_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="n">final_image_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">unique_task_images</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="c1"># Get unique paths and sort them</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applied uniqueness filter: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_found_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> found -&gt; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">final_image_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> unique.&quot;</span><span class="p">)</span>
+            <span class="c1"># else: final_image_files is already set for &#39;all&#39; and &#39;trials&#39;</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">final_image_files</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No images found for filter &#39;</span><span class="si">{</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">&#39; in </span><span class="si">{</span><span class="n">context_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;information&quot;</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No images found for filter &#39;</span><span class="si">{</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">&#39; in </span><span class="si">{</span><span class="n">context_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Prepare the command list</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="n">sxiv_cmd</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span> <span class="k">for</span> <span class="n">img_path</span> <span class="ow">in</span> <span class="n">final_image_files</span><span class="p">]</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Opening </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">final_image_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> images with sxiv (filter: </span><span class="si">{</span><span class="n">filter_type</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="c1"># This case should be caught by _check_sxiv, but handle defensively</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;sxiv&#39; command not found when trying to execute.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;sxiv not found. Cannot open images.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error finding or opening images with sxiv from </span><span class="si">{</span><span class="n">context_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error viewing images: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># --- END ADDED IMAGE VIEWING ACTIONS ---</span>
+
+    <span class="c1"># --- START ADDED SORT ACTION ---</span>
+<div class="viewcode-block" id="SessionsNavigator.action_sort_table">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.action_sort_table">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_sort_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pushes the SortModal screen to select a column for sorting.&quot;&quot;&quot;</span>
+        <span class="c1"># Get the currently active screen</span>
+        <span class="n">current_screen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Check if the current screen has a sortable table</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">current_screen</span><span class="p">,</span> <span class="s2">&quot;table&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">current_screen</span><span class="o">.</span><span class="n">table</span><span class="p">,</span> <span class="s2">&quot;columns&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">current_screen</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Opening SortModal for screen: </span><span class="si">{</span><span class="n">current_screen</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Define the callback function to handle the result from SortModal</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">handle_sort_dismiss</span><span class="p">(</span><span class="n">selected_key</span><span class="p">:</span> <span class="n">ColumnKey</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Callback executed when SortModal is dismissed.&quot;&quot;&quot;</span>
+                <span class="c1"># Ensure the screen context is still valid (might have changed)</span>
+                <span class="n">active_screen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">selected_key</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SortModal dismissed for </span><span class="si">{</span><span class="n">active_screen</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, sorting by: </span><span class="si">{</span><span class="n">selected_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">active_screen</span><span class="p">,</span> <span class="s2">&quot;perform_sort&quot;</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="c1"># Call perform_sort on the screen that was active</span>
+                            <span class="n">active_screen</span><span class="o">.</span><span class="n">perform_sort</span><span class="p">(</span><span class="n">selected_key</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error calling perform_sort on </span><span class="si">{</span><span class="n">active_screen</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> after SortModal dismiss: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during sort: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Screen </span><span class="si">{</span><span class="n">active_screen</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no perform_sort method.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Sort function not implemented on current screen.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SortModal dismissed (cancelled) for </span><span class="si">{</span><span class="n">active_screen</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Push the SortModal screen with the callback</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">push_screen</span><span class="p">(</span>
+                <span class="n">SortModal</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">current_screen</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span>
+                <span class="n">handle_sort_dismiss</span> <span class="c1"># Pass the callback function</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Attempted to sort on a screen without a valid table/columns.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;No sortable table on the current screen.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># --- END ADDED SORT ACTION ---</span>
+
+<div class="viewcode-block" id="SessionsNavigator.action_quit">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.SessionsNavigator.action_quit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_quit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Quits the application&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
+</div>
+
+
+<div class="viewcode-block" id="run">
+<a class="viewcode-back" href="../../modules/api/seer_navigator/sessions_navigator/index.html#seer_navigator.sessions_navigator.run">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Navigate ARC test sessions.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--sessions-dir&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the sessions directory&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">SessionsNavigator</span><span class="p">(</span><span class="n">sessions_root</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">sessions_dir</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">run</span><span class="p">()</span>
+</pre></div>
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

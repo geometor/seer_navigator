@@ -1,0 +1,42 @@
+seer_navigator.renderers.tiny_grid
+==================================
+
+.. py:module:: seer_navigator.renderers.tiny_grid
+
+.. autoapi-nested-parse::
+
+   Provides the TinyGrid renderer using Unicode half-block characters.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.renderers.tiny_grid.TinyGrid
+
+
+Module Contents
+---------------
+
+.. py:class:: TinyGrid
+
+   Bases: :py:obj:`seer_navigator.renderers.base_grid.BaseGrid`
+
+
+   Renders the grid using the Unicode upper half block character '▀'.
+   Each character represents two rows:
+   - Foreground color = top row cell color
+   - Background color = bottom row cell color
+   If there's an odd number of rows, the last row uses black for the background.
+
+
+   .. py:attribute:: HALF_BLOCK_CHAR
+      :value: '▀'
+
+
+
+   .. py:method:: render() -> rich.text.Text
+
+

@@ -1,0 +1,573 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.screens.step_screen &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+        </div>
+        <div class="next">
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">Module code</a></span>
+          <span>/</span>
+        <span><a href="../../seer_navigator.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.screens.step_screen</span>
+      </nav>
+      <div class="content">
+          <h1>Source code for seer_navigator.screens.step_screen</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the StepScreen for browsing files within a task step.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span> <span class="c1"># To find terminal emulator</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComposeResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Horizontal</span><span class="p">,</span> <span class="n">Vertical</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.reactive</span><span class="w"> </span><span class="kn">import</span> <span class="n">reactive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">Screen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataTable</span><span class="p">,</span> <span class="n">Header</span><span class="p">,</span> <span class="n">Footer</span><span class="p">,</span> <span class="n">TextArea</span><span class="p">,</span> <span class="n">ContentSwitcher</span><span class="p">,</span> <span class="n">Static</span> <span class="c1"># Removed Markdown</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.binding</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binding</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span>
+
+<span class="c1"># Import the new screen we will create</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer_navigator.screens.trial_split_view_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrialSplitViewScreen</span>
+
+
+<div class="viewcode-block" id="LANGUAGE_MAP">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.LANGUAGE_MAP">[docs]</a>
+<span class="n">LANGUAGE_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;.py&quot;</span><span class="p">:</span> <span class="s2">&quot;python&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.md&quot;</span><span class="p">:</span> <span class="s2">&quot;markdown&quot;</span><span class="p">,</span> 
+    <span class="s2">&quot;.json&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.yaml&quot;</span><span class="p">:</span> <span class="s2">&quot;yaml&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.yml&quot;</span><span class="p">:</span> <span class="s2">&quot;yaml&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.txt&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">}</span></div>
+
+<span class="c1"># DEFAULT_THEME = &quot;&quot; # Removed unused variable</span>
+
+<div class="viewcode-block" id="StepScreen">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StepScreen</span><span class="p">(</span><span class="n">Screen</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Displays the files within a step folder and their content.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StepScreen.CSS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.CSS">[docs]</a>
+    <span class="n">CSS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Screen {</span>
+<span class="s2">        layers: base overlay;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    Horizontal {</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    #file-list-container {</span>
+<span class="s2">        width: 30%;</span>
+<span class="s2">        border-right: thick $accent;</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">        overflow-y: auto; /* Ensure DataTable scrolls if needed */</span>
+<span class="s2">    }</span>
+
+<span class="s2">    #file-content-container {</span>
+<span class="s2">        width: 70%;</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    DataTable {</span>
+<span class="s2">       height: 100%; /* Make DataTable fill its container */</span>
+<span class="s2">       width: 100%;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    /* Ensure ContentSwitcher and its children fill the container */</span>
+<span class="s2">    ContentSwitcher {</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">    }</span>
+<span class="s2">    TextArea, #content-placeholder {</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">        border: none; /* Remove default border if desired */</span>
+<span class="s2">    }</span>
+<span class="s2">    /* Center placeholder text */</span>
+<span class="s2">    #content-placeholder {</span>
+<span class="s2">        content-align: center middle;</span>
+<span class="s2">        color: $text-muted;</span>
+<span class="s2">    }</span>
+
+
+<span class="s2">    /* Style the focused row in the DataTable */</span>
+<span class="s2">    DataTable &gt; .datatable--cursor {</span>
+<span class="s2">        background: $accent;</span>
+<span class="s2">        color: $text;</span>
+<span class="s2">    }</span>
+<span class="s2">    DataTable:focus &gt; .datatable--cursor {</span>
+<span class="s2">         background: $accent-darken-1;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="StepScreen.BINDINGS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.BINDINGS">[docs]</a>
+    <span class="n">BINDINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;j&quot;</span><span class="p">,</span> <span class="s2">&quot;cursor_down&quot;</span><span class="p">,</span> <span class="s2">&quot;Cursor Down&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;cursor_up&quot;</span><span class="p">,</span> <span class="s2">&quot;Cursor Up&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;enter&quot;</span><span class="p">,</span> <span class="s2">&quot;select_file&quot;</span><span class="p">,</span> <span class="s2">&quot;Select File&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> 
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;app.pop_screen&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;open_terminal&quot;</span><span class="p">,</span> <span class="s2">&quot;Open Terminal&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> 
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;view_trial_split&quot;</span><span class="p">,</span> <span class="s2">&quot;View Trial Split&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="c1"># Added binding</span>
+        <span class="c1"># REMOVED Binding(&quot;i&quot;, &quot;view_images&quot;, &quot;View Images&quot;, show=True),</span>
+        <span class="c1"># Binding(&quot;[&quot;, &quot;previous_sibling&quot;, &quot;Previous Sibling&quot;, show=True), </span>
+        <span class="c1"># Binding(&quot;]&quot;, &quot;next_sibling&quot;, &quot;Next Sibling&quot;, show=True),     </span>
+    <span class="p">]</span></div>
+
+
+    <span class="c1"># Reactive variable to store the list of files</span>
+<div class="viewcode-block" id="StepScreen.file_paths">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.file_paths">[docs]</a>
+    <span class="n">file_paths</span> <span class="o">=</span> <span class="n">reactive</span><span class="p">([])</span></div>
+
+<div class="viewcode-block" id="StepScreen.selected_file_path">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.selected_file_path">[docs]</a>
+    <span class="n">selected_file_path</span> <span class="o">=</span> <span class="n">reactive</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">task_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">step_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+<div class="viewcode-block" id="StepScreen.session_path">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.session_path">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_path</span> <span class="o">=</span> <span class="n">session_path</span></div>
+
+<div class="viewcode-block" id="StepScreen.task_path">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.task_path">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_path</span> <span class="o">=</span> <span class="n">task_path</span></div>
+
+<div class="viewcode-block" id="StepScreen.step_path">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.step_path">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_path</span> <span class="o">=</span> <span class="n">step_path</span></div>
+
+<div class="viewcode-block" id="StepScreen.step_name">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.step_name">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_name</span> <span class="o">=</span> <span class="n">step_path</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="StepScreen.task_name">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.task_name">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_name</span> <span class="o">=</span> <span class="n">task_path</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="StepScreen.session_name">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.session_name">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_name</span> <span class="o">=</span> <span class="n">session_path</span><span class="o">.</span><span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="StepScreen.compose">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.compose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComposeResult</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">Header</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">Horizontal</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">Vertical</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;file-list-container&quot;</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">DataTable</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;file-list-table&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">Vertical</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;file-content-container&quot;</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">ContentSwitcher</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="s2">&quot;text-viewer&quot;</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">TextArea</span><span class="o">.</span><span class="n">code_editor</span><span class="p">(</span>
+                        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">show_line_numbers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># Enable soft wrapping</span>
+                        <span class="c1">#  theme=DEFAULT_THEME,</span>
+                        <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;text-viewer&quot;</span> <span class="c1"># ID for the TextArea</span>
+                    <span class="p">)</span>
+                    <span class="c1"># Removed TrialViewer from here</span>
+                    <span class="k">yield</span> <span class="n">Static</span><span class="p">(</span><span class="s2">&quot;Select a file to view its content.&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;content-placeholder&quot;</span><span class="p">)</span>
+
+        <span class="k">yield</span> <span class="n">Footer</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="StepScreen.on_mount">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.on_mount">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when the screen is mounted.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_name</span><span class="si">}</span><span class="s2"> • </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_name</span><span class="si">}</span><span class="s2"> • </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">step_name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">cursor_type</span> <span class="o">=</span> <span class="s2">&quot;row&quot;</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Files&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="c1"># Let width be automatic</span>
+
+        <span class="c1"># List files in the step directory, sorted alphabetically</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Filter for files only, ignore directories</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">()])</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">pop_screen</span><span class="p">()</span> <span class="c1"># Go back if path doesn&#39;t exist</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Error: Step directory not found.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error listing files in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">pop_screen</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error listing files: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="s2">&quot;No files found.&quot;</span><span class="p">)</span>
+            <span class="c1"># Disable table focus if empty? Or allow focus but handle selection gracefully.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">:</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_row_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">focus</span><span class="p">()</span> </div>
+
+
+<div class="viewcode-block" id="StepScreen.select_row_index">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.select_row_index">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select_row_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Selects a row by index and triggers loading/display logic.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">):</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="n">DataTable</span><span class="p">)</span>
+            <span class="c1"># Check if cursor is already at the target row to avoid unnecessary updates</span>
+            <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span> <span class="o">!=</span> <span class="n">index</span><span class="p">:</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># Update selected_file_path which triggers the watch method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Clear selection if index is out of bounds</span></div>
+
+
+    <span class="c1"># Watch for changes in selected_file_path and update the appropriate viewer</span>
+<div class="viewcode-block" id="StepScreen.watch_selected_file_path">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.watch_selected_file_path">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">watch_selected_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">new_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when selected_file_path changes. Updates the content viewer.&quot;&quot;&quot;</span>
+        <span class="n">switcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="n">ContentSwitcher</span><span class="p">)</span>
+        <span class="n">text_viewer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#text-viewer&quot;</span><span class="p">,</span> <span class="n">TextArea</span><span class="p">)</span>
+        <span class="n">placeholder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#content-placeholder&quot;</span><span class="p">,</span> <span class="n">Static</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">new_path</span><span class="p">:</span>
+            <span class="n">file_suffix</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">name</span>
+
+            <span class="c1"># Check if it&#39;s a trial file - treat like other text files now</span>
+            <span class="c1"># The special handling is moved to action_view_trial_split</span>
+            <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;trial.json&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;trials.json&quot;</span><span class="p">):</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Displaying JSON content for: </span><span class="si">{</span><span class="n">new_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span> <span class="c1"># Set language to JSON</span>
+                    <span class="n">switcher</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;text-viewer&quot;</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">scroll_home</span><span class="p">(</span><span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading trial JSON file </span><span class="si">{</span><span class="n">new_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">error_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Error loading file:</span><span class="se">\n\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="n">error_content</span><span class="p">)</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">switcher</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;text-viewer&quot;</span>
+
+            <span class="k">elif</span> <span class="n">file_suffix</span> <span class="o">==</span> <span class="s2">&quot;.png&quot;</span><span class="p">:</span>
+                <span class="c1"># Handle PNG files - show placeholder</span>
+                <span class="n">placeholder</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selected: &#39;</span><span class="si">{</span><span class="n">new_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; (PNG)</span><span class="se">\n\n</span><span class="s2">Press &#39;i&#39; to view images (if available).&quot;</span><span class="p">)</span> <span class="c1"># Updated placeholder text</span>
+                <span class="n">switcher</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;content-placeholder&quot;</span>
+
+            <span class="k">elif</span> <span class="n">file_suffix</span> <span class="o">==</span> <span class="s2">&quot;.md&quot;</span><span class="p">:</span>
+                <span class="c1"># Handle Markdown files using TextArea</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+                    <span class="c1"># Load into TextArea and set language</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s2">&quot;markdown&quot;</span>
+                    <span class="n">switcher</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;text-viewer&quot;</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">scroll_home</span><span class="p">(</span><span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Scroll TextArea to top</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading Markdown file </span><span class="si">{</span><span class="n">new_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="c1"># Display error in TextArea (fallback)</span>
+                    <span class="n">error_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Error loading file:</span><span class="se">\n\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="n">error_content</span><span class="p">)</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">switcher</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;text-viewer&quot;</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Handle other text/code files</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">new_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+                    <span class="n">language</span> <span class="o">=</span> <span class="n">LANGUAGE_MAP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">file_suffix</span><span class="p">)</span>
+
+                    <span class="c1"># Check if language requires the &#39;syntax&#39; extra for TextArea</span>
+                    <span class="k">if</span> <span class="n">language</span> <span class="ow">and</span> <span class="n">language</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">text_viewer</span><span class="o">.</span><span class="n">available_languages</span><span class="p">:</span>
+                         <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Language &#39;</span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">&#39; for </span><span class="si">{</span><span class="n">new_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> not available in TextArea. Install &#39;textual[syntax]&#39; for highlighting.&quot;</span><span class="p">)</span>
+                         <span class="n">language</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Fallback for TextArea</span>
+
+                    <span class="c1"># Load text first, then set language for TextArea</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
+                    <span class="n">switcher</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;text-viewer&quot;</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">scroll_home</span><span class="p">(</span><span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Scroll TextArea to top</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading file </span><span class="si">{</span><span class="n">new_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="c1"># Display error in TextArea</span>
+                    <span class="n">error_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Error loading file:</span><span class="se">\n\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="n">error_content</span><span class="p">)</span>
+                    <span class="n">text_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">switcher</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;text-viewer&quot;</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Clear viewer if no file is selected</span>
+            <span class="n">text_viewer</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">text_viewer</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">placeholder</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;No file selected.&quot;</span><span class="p">)</span> <span class="c1"># Reset placeholder</span>
+            <span class="c1"># Switch to placeholder when nothing is selected</span>
+            <span class="n">switcher</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="s2">&quot;content-placeholder&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="StepScreen.action_cursor_down">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.action_cursor_down">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_cursor_down</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the cursor down in the DataTable.&quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">current_row</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span>
+        <span class="n">next_row</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_row</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_row_index</span><span class="p">(</span><span class="n">next_row</span><span class="p">)</span> <span class="c1"># Use select_row_index to trigger watch</span></div>
+
+
+<div class="viewcode-block" id="StepScreen.action_cursor_up">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.action_cursor_up">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_cursor_up</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the cursor up in the DataTable.&quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">current_row</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span>
+        <span class="n">prev_row</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">current_row</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_row_index</span><span class="p">(</span><span class="n">prev_row</span><span class="p">)</span> <span class="c1"># Use select_row_index to trigger watch</span></div>
+
+
+<div class="viewcode-block" id="StepScreen.action_select_file">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.action_select_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_select_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Action triggered by pressing Enter on the table.&quot;&quot;&quot;</span>
+        <span class="c1"># The watch_selected_file_path handles pushing TrialScreen or updating viewers.</span>
+        <span class="c1"># This action might be useful if we want Enter to *always* try to open/view,</span>
+        <span class="c1"># even if the selection hasn&#39;t changed, but for now, it&#39;s implicitly handled.</span>
+        <span class="c1"># We could force a re-evaluation if needed:</span>
+        <span class="n">current_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span>
+        <span class="k">if</span> <span class="n">current_path</span><span class="p">:</span>
+             <span class="c1"># Temporarily set to None and back to force the watch method</span>
+             <span class="c1"># This ensures the watch method runs even if the selection didn&#39;t change visually</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span> <span class="o">=</span> <span class="kc">None</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span> <span class="o">=</span> <span class="n">current_path</span>
+        <span class="k">pass</span> <span class="c1"># Corrected indentation</span></div>
+
+
+<div class="viewcode-block" id="StepScreen.action_view_trial_split">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.action_view_trial_split">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_view_trial_split</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finds all trial files in the current step and pushes TrialSplitViewScreen.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">trial_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span>
+                <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.trial.json&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;trials.json&quot;</span><span class="p">))</span>
+            <span class="p">])</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">trial_files</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;No &#39;.trial.json&#39; files found in this step.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trial_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> trial files in step </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">step_name</span><span class="si">}</span><span class="s2">. Pushing TrialSplitViewScreen.&quot;</span><span class="p">)</span>
+            <span class="n">split_screen</span> <span class="o">=</span> <span class="n">TrialSplitViewScreen</span><span class="p">(</span>
+                <span class="n">trial_paths</span><span class="o">=</span><span class="n">trial_files</span><span class="p">,</span> <span class="c1"># Pass the list of paths</span>
+                <span class="n">renderer_class_arg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">renderer</span> <span class="c1"># Pass the app&#39;s current renderer class</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">push_screen</span><span class="p">(</span><span class="n">split_screen</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Step directory not found.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+             <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step directory not found when searching for trials: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error finding trial files: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+             <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error finding trial files in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="StepScreen.action_open_terminal">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.action_open_terminal">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_open_terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Opens a new terminal window in the current step directory.&quot;&quot;&quot;</span>
+        <span class="c1"># Corrected indentation for the whole method body</span>
+        <span class="n">terminal_commands</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;gnome-terminal&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;konsole&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;xfce4-terminal&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;lxterminal&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;mate-terminal&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;terminator&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;xterm&quot;</span><span class="p">,</span>
+             <span class="c1"># Add other common Linux terminals if needed</span>
+        <span class="p">]</span>
+        <span class="n">terminal_cmd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">terminal_commands</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">cmd</span><span class="p">):</span>
+                <span class="n">terminal_cmd</span> <span class="o">=</span> <span class="n">cmd</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">terminal_cmd</span><span class="p">:</span>
+            <span class="c1"># Basic fallback for macOS (might need refinement)</span>
+            <span class="k">if</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">&quot;open&quot;</span><span class="p">):</span>
+                 <span class="k">try</span><span class="p">:</span>
+                     <span class="c1"># Use &#39;open -a Terminal .&#39; which should open Terminal.app at the CWD</span>
+                     <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="s2">&quot;-a&quot;</span><span class="p">,</span> <span class="s2">&quot;Terminal&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="p">)</span>
+                     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Opened macOS Terminal in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                     <span class="k">return</span> <span class="c1"># Success</span>
+                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                     <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to open macOS Terminal: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                     <span class="c1"># Fall through to notify error if &#39;open&#39; failed</span>
+ 
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not find a suitable terminal emulator.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Could not find a suitable terminal emulator.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+ 
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Opening terminal &#39;</span><span class="si">{</span><span class="n">terminal_cmd</span><span class="si">}</span><span class="s2">&#39; in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Most terminals accept --working-directory= or similar, but launching</span>
+            <span class="c1"># with cwd set in Popen is more reliable across different terminals.</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">terminal_cmd</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to open terminal </span><span class="si">{</span><span class="n">terminal_cmd</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to open terminal: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span></div>
+
+ 
+ 
+    <span class="c1"># Removed action_view_images as the binding was removed.</span>
+    <span class="c1"># If you want to keep the functionality but trigger it differently, let me know.</span>
+
+<div class="viewcode-block" id="StepScreen.on_data_table_row_selected">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.on_data_table_row_selected">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_data_table_row_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">DataTable</span><span class="o">.</span><span class="n">RowSelected</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle row selection in the DataTable (e.g., by clicking).&quot;&quot;&quot;</span>
+        <span class="c1"># Corrected indentation for the whole method body</span>
+        <span class="c1"># Ensure the index is valid before selecting</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">cursor_row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">event</span><span class="o">.</span><span class="n">cursor_row</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">):</span>
+            <span class="c1"># Use select_row_index to trigger the watch method consistently</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_row_index</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">cursor_row</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Clear if selection is invalid</span></div>
+
+
+<div class="viewcode-block" id="StepScreen.refresh_content">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/step_screen/index.html#seer_navigator.screens.step_screen.StepScreen.refresh_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh_content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reloads the file list and the content of the selected file.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshing StepScreen content for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">current_cursor_row</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span>
+        <span class="n">previously_selected_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="c1"># Re-list files</span>
+        <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">()])</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error re-listing files in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">step_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error refreshing file list: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="c1"># Optionally clear table or show error state</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="s2">&quot;Error refreshing list.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Clear selection</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Clear and repopulate table</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="s2">&quot;No files found.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_file_path</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Clear selection</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">:</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="c1"># Try to re-select the previously selected file by name</span>
+            <span class="n">new_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">previously_selected_filename</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">new_index</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">previously_selected_filename</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">new_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># File no longer exists</span>
+
+            <span class="c1"># Select the found index, or the previous row index if valid, or the first row</span>
+            <span class="k">if</span> <span class="n">new_index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">select_row_index</span><span class="p">(</span><span class="n">new_index</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">current_cursor_row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">current_cursor_row</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">select_row_index</span><span class="p">(</span><span class="n">current_cursor_row</span><span class="p">)</span> <span class="c1"># Fallback to previous index if still valid</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">select_row_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># Fallback to first item</span>
+
+        <span class="n">table</span><span class="o">.</span><span class="n">focus</span><span class="p">()</span> <span class="c1"># Ensure table has focus</span></div>
+</div>
+
+</pre></div>
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+seer_navigator.renderers.image_grid
+===================================
+
+.. py:module:: seer_navigator.renderers.image_grid
+
+.. autoapi-nested-parse::
+
+   Provides the ImageGrid renderer using PIL and rich-pixels.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.renderers.image_grid.ImageGrid
+
+
+Module Contents
+---------------
+
+.. py:class:: ImageGrid(grid, **kwargs)
+
+   Bases: :py:obj:`geometor.seer_navigator.renderers.base_grid.BaseGrid`
+
+
+   Grid rendered using an image-based approach via rich-pixels.
+   This mode creates a PIL image with grid lines separating the cells.
+
+
+   .. py:method:: on_mount()
+
+
+   .. py:method:: on_resize(event)
+
+      Regenerate the image on resize so that cell sizes scale with available space.
+
+
+

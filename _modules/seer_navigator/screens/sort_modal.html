@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.screens.sort_modal &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+        </div>
+        <div class="next">
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">Module code</a></span>
+          <span>/</span>
+        <span><a href="../../seer_navigator.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.screens.sort_modal</span>
+      </nav>
+      <div class="content">
+          <h1>Source code for seer_navigator.screens.sort_modal</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the SortModal screen for selecting a DataTable column to sort.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span> <span class="c1"># Added List, Tuple</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComposeResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vertical</span><span class="p">,</span> <span class="n">Container</span> <span class="c1"># Added Container</span>
+<span class="c1"># Use ModalScreen[ReturnType] to specify what dismiss returns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModalScreen</span>
+<span class="c1"># Import ListView and ListItem, remove Button</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Label</span><span class="p">,</span> <span class="n">ListView</span><span class="p">,</span> <span class="n">ListItem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.binding</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binding</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets._data_table</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">on</span> <span class="c1"># Added on decorator</span>
+
+
+<span class="c1"># Specify the return type for dismiss()</span>
+<div class="viewcode-block" id="SortModal">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/sort_modal/index.html#seer_navigator.screens.sort_modal.SortModal">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SortModal</span><span class="p">(</span><span class="n">ModalScreen</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ColumnKey</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modal dialog for selecting a column to sort. Returns the selected ColumnKey or None.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SortModal.CSS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/sort_modal/index.html#seer_navigator.screens.sort_modal.SortModal.CSS">[docs]</a>
+    <span class="n">CSS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    SortModal {</span>
+<span class="s2">        align: center middle;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    #dialog { /* Changed ID and styling */</span>
+<span class="s2">        padding: 0 1;</span>
+<span class="s2">        width: auto; /* Auto width based on content */</span>
+<span class="s2">        max-width: 60; /* Limit max width */</span>
+<span class="s2">        height: auto; /* Auto height based on content */</span>
+<span class="s2">        max-height: 80%; /* Limit max height */</span>
+<span class="s2">        border: thick $background 80%;</span>
+<span class="s2">        background: $surface;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    #dialog &gt; Label { /* Style title label */</span>
+<span class="s2">        width: 100%;</span>
+<span class="s2">        text-align: center;</span>
+<span class="s2">        margin-bottom: 1;</span>
+<span class="s2">    }</span>
+
+<span class="s2">    #sort-list { /* Style the ListView */</span>
+<span class="s2">        border: none;</span>
+<span class="s2">        background: $surface;</span>
+<span class="s2">        height: auto; /* Adjust height based on content */</span>
+<span class="s2">        max-height: 15; /* Limit max height to prevent overflow */</span>
+<span class="s2">    }</span>
+
+<span class="s2">    #sort-list &gt; ListItem {</span>
+<span class="s2">        padding: 0 1; /* Remove vertical padding, keep horizontal */</span>
+<span class="s2">        height: 1; /* Explicitly set height to 1 */</span>
+<span class="s2">    }</span>
+
+<span class="s2">    #sort-list &gt; ListItem.--highlight {</span>
+<span class="s2">        background: $accent;</span>
+<span class="s2">    }</span>
+<span class="s2">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SortModal.BINDINGS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/sort_modal/index.html#seer_navigator.screens.sort_modal.SortModal.BINDINGS">[docs]</a>
+    <span class="n">BINDINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;escape&quot;</span><span class="p">,</span> <span class="s2">&quot;cancel_sort&quot;</span><span class="p">,</span> <span class="s2">&quot;Cancel&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="c1"># Changed action</span>
+    <span class="p">]</span></div>
+
+
+    <span class="c1"># Remove parent_screen from __init__</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ColumnKey</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Store column labels and their corresponding ColumnKey objects</span>
+<div class="viewcode-block" id="SortModal.column_options">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/sort_modal/index.html#seer_navigator.screens.sort_modal.SortModal.column_options">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">column_options</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ColumnKey</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+        <span class="k">for</span> <span class="n">col_key</span><span class="p">,</span> <span class="n">column_obj</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Get column label safely</span>
+            <span class="n">column_label</span> <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">column_obj</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">):</span>
+                <span class="c1"># Ensure label is extracted correctly, handling potential Text objects</span>
+                <span class="n">label_obj</span> <span class="o">=</span> <span class="n">column_obj</span><span class="o">.</span><span class="n">label</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">label_obj</span><span class="p">,</span> <span class="s1">&#39;plain&#39;</span><span class="p">):</span>
+                    <span class="n">column_label</span> <span class="o">=</span> <span class="n">label_obj</span><span class="o">.</span><span class="n">plain</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">column_label</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">label_obj</span><span class="p">)</span> <span class="c1"># Fallback to string conversion</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">column_options</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">column_label</span><span class="p">,</span> <span class="n">col_key</span><span class="p">))</span>
+
+        <span class="c1"># Sort options alphabetically by label for user convenience</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">column_options</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SortModal initialized with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_options</span><span class="p">)</span><span class="si">}</span><span class="s2"> column options.&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SortModal.compose">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/sort_modal/index.html#seer_navigator.screens.sort_modal.SortModal.compose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComposeResult</span><span class="p">:</span>
+        <span class="c1"># Use Container instead of Vertical for more control if needed, but Vertical works</span>
+        <span class="k">with</span> <span class="n">Vertical</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;dialog&quot;</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Sort by which column?&quot;</span><span class="p">)</span>
+            <span class="c1"># Yield the ListView first</span>
+            <span class="k">with</span> <span class="n">ListView</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;sort-list&quot;</span><span class="p">):</span>
+                <span class="c1"># Yield each ListItem as a child of the ListView</span>
+                <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_options</span><span class="p">:</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="n">ListItem</span><span class="p">(</span><span class="n">Label</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+                    <span class="c1"># Store the actual ColumnKey object as a custom attribute on the ListItem</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">sort_key</span> <span class="o">=</span> <span class="n">key</span>
+                    <span class="k">yield</span> <span class="n">item</span></div>
+
+            <span class="c1"># Consider adding a Cancel button or relying solely on Escape binding</span>
+            <span class="c1"># yield Button(&quot;Cancel&quot;, id=&quot;cancel&quot;, variant=&quot;default&quot;)</span>
+
+
+    <span class="nd">@on</span><span class="p">(</span><span class="n">ListView</span><span class="o">.</span><span class="n">Selected</span><span class="p">)</span>
+<div class="viewcode-block" id="SortModal.handle_selection">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/sort_modal/index.html#seer_navigator.screens.sort_modal.SortModal.handle_selection">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">ListView</span><span class="o">.</span><span class="n">Selected</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle selection of a column from the ListView.&quot;&quot;&quot;</span>
+        <span class="n">selected_item</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">item</span>
+        <span class="c1"># Retrieve the stored ColumnKey from the selected ListItem</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">selected_item</span><span class="p">,</span> <span class="s1">&#39;sort_key&#39;</span><span class="p">):</span>
+            <span class="n">selected_key</span> <span class="o">=</span> <span class="n">selected_item</span><span class="o">.</span><span class="n">sort_key</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ListView item selected. Dismissing SortModal with ColumnKey: </span><span class="si">{</span><span class="n">selected_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dismiss</span><span class="p">(</span><span class="n">selected_key</span><span class="p">)</span> <span class="c1"># Dismiss with the selected ColumnKey</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Selected ListItem missing &#39;sort_key&#39; attribute.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dismiss</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="c1"># Dismiss with None on error</span></div>
+
+
+    <span class="c1"># Action for the escape binding (remains the same)</span>
+<div class="viewcode-block" id="SortModal.action_cancel_sort">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/sort_modal/index.html#seer_navigator.screens.sort_modal.SortModal.action_cancel_sort">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_cancel_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when escape is pressed.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;SortModal cancelled via escape key.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dismiss</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+</div>
+
+
+</pre></div>
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

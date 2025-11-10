@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.screens.trial_screen &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+           <a href="../tasks_screen/index.html" class="prev" title="seer_navigator.screens.tasks_screen" >Prev</a>
+        </div>
+        <div class="next">
+          <a href="../trial_split_view_screen/index.html" class="next" title="seer_navigator.screens.trial_split_view_screen" >Next</a>
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../../index.html">API Reference</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">seer_navigator</a></span>
+          <span>/</span>
+        <span><a href="../index.html">seer_navigator.screens</a></span>
+        <span>/</span>
+        <span>seer_navigator.screens.trial_screen</span>
+      </nav>
+      <div class="content">
+          <section id="module-seer_navigator.screens.trial_screen">
+<span id="seer-navigator-screens-trial-screen"></span><h1>seer_navigator.screens.trial_screen<a class="headerlink" href="#module-seer_navigator.screens.trial_screen" title="Link to this heading">¶</a></h1>
+<p>Defines the TrialViewer widget for displaying trial input/output grids.</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#seer_navigator.screens.trial_screen.RENDERERS" title="seer_navigator.screens.trial_screen.RENDERERS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RENDERERS</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#seer_navigator.screens.trial_screen.TrialViewer" title="seer_navigator.screens.trial_screen.TrialViewer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrialViewer</span></code></a></p></td>
+<td><p>Displays the input, expected output, and actual output grids from a trial.json file.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.RENDERERS">
+<span class="sig-prename descclassname"><span class="pre">seer_navigator.screens.trial_screen.</span></span><span class="sig-name descname"><span class="pre">RENDERERS</span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#RENDERERS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.RENDERERS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seer_navigator.screens.trial_screen.</span></span><span class="sig-name descname"><span class="pre">TrialViewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trial_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.9/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><span class="pre">pathlib.Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renderer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#type" title="(in Python v3.9)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><span class="pre">textual.widgets.Static</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SolidGrid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">textual.containers.ScrollableContainer</span></code></p>
+<p>Displays the input, expected output, and actual output grids from a trial.json file.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.DEFAULT_CSS">
+<span class="sig-name descname"><span class="pre">DEFAULT_CSS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Multiline-String</span></em><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.DEFAULT_CSS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.DEFAULT_CSS" title="Link to this definition">¶</a></dt>
+<dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TrialViewer {</span>
+<span class="sd">        /* Inherit background from parent */</span>
+<span class="sd">    }</span>
+<span class="sd">    .trial-grid {</span>
+<span class="sd">        grid-size: 4; /* Details, Input, Expected, Actual */</span>
+<span class="sd">        grid-gutter: 1 2;</span>
+<span class="sd">        grid-rows: auto;</span>
+<span class="sd">        padding: 1 2;</span>
+<span class="sd">        align: center top;</span>
+<span class="sd">        border-bottom: thick $accent-darken-1;</span>
+<span class="sd">        height: auto; /* Fit content height */</span>
+<span class="sd">        margin-bottom: 1;</span>
+<span class="sd">    }</span>
+<span class="sd">    .trial-details-table {</span>
+<span class="sd">        height: auto; /* Fit content height */</span>
+<span class="sd">        border: none; /* No border for summary tables */</span>
+<span class="sd">        width: auto; /* Fit content width */</span>
+<span class="sd">    }</span>
+<span class="sd">    /* Ensure no focus border on summary tables */</span>
+<span class="sd">    .trial-details-table:focus {</span>
+<span class="sd">        border: none;</span>
+<span class="sd">    }</span>
+<span class="sd">    .trial-set-label {</span>
+<span class="sd">        width: 100%;</span>
+<span class="sd">        text-align: center;</span>
+<span class="sd">        text-style: bold underline;</span>
+<span class="sd">        margin-top: 2;</span>
+<span class="sd">        margin-bottom: 1;</span>
+<span class="sd">    }</span>
+<span class="sd">    /* Style for grid labels (optional, if needed above each grid) */</span>
+<span class="sd">    .grid-label {</span>
+<span class="sd">        text-style: bold;</span>
+<span class="sd">        text-align: center;</span>
+<span class="sd">        margin-bottom: 1;</span>
+<span class="sd">    }</span>
+<span class="sd">    /* Add style for the individual grid renderer cells */</span>
+<span class="sd">    .grid-renderer-cell {</span>
+<span class="sd">        overflow-x: scroll; /* Enable horizontal scrolling */</span>
+<span class="sd">        overflow-y: hidden; /* Prevent vertical scrolling within the cell */</span>
+<span class="sd">        height: auto; /* Let content determine height */</span>
+<span class="sd">        /* The TextualGrid layout will determine the width */</span>
+<span class="sd">    }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</details><p>Default TCSS.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.trial_path">
+<span class="sig-name descname"><span class="pre">trial_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.trial_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.trial_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.renderer">
+<span class="sig-name descname"><span class="pre">renderer</span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.renderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.renderer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.trial_data">
+<span class="sig-name descname"><span class="pre">trial_data</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.trial_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.trial_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.trials_container">
+<span class="sig-name descname"><span class="pre">trials_container</span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.trials_container"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.trials_container" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.compose">
+<span class="sig-name descname"><span class="pre">compose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">textual.app.ComposeResult</span></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.compose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.compose" title="Link to this definition">¶</a></dt>
+<dd><p>Called by Textual to create child widgets.</p>
+<p>This method is called when a widget is mounted or by setting <cite>recompose=True</cite> when
+calling [<cite>refresh()</cite>][textual.widget.Widget.refresh].</p>
+<p>Note that you don’t typically need to explicitly call this method.</p>
+<dl>
+<dt>Example:</dt><dd><p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
+def compose(self) -&gt; ComposeResult:</p>
+<blockquote>
+<div><p>yield Header()
+yield Label(“Press the button below:”)
+yield Button()
+yield Footer()</p>
+</div></blockquote>
+<p><a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.on_mount">
+<span class="sig-name descname"><span class="pre">on_mount</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.on_mount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.on_mount" title="Link to this definition">¶</a></dt>
+<dd><p>Load data and display trials when the widget is mounted or path changes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.load_and_display">
+<span class="sig-name descname"><span class="pre">load_and_display</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.load_and_display"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.load_and_display" title="Link to this definition">¶</a></dt>
+<dd><p>Loads the trial JSON and populates the trials container.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.display_trials">
+<span class="sig-name descname"><span class="pre">display_trials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.display_trials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.display_trials" title="Link to this definition">¶</a></dt>
+<dd><p>Clears and repopulates the trials container with trial data using the current renderer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="seer_navigator.screens.trial_screen.TrialViewer.refresh_display">
+<span class="sig-name descname"><span class="pre">refresh_display</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../../../../_modules/seer_navigator/screens/trial_screen.html#TrialViewer.refresh_display"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#seer_navigator.screens.trial_screen.TrialViewer.refresh_display" title="Link to this definition">¶</a></dt>
+<dd><p>Refreshes the grid display using the current renderer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+      <div class="rst-footer-buttons" role="navigation" aria-label="Footer Nav">
+          <a href="../tasks_screen/index.html" class="btn btn-neutral float-left" title="seer_navigator.screens.tasks_screen" accesskey="p" rel="prev"> Previous</a>
+          <a href="../trial_split_view_screen/index.html" class="btn btn-neutral float-right" title="seer_navigator.screens.trial_split_view_screen" accesskey="n" rel="next">Next </a>
+      </div>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

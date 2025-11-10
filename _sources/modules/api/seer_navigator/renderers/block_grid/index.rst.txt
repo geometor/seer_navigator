@@ -1,0 +1,43 @@
+seer_navigator.renderers.block_grid
+===================================
+
+.. py:module:: seer_navigator.renderers.block_grid
+
+.. autoapi-nested-parse::
+
+   Provides the BlockGrid renderer using specific Unicode block characters.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.renderers.block_grid.BlockGrid
+
+
+Module Contents
+---------------
+
+.. py:class:: BlockGrid(grid, **kwargs)
+
+   Bases: :py:obj:`geometor.seer_navigator.renderers.base_grid.BaseGrid`
+
+
+   first row cells are made of 3 characters - half vertical and full
+   next row made of top and bottom half - 1 space, 1 half block
+   " ██"
+   " ▄▄"
+   " ▀▀"
+
+
+   .. py:method:: render()
+
+      Get a rich renderable for the widget's content.
+
+      Returns:
+          A rich renderable.
+
+
+

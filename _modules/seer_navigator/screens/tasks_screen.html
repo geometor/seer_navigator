@@ -1,0 +1,762 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seer_navigator.screens.tasks_screen &mdash; Project name not set  documentation</title>
+  <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/css/styles.css?v=85f2e26d" />
+  <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="../../../index.html">
+        <h1>Project name not set</h1>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main>
+
+    <article>
+      <nav class="context">
+        <div class="prev">
+        </div>
+        <div class="next">
+        </div>
+      </nav>
+      <nav class="breadcrumbs">
+        <span><a href="../../../index.html">Home</a></span>
+          <span>/</span>
+        <span><a href="../../index.html">Module code</a></span>
+          <span>/</span>
+        <span><a href="../../seer_navigator.html">seer_navigator</a></span>
+        <span>/</span>
+        <span>seer_navigator.screens.tasks_screen</span>
+      </nav>
+      <div class="content">
+          <h1>Source code for seer_navigator.screens.tasks_screen</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines the TasksScreen for displaying aggregated data for all unique tasks.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">Text</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComposeResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">Screen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataTable</span><span class="p">,</span> <span class="n">Header</span><span class="p">,</span> <span class="n">Footer</span><span class="p">,</span> <span class="n">Static</span> <span class="c1"># Added Static</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.reactive</span><span class="w"> </span><span class="kn">import</span> <span class="n">reactive</span> <span class="c1"># ADDED reactive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vertical</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.binding</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binding</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.widgets._data_table</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnKey</span> <span class="c1"># ADDED ColumnKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span>
+
+
+<span class="c1"># Import Grid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">textual.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vertical</span><span class="p">,</span> <span class="n">Grid</span>
+
+<span class="c1"># Import Task for weight calculation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer.tasks.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span>
+
+<span class="c1"># Import the new screen</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.task_sessions_screen</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskSessionsScreen</span> <span class="c1"># ADDED</span>
+
+
+<div class="viewcode-block" id="TasksScreen">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TasksScreen</span><span class="p">(</span><span class="n">Screen</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Displays aggregated task data across all sessions.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TasksScreen.CSS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.CSS">[docs]</a>
+    <span class="n">CSS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Screen &gt; Vertical {</span>
+<span class="s2">        grid-size: 2;</span>
+<span class="s2">        grid-rows: auto 1fr; /* Summary auto height, table takes rest */</span>
+<span class="s2">    }</span>
+<span class="s2">    #summary-grid {</span>
+<span class="s2">        grid-size: 3; /* Three columns for the summary tables */</span>
+<span class="s2">        grid-gutter: 1 2;</span>
+<span class="s2">        height: auto; /* Let the grid determine its height */</span>
+<span class="s2">        padding: 0 1; /* Add some horizontal padding */</span>
+<span class="s2">        margin-bottom: 1; /* Space below summary */</span>
+<span class="s2">    }</span>
+<span class="s2">    .summary-table {</span>
+<span class="s2">        height: auto; /* Fit content height */</span>
+<span class="s2">        border: none; /* No border for summary tables */</span>
+<span class="s2">    }</span>
+<span class="s2">    /* Ensure no focus border on summary tables */</span>
+<span class="s2">    .summary-table:focus {</span>
+<span class="s2">        border: none;</span>
+<span class="s2">    }</span>
+<span class="s2">    #tasks-table { /* Style for the main tasks table */</span>
+<span class="s2">        height: 1fr;</span>
+<span class="s2">    }</span>
+<span class="s2">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="TasksScreen.BINDINGS">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.BINDINGS">[docs]</a>
+    <span class="n">BINDINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;j&quot;</span><span class="p">,</span> <span class="s2">&quot;cursor_down&quot;</span><span class="p">,</span> <span class="s2">&quot;Cursor Down&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;cursor_up&quot;</span><span class="p">,</span> <span class="s2">&quot;Cursor Up&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Binding</span><span class="p">(</span><span class="s2">&quot;l,enter&quot;</span><span class="p">,</span> <span class="s2">&quot;select_task&quot;</span><span class="p">,</span> <span class="s2">&quot;Select Task&quot;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="c1"># ENABLED task selection</span>
+        <span class="c1"># Binding(&quot;h&quot;, &quot;app.pop_screen&quot;, &quot;Back&quot;, show=False), # REMOVED - TasksScreen is root</span>
+    <span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sessions_root</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+<div class="viewcode-block" id="TasksScreen.sessions_root">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.sessions_root">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">sessions_root</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TasksScreen.tasks_summary">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.tasks_summary">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_summary</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;sessions&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span>
+            <span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;test_passed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;train_passed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;total_steps&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># Add total steps</span>
+            <span class="s1">&#39;total_duration&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="c1"># Add total duration</span>
+            <span class="s1">&#39;best_score&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span> <span class="c1"># Initialize best score to infinity (lower is better)</span>
+            <span class="c1"># ADDED token aggregation fields</span>
+            <span class="s1">&#39;total_prompt_tokens&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;total_candidates_tokens&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;total_tokens&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># ADDED weight field</span>
+        <span class="p">})</span></div>
+
+<div class="viewcode-block" id="TasksScreen.sorted_task_ids">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.sorted_task_ids">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted_task_ids</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># To maintain table order</span></div>
+
+<div class="viewcode-block" id="TasksScreen.current_sort_key">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.current_sort_key">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_key</span><span class="p">:</span> <span class="n">ColumnKey</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># ADDED sort state</span></div>
+
+<div class="viewcode-block" id="TasksScreen.current_sort_reverse">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.current_sort_reverse">[docs]</a>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_reverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>      <span class="c1"># ADDED sort state</span></div>
+
+
+<div class="viewcode-block" id="TasksScreen.compose">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.compose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComposeResult</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">DataTable</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tasks-table&quot;</span><span class="p">)</span> <span class="c1"># Main tasks table</span>
+
+        <span class="k">yield</span> <span class="n">Header</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">Vertical</span><span class="p">():</span>
+            <span class="c1"># Summary Grid with three DataTables</span>
+            <span class="k">with</span> <span class="n">Grid</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;summary-grid&quot;</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">DataTable</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;summary-table&quot;</span><span class="p">,</span> <span class="n">show_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cursor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;summary-table&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">DataTable</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;trials-table&quot;</span><span class="p">,</span> <span class="n">show_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cursor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;summary-table&quot;</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">DataTable</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tokens-table&quot;</span><span class="p">,</span> <span class="n">show_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cursor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s2">&quot;summary-table&quot;</span><span class="p">)</span> <span class="c1"># Placeholder for now</span>
+            <span class="c1"># Main tasks table</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span>
+        <span class="k">yield</span> <span class="n">Footer</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TasksScreen.on_mount">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.on_mount">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_mount</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when the screen is mounted.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SEER Tasks • </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Add columns to summary tables</span>
+        <span class="n">summary_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#summary-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span><span class="s2">&quot;Metric&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+        <span class="n">trials_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#trials-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span><span class="s2">&quot;Metric&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">,</span> <span class="s2">&quot;±&quot;</span><span class="p">)</span> <span class="c1"># Add third column header</span>
+        <span class="n">tokens_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#tokens-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span><span class="s2">&quot;Metric&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Setup main table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_type</span> <span class="o">=</span> <span class="s2">&quot;row&quot;</span>
+        <span class="c1"># Add columns: TASK, SESSIONS, ERRORS, TEST, TRAIN, STEPS, TIME, BEST</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">add_columns</span><span class="p">(</span>
+            <span class="s2">&quot;TASK&quot;</span><span class="p">,</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;SESSIONS&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;ERRORS&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;TEST&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;TRAIN&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;STEPS&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;TIME&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;BEST&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="c1"># ADDED Token Columns</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;IN&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;OUT&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;TOTAL&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;WEIGHT&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="c1"># ADDED WEIGHT column</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_and_display_tasks</span><span class="p">()</span> <span class="c1"># This will now also call update_summary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">focus</span><span class="p">()</span>
+        <span class="c1"># Add sort key tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_reverse</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="TasksScreen.load_and_display_tasks">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.load_and_display_tasks">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_and_display_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scans sessions, aggregates task data, and populates the DataTable.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scanning sessions in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span><span class="si">}</span><span class="s2"> to aggregate task data...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_summary</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span> <span class="c1"># Clear previous data before rescanning</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sessions root directory not found: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: Directory not found: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="k">for</span> <span class="n">session_dir</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">session_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                    <span class="n">session_name</span> <span class="o">=</span> <span class="n">session_dir</span><span class="o">.</span><span class="n">name</span>
+                    <span class="k">for</span> <span class="n">task_dir</span> <span class="ow">in</span> <span class="n">session_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">task_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                            <span class="n">task_id</span> <span class="o">=</span> <span class="n">task_dir</span><span class="o">.</span><span class="n">name</span>
+                            <span class="n">summary_path</span> <span class="o">=</span> <span class="n">task_dir</span> <span class="o">/</span> <span class="s2">&quot;index.json&quot;</span>
+                            <span class="n">task_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_summary</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="c1"># Get or create entry</span>
+
+                            <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;sessions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">session_name</span><span class="p">)</span>
+
+                            <span class="k">if</span> <span class="n">summary_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                                <span class="k">try</span><span class="p">:</span>
+                                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">summary_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                                        <span class="n">summary</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+                                    <span class="c1"># Aggregate counts</span>
+                                    <span class="c1"># Increment &#39;errors&#39; if the task had errors in this session</span>
+                                    <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_errors&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                                        <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                                    <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test_passed&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                                        <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;test_passed&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                                    <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;train_passed&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                                        <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;train_passed&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                                    <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;total_steps&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+                                    <span class="c1"># Aggregate duration</span>
+                                    <span class="n">duration</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;duration_seconds&quot;</span><span class="p">)</span>
+                                    <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                        <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;total_duration&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">duration</span>
+
+                                    <span class="c1"># Find best (minimum) score</span>
+                                    <span class="n">score</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;best_score&quot;</span><span class="p">)</span>
+                                    <span class="k">if</span> <span class="n">score</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">score</span> <span class="o">&lt;</span> <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;best_score&#39;</span><span class="p">]:</span>
+                                        <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;best_score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+
+                                    <span class="c1"># --- START ADDED TOKEN AGGREGATION ---</span>
+                                    <span class="n">tokens_data</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                                    <span class="n">prompt_tokens</span> <span class="o">=</span> <span class="n">tokens_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt_tokens&quot;</span><span class="p">)</span>
+                                    <span class="n">candidates_tokens</span> <span class="o">=</span> <span class="n">tokens_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;candidates_tokens&quot;</span><span class="p">)</span>
+                                    <span class="n">total_tokens</span> <span class="o">=</span> <span class="n">tokens_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;total_tokens&quot;</span><span class="p">)</span>
+
+                                    <span class="k">if</span> <span class="n">prompt_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                        <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;total_prompt_tokens&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">prompt_tokens</span>
+                                    <span class="k">if</span> <span class="n">candidates_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                        <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;total_candidates_tokens&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">candidates_tokens</span>
+                                    <span class="k">if</span> <span class="n">total_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                        <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;total_tokens&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">total_tokens</span>
+                                    <span class="c1"># --- END ADDED TOKEN AGGREGATION ---</span>
+
+                                    <span class="c1"># --- START ADDED WEIGHT CALCULATION ---</span>
+                                    <span class="c1"># Find the corresponding task.json in *any* session dir for this task</span>
+                                    <span class="n">task_json_path</span> <span class="o">=</span> <span class="kc">None</span>
+                                    <span class="k">for</span> <span class="n">s_dir</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+                                        <span class="n">potential_path</span> <span class="o">=</span> <span class="n">s_dir</span> <span class="o">/</span> <span class="n">task_id</span> <span class="o">/</span> <span class="s2">&quot;task.json&quot;</span>
+                                        <span class="k">if</span> <span class="n">potential_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                                            <span class="n">task_json_path</span> <span class="o">=</span> <span class="n">potential_path</span>
+                                            <span class="k">break</span> <span class="c1"># Found one, no need to check others</span>
+
+                                    <span class="k">if</span> <span class="n">task_json_path</span><span class="p">:</span>
+                                        <span class="k">try</span><span class="p">:</span>
+                                            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">task_json_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_task</span><span class="p">:</span>
+                                                <span class="n">task_json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f_task</span><span class="p">)</span>
+                                            <span class="n">task_obj</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">task_json_data</span><span class="p">)</span>
+                                            <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">task_obj</span><span class="o">.</span><span class="n">weight</span> <span class="c1"># Store weight</span>
+                                        <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)</span> <span class="k">as</span> <span class="n">e_task</span><span class="p">:</span>
+                                            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error loading/processing </span><span class="si">{</span><span class="n">task_json_path</span><span class="si">}</span><span class="s2"> for weight: </span><span class="si">{</span><span class="n">e_task</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                            <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># Indicate error</span>
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find task.json for task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> in any session.&quot;</span><span class="p">)</span>
+                                        <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="c1"># Indicate not found</span>
+                                    <span class="c1"># --- END ADDED WEIGHT CALCULATION ---</span>
+
+                                <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not decode JSON in </span><span class="si">{</span><span class="n">summary_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                    <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># Count decode error as an error</span>
+                                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading </span><span class="si">{</span><span class="n">summary_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                    <span class="n">task_data</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># Count other read errors</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="c1"># If index.json is missing, maybe log or count as error?</span>
+                                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing index.json for task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> in session </span><span class="si">{</span><span class="n">session_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                <span class="c1"># task_data[&#39;errors&#39;] += 1 # Optionally count missing index as error</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning directories: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning sessions: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="c1"># Display error in table?</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="n">DataTable</span><span class="p">)</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bold red&quot;</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Populate the main DataTable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># Sort tasks by ID for consistent display order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted_task_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_summary</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorted_task_ids</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="s2">&quot;No tasks found.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_summary</span><span class="p">()</span> <span class="c1"># Update summary even if no tasks</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorted_task_ids</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_summary</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+            <span class="n">session_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;sessions&#39;</span><span class="p">])</span>
+            <span class="n">error_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]),</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bold #FFD700&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Color TEST and TRAIN counts</span>
+            <span class="n">test_passed_count</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;test_passed&#39;</span><span class="p">]</span>
+            <span class="n">test_text</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">test_passed_count</span><span class="p">),</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bold green&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">test_passed_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                <span class="k">else</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">train_passed_count</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;train_passed&#39;</span><span class="p">]</span>
+            <span class="n">train_text</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">train_passed_count</span><span class="p">),</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bold green&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">train_passed_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                <span class="k">else</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">steps_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_steps&#39;</span><span class="p">]),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="c1"># Format duration</span>
+            <span class="n">time_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_duration</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_duration&#39;</span><span class="p">])</span>
+            <span class="c1"># Format best score</span>
+            <span class="n">best_score_val</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;best_score&#39;</span><span class="p">]</span>
+            <span class="n">best_score_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">best_score_val</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">best_score_val</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+            <span class="c1"># --- START ADDED TOKEN TEXT ---</span>
+            <span class="n">in_tokens_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_prompt_tokens&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_prompt_tokens&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="n">out_tokens_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_candidates_tokens&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_candidates_tokens&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="n">total_tokens_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_tokens&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_tokens&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="c1"># --- END ADDED TOKEN TEXT ---</span>
+
+            <span class="c1"># --- START ADDED WEIGHT TEXT ---</span>
+            <span class="n">weight_val</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">weight_val</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">weight_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;ERR&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bold red&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">weight_val</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">weight_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;dim&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">weight_text</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">weight_val</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+            <span class="c1"># --- END ADDED WEIGHT TEXT ---</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span>
+                <span class="n">task_id</span><span class="p">,</span>                       <span class="c1"># TASK</span>
+                <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">session_count</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="c1"># SESSIONS</span>
+                <span class="n">error_text</span><span class="p">,</span>                    <span class="c1"># ERRORS</span>
+                <span class="n">test_text</span><span class="p">,</span>                     <span class="c1"># TEST</span>
+                <span class="n">train_text</span><span class="p">,</span>                    <span class="c1"># TRAIN</span>
+                <span class="n">steps_text</span><span class="p">,</span>                    <span class="c1"># STEPS</span>
+                <span class="n">Text</span><span class="p">(</span><span class="n">time_str</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="c1"># TIME</span>
+                <span class="n">best_score_text</span><span class="p">,</span>               <span class="c1"># BEST</span>
+                <span class="c1"># ADDED Token Columns</span>
+                <span class="n">in_tokens_text</span><span class="p">,</span>                <span class="c1"># IN</span>
+                <span class="n">out_tokens_text</span><span class="p">,</span>               <span class="c1"># OUT</span>
+                <span class="n">total_tokens_text</span><span class="p">,</span>             <span class="c1"># TOTAL</span>
+                <span class="n">weight_text</span><span class="p">,</span>                   <span class="c1"># WEIGHT (ADDED)</span>
+            <span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finished aggregating data for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sorted_task_ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> unique tasks.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_summary</span><span class="p">()</span> <span class="c1"># Update summary after loading tasks</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_format_duration</span><span class="p">(</span><span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Formats duration in HH:MM:SS format. (Copied from Level)&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: Consider moving this to a shared utility module</span>
+        <span class="k">if</span> <span class="n">seconds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">seconds</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;-&quot;</span>
+        <span class="c1"># Use Level&#39;s static method directly</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">geometor.seer.session.level</span><span class="w"> </span><span class="kn">import</span> <span class="n">Level</span>
+        <span class="k">return</span> <span class="n">Level</span><span class="o">.</span><span class="n">_format_duration</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TasksScreen.update_summary">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.update_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the summary DataTables with aggregated data.&quot;&quot;&quot;</span>
+        <span class="n">summary_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#summary-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">trials_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#trials-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="n">tokens_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#tokens-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span> <span class="c1"># Placeholder</span>
+
+        <span class="n">total_unique_tasks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_summary</span><span class="p">)</span>
+        <span class="n">total_sessions_involved</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">total_errors</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Keep this for the main table column aggregation logic if needed elsewhere</span>
+        <span class="n">tasks_failed_all_sessions</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># New counter for tasks failing in all their sessions</span>
+        <span class="c1"># --- START: Counters for unique task passes ---</span>
+        <span class="n">unique_tasks_passed_test</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">unique_tasks_passed_train</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># --- END: Counters for unique task passes ---</span>
+        <span class="n">grand_total_steps</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">grand_total_duration</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">best_scores</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># ADDED token counters for summary</span>
+        <span class="n">grand_total_prompt_tokens</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">grand_total_candidates_tokens</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">grand_total_tokens_all_tasks</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">grand_total_weight</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># ADDED total weight counter</span>
+
+        <span class="k">for</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_summary</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">num_sessions_for_task</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;sessions&#39;</span><span class="p">])</span>
+            <span class="n">task_error_count</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span> <span class="c1"># Now represents sessions with errors for this task</span>
+
+            <span class="n">total_sessions_involved</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;sessions&#39;</span><span class="p">])</span>
+            <span class="c1"># total_errors is no longer a simple sum of counts, but sum of sessions with errors</span>
+            <span class="n">total_errors</span> <span class="o">+=</span> <span class="n">task_error_count</span>
+
+            <span class="c1"># --- START: Check if task had errors in *any* session ---</span>
+            <span class="c1"># tasks_failed_all_sessions is renamed/repurposed to count tasks that had at least one error</span>
+            <span class="k">if</span> <span class="n">task_error_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">tasks_failed_all_sessions</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># Count tasks that had errors in at least one session</span>
+            <span class="c1"># --- END: Check if task had errors in *any* session ---</span>
+
+            <span class="c1"># --- START: Increment unique task pass counters ---</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;test_passed&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># Check if task passed test at least once</span>
+                <span class="n">unique_tasks_passed_test</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;train_passed&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># Check if task passed train at least once</span>
+                <span class="n">unique_tasks_passed_train</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># --- END: Increment unique task pass counters ---</span>
+            <span class="c1"># Keep aggregating total passes if needed elsewhere, but don&#39;t use for summary display</span>
+            <span class="n">total_test_passed</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;test_passed&#39;</span><span class="p">]</span> <span class="c1"># Example: If you still need the raw total somewhere</span>
+            <span class="n">total_train_passed</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;train_passed&#39;</span><span class="p">]</span> <span class="c1"># Example: If you still need the raw total somewhere</span>
+            <span class="n">grand_total_steps</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_steps&#39;</span><span class="p">]</span>
+            <span class="n">grand_total_duration</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_duration&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;best_score&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">):</span>
+                <span class="n">best_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;best_score&#39;</span><span class="p">])</span>
+            <span class="c1"># ADDED token aggregation for summary</span>
+            <span class="n">grand_total_prompt_tokens</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_prompt_tokens&#39;</span><span class="p">]</span>
+            <span class="n">grand_total_candidates_tokens</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_candidates_tokens&#39;</span><span class="p">]</span>
+            <span class="n">grand_total_tokens_all_tasks</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;total_tokens&#39;</span><span class="p">]</span>
+            <span class="c1"># ADDED weight aggregation for summary</span>
+            <span class="n">weight_val</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">weight_val</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># Only add valid weights</span>
+                <span class="n">grand_total_weight</span> <span class="o">+=</span> <span class="n">weight_val</span>
+
+        <span class="n">num_sessions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">total_sessions_involved</span><span class="p">)</span>
+        <span class="n">best_overall_score</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">best_scores</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">best_scores</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span>
+        <span class="n">formatted_total_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_duration</span><span class="p">(</span><span class="n">grand_total_duration</span><span class="p">)</span>
+
+        <span class="c1"># --- START Calculate summary percentages/diffs ---</span>
+        <span class="n">test_percent</span> <span class="o">=</span> <span class="p">(</span><span class="n">unique_tasks_passed_test</span> <span class="o">/</span> <span class="n">total_unique_tasks</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="k">if</span> <span class="n">total_unique_tasks</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="n">test_percent_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">test_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span>
+
+        <span class="n">train_diff</span> <span class="o">=</span> <span class="n">unique_tasks_passed_test</span> <span class="o">-</span> <span class="n">unique_tasks_passed_train</span>
+        <span class="n">train_diff_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">train_diff</span><span class="si">:</span><span class="s2">+</span><span class="si">}</span><span class="s2">&quot;</span> <span class="c1"># Format with sign (+/-)</span>
+
+        <span class="n">error_percent</span> <span class="o">=</span> <span class="p">(</span><span class="n">tasks_failed_all_sessions</span> <span class="o">/</span> <span class="n">total_unique_tasks</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="k">if</span> <span class="n">total_unique_tasks</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="n">error_percent_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">error_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span>
+        <span class="c1"># --- END Calculate summary percentages/diffs ---</span>
+
+        <span class="c1"># Clear and update summary table</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;tasks:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">total_unique_tasks</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;sessions:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">num_sessions</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;steps:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">grand_total_steps</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;time:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="n">formatted_total_duration</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;weight:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">grand_total_weight</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span> <span class="c1"># ADDED total weight</span>
+
+        <span class="c1"># Clear and update trials table using unique task pass counts and calculated stats</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;test:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">unique_tasks_passed_test</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="n">test_percent_str</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span> <span class="c1"># Add percentage</span>
+        <span class="p">)</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;train:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">unique_tasks_passed_train</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="n">train_diff_str</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span> <span class="c1"># Add difference</span>
+        <span class="p">)</span>
+        <span class="n">trials_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span>
+            <span class="n">Text</span><span class="p">(</span><span class="s2">&quot;errors:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span>
+            <span class="n">Text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tasks_failed_all_sessions</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="c1"># Use the count of tasks with errors</span>
+            <span class="n">Text</span><span class="p">(</span><span class="n">error_percent_str</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span> <span class="c1"># Add percentage</span>
+        <span class="p">)</span>
+        <span class="c1"># Removed best score row</span>
+
+        <span class="c1"># Clear and update tokens table</span>
+        <span class="c1"># Clear and update tokens table (Placeholder - needs data aggregation)</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;in:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">grand_total_prompt_tokens</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;out:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">grand_total_candidates_tokens</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span>
+        <span class="n">tokens_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">Text</span><span class="p">(</span><span class="s2">&quot;total:&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">),</span> <span class="n">Text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">grand_total_tokens_all_tasks</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="TasksScreen.action_cursor_down">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.action_cursor_down">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_cursor_down</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the cursor down in the DataTable.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">action_cursor_down</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TasksScreen.action_cursor_up">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.action_cursor_up">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_cursor_up</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the cursor up in the DataTable.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">action_cursor_up</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TasksScreen.action_select_task">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.action_select_task">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_select_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when a task row is selected (Enter or &#39;l&#39;). Pushes TaskSessionsScreen.&quot;&quot;&quot;</span>
+        <span class="c1"># Ensure we target the correct table using its ID</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_one</span><span class="p">(</span><span class="s2">&quot;#tasks-table&quot;</span><span class="p">,</span> <span class="n">DataTable</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">row_count</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;action_select_task: Table empty or no cursor row.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="c1"># No tasks or no selection</span>
+
+        <span class="n">cursor_row</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_task: Cursor row is </span><span class="si">{</span><span class="n">cursor_row</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get the entire row data using get_row_at</span>
+            <span class="n">row_data</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">get_row_at</span><span class="p">(</span><span class="n">cursor_row</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">row_data</span><span class="p">:</span>
+                 <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_task: Could not get row data for row </span><span class="si">{</span><span class="n">cursor_row</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Error selecting task row data.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                 <span class="k">return</span>
+
+            <span class="c1"># The first element in the row data should be the task_id</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># Ensure it&#39;s a string</span>
+
+            <span class="c1"># Basic validation</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_task: Retrieved empty task ID from row data at index </span><span class="si">{</span><span class="n">cursor_row</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Error: Could not get task ID from selected row.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_task: Task ID from row data (</span><span class="si">{</span><span class="n">cursor_row</span><span class="si">}</span><span class="s2">) is &#39;</span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">&#39;. Pushing TaskSessionsScreen.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">push_screen</span><span class="p">(</span><span class="n">TaskSessionsScreen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions_root</span><span class="p">,</span> <span class="n">task_id</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="c1"># This might happen if the row data structure is unexpected</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_task: IndexError accessing row data for row </span><span class="si">{</span><span class="n">cursor_row</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Error accessing task data.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Catch other potential errors</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;action_select_task: Error processing row </span><span class="si">{</span><span class="n">cursor_row</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Error selecting task.&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TasksScreen.on_data_table_row_selected">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.on_data_table_row_selected">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_data_table_row_selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">DataTable</span><span class="o">.</span><span class="n">RowSelected</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle row selection via click.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_select_task</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TasksScreen.refresh_content">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.refresh_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh_content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reloads task data and updates the screen.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Refreshing TasksScreen content...&quot;</span><span class="p">)</span>
+        <span class="c1"># Store current cursor position</span>
+        <span class="n">current_cursor_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">cursor_row</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_and_display_tasks</span><span class="p">()</span> <span class="c1"># Reloads table data and updates summary</span>
+
+        <span class="c1"># Restore cursor position if possible</span>
+        <span class="k">if</span> <span class="n">current_cursor_row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">current_cursor_row</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">row_count</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">current_cursor_row</span><span class="p">,</span> <span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">row_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Move to top if previous row is gone</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">focus</span><span class="p">()</span> <span class="c1"># Ensure table has focus</span></div>
+
+
+    <span class="c1"># --- START REVISED SORT METHOD ---</span>
+<div class="viewcode-block" id="TasksScreen.perform_sort">
+<a class="viewcode-back" href="../../../modules/api/seer_navigator/screens/tasks_screen/index.html#seer_navigator.screens.tasks_screen.TasksScreen.perform_sort">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">perform_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sort_key</span><span class="p">:</span> <span class="n">ColumnKey</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sorts the task data and reloads the DataTable.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Performing sort on TasksScreen by key: </span><span class="si">{</span><span class="n">sort_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Determine sort direction</span>
+        <span class="n">reverse</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_key</span> <span class="o">==</span> <span class="n">sort_key</span><span class="p">:</span>
+            <span class="n">reverse</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_reverse</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Default sort directions (can be customized per column if needed)</span>
+            <span class="c1"># Typically descending for numeric/counts, ascending for names</span>
+            <span class="n">key_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sort_key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;SESSIONS&quot;</span><span class="p">,</span> <span class="s2">&quot;ERRORS&quot;</span><span class="p">,</span> <span class="s2">&quot;TEST&quot;</span><span class="p">,</span> <span class="s2">&quot;TRAIN&quot;</span><span class="p">,</span> <span class="s2">&quot;STEPS&quot;</span><span class="p">,</span> <span class="s2">&quot;BEST&quot;</span><span class="p">,</span> <span class="s2">&quot;IN&quot;</span><span class="p">,</span> <span class="s2">&quot;OUT&quot;</span><span class="p">,</span> <span class="s2">&quot;TOTAL&quot;</span><span class="p">,</span> <span class="s2">&quot;WEIGHT&quot;</span><span class="p">,</span> <span class="s2">&quot;TIME&quot;</span><span class="p">]:</span>
+                 <span class="n">reverse</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># Default descending for numeric-like columns</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1"># TASK</span>
+                 <span class="n">reverse</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Default ascending for text</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_key</span> <span class="o">=</span> <span class="n">sort_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_sort_reverse</span> <span class="o">=</span> <span class="n">reverse</span>
+
+        <span class="c1"># Define key function operating directly on the summary data dict</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_sort_key_from_dict</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+            <span class="n">task_id</span><span class="p">,</span> <span class="n">data_dict</span> <span class="o">=</span> <span class="n">item</span>
+            <span class="n">key_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sort_key</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;TASK&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">task_id</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;SESSIONS&quot;</span><span class="p">:</span>
+                <span class="c1"># Sort by the number of sessions</span>
+                <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sessions&#39;</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;ERRORS&quot;</span><span class="p">:</span>
+                <span class="c1"># Sort by the count of sessions with errors for this task</span>
+                <span class="k">return</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;errors&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;TEST&quot;</span><span class="p">:</span>
+                <span class="c1"># Sort by count of sessions where test passed</span>
+                <span class="k">return</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;test_passed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;TRAIN&quot;</span><span class="p">:</span>
+                 <span class="c1"># Sort by count of sessions where train passed</span>
+                <span class="k">return</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;train_passed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;STEPS&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total_steps&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;BEST&quot;</span><span class="p">:</span>
+                <span class="c1"># Lower score is better, inf sorts last when ascending</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;best_score&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span>
+                <span class="c1"># Return negative score for descending sort (highest score first)</span>
+                <span class="c1"># Or handle inf appropriately if reverse=False (lowest score first)</span>
+                <span class="c1"># Python&#39;s float(&#39;inf&#39;) comparison handles this correctly with reverse flag.</span>
+                <span class="k">return</span> <span class="n">score</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;TIME&quot;</span><span class="p">:</span>
+                <span class="c1"># Sort by total duration in seconds</span>
+                <span class="n">duration</span> <span class="o">=</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total_duration&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">duration</span> <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="mf">1.0</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;IN&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total_prompt_tokens&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;OUT&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total_candidates_tokens&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;TOTAL&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total_tokens&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">key_str</span> <span class="o">==</span> <span class="s2">&quot;WEIGHT&quot;</span><span class="p">:</span>
+                <span class="c1"># Sort valid weights numerically. ERR/?: sort them last when descending, first when ascending.</span>
+                <span class="n">weight</span> <span class="o">=</span> <span class="n">data_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># Use -2 for not found/default</span>
+                <span class="k">if</span> <span class="n">weight</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">weight</span>
+                <span class="c1"># Assign values that sort consistently relative to numbers based on &#39;reverse&#39;</span>
+                <span class="c1"># If reverse (desc), we want ERR/? to be effectively -inf</span>
+                <span class="c1"># If not reverse (asc), we want ERR/? to be effectively +inf (or handle separately)</span>
+                <span class="c1"># Let&#39;s use a simpler approach: map ERR/ ? to values that place them consistently.</span>
+                <span class="c1"># Ascending: ERR (-1) &lt; ? (-2) &lt; 0 &lt; positive weights.</span>
+                <span class="c1"># Map: ERR -&gt; float(&#39;-inf&#39;), ? -&gt; float(&#39;-inf&#39;) + 1</span>
+                <span class="k">if</span> <span class="n">weight</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span>      <span class="c1"># ERR sorts first (ascending) / last (descending)</span>
+                <span class="k">if</span> <span class="n">weight</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># ? sorts after ERR (ascending) / before ERR (descending)</span>
+                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span> <span class="c1"># Fallback for unexpected negative values</span>
+
+            <span class="c1"># Fallback for unknown column</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown sort key encountered: </span><span class="si">{</span><span class="n">key_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span> <span class="c1"># Should not happen if modal uses table columns</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># 1. Get items from the summary dictionary</span>
+            <span class="n">items_to_sort</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_summary</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+            <span class="c1"># 2. Sort the items using the new key function</span>
+            <span class="c1"># Handle potential None return from key function gracefully during sort</span>
+            <span class="n">items_to_sort</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">get_sort_key_from_dict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">)</span>
+
+            <span class="c1"># 3. Update the order of task IDs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sorted_task_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items_to_sort</span><span class="p">]</span>
+
+            <span class="c1"># 4. Reload the table content using the new sorted order</span>
+            <span class="c1"># load_and_display_tasks already calls self.table.clear()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_and_display_tasks</span><span class="p">()</span>
+
+            <span class="c1"># Ensure the cursor is reset or maintained appropriately after sort</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">row_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Move cursor to top after sort</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sorted by </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">sort_key</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;(desc)&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">reverse</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;(asc)&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during TasksScreen sort: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># Use log.exception</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error sorting table: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="c1"># Restore default sort on error</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sorted_task_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks_summary</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="c1"># load_and_display_tasks already calls self.table.clear()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_and_display_tasks</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">row_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">animate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Reset cursor on error too</span></div>
+</div>
+
+    <span class="c1"># --- END REVISED SORT METHOD ---</span>
+</pre></div>
+      </div>
+      <footer></footer>
+    </article>
+
+  </main>
+
+<div class="asides">
+    <aside>
+        <h3>Search</h3>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </aside>
+    
+</div>
+<footer>
+    <hr/>
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright .
+        </p>
+    </div>
+</footer>
+
+  <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+  <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+  <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+
+
+</body>
+</html>

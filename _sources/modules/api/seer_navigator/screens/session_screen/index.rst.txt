@@ -1,0 +1,175 @@
+seer_navigator.screens.session_screen
+=====================================
+
+.. py:module:: seer_navigator.screens.session_screen
+
+.. autoapi-nested-parse::
+
+   Defines the SessionScreen for displaying tasks within a single session.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   seer_navigator.screens.session_screen.SessionScreen
+
+
+Module Contents
+---------------
+
+.. py:class:: SessionScreen(session_path: pathlib.Path, task_dirs: list[pathlib.Path])
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   The base class for screens.
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             Screen > Vertical {
+                 grid-size: 2;
+                 grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+             }
+             #summary-grid {
+                 grid-size: 3; /* Three columns for the summary tables */
+                 grid-gutter: 1 2;
+                 height: auto; /* Let the grid determine its height */
+                 padding: 0 1; /* Add some horizontal padding */
+                 margin-bottom: 1; /* Space below summary */
+             }
+             .summary-table {
+                 height: auto; /* Fit content height */
+                 border: none; /* No border for summary tables */
+             }
+             /* Ensure no focus border on summary tables */
+             .summary-table:focus {
+                 border: none;
+             }
+             DataTable { /* Style for the main tasks table */
+                 height: 1fr;
+             }
+             Vertical {height: 100%;}
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+      Inline CSS, useful for quick scripts. Rules here take priority over CSS_PATH.
+
+      Note:
+          This CSS applies to the whole app.
+
+
+
+   .. py:attribute:: BINDINGS
+
+      A list of key bindings.
+
+
+
+   .. py:attribute:: session_path
+
+
+   .. py:attribute:: task_dirs
+
+
+   .. py:attribute:: task_index
+      :value: 0
+
+
+
+   .. py:attribute:: current_sort_key
+      :type:  textual.widgets._data_table.ColumnKey | None
+      :value: None
+
+
+
+   .. py:attribute:: current_sort_reverse
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+      Called by Textual to create child widgets.
+
+      This method is called when a widget is mounted or by setting `recompose=True` when
+      calling [`refresh()`][textual.widget.Widget.refresh].
+
+      Note that you don't typically need to explicitly call this method.
+
+      Example:
+          ```python
+          def compose(self) -> ComposeResult:
+              yield Header()
+              yield Label("Press the button below:")
+              yield Button()
+              yield Footer()
+          ```
+
+
+
+   .. py:method:: on_mount() -> None
+
+
+   .. py:method:: update_tasks_list()
+
+      Loads data into the main tasks DataTable.
+
+
+
+   .. py:method:: update_summary()
+
+      Updates the three summary DataTables for the current session.
+
+
+
+   .. py:method:: select_task_by_index(index: int) -> None
+
+
+   .. py:method:: previous_sibling()
+
+
+   .. py:method:: next_sibling()
+
+
+   .. py:method:: action_move_up()
+
+
+   .. py:method:: action_move_down()
+
+
+   .. py:method:: action_select_row()
+
+
+   .. py:method:: on_data_table_row_selected(event: textual.widgets.DataTable.RowSelected)
+
+
+   .. py:method:: refresh_content() -> None
+
+      Reloads task data for the session and updates the screen.
+
+
+
+   .. py:method:: perform_sort(sort_key: textual.widgets._data_table.ColumnKey) -> None
+
+      Sorts the DataTable by the given column key.
+
+
+

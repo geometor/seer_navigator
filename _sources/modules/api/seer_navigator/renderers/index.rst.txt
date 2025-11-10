@@ -1,0 +1,25 @@
+seer_navigator.renderers
+========================
+
+.. py:module:: seer_navigator.renderers
+
+.. autoapi-nested-parse::
+
+   Grid rendering widgets for the Seer Navigator.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /modules/api/seer_navigator/renderers/base_grid/index
+   /modules/api/seer_navigator/renderers/block_grid/index
+   /modules/api/seer_navigator/renderers/char_grid/index
+   /modules/api/seer_navigator/renderers/image_grid/index
+   /modules/api/seer_navigator/renderers/solid_grid/index
+   /modules/api/seer_navigator/renderers/tiny_grid/index
+
+

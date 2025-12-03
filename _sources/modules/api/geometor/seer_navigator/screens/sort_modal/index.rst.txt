@@ -1,0 +1,3380 @@
+geometor.seer_navigator.screens.sort_modal
+==========================================
+
+.. py:module:: geometor.seer_navigator.screens.sort_modal
+
+.. autoapi-nested-parse::
+
+   Defines the SortModal screen for selecting a DataTable column to sort.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer_navigator.screens.sort_modal.SortModal
+
+
+Module Contents
+---------------
+
+.. py:class:: SortModal(columns: Dict[textual.widgets._data_table.ColumnKey, object], *args, **kwargs)
+
+   Bases: :py:obj:`textual.screen.ModalScreen`\ [\ :py:obj:`Union`\ [\ :py:obj:`textual.widgets._data_table.ColumnKey`\ , :py:obj:`None`\ ]\ ]
+
+
+   Modal dialog for selecting a column to sort. Returns the selected ColumnKey or None.
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             SortModal {
+                 align: center middle;
+             }
+         
+             #dialog { /* Changed ID and styling */
+                 padding: 0 1;
+                 width: auto; /* Auto width based on content */
+                 max-width: 60; /* Limit max width */
+                 height: auto; /* Auto height based on content */
+                 max-height: 80%; /* Limit max height */
+                 border: thick $background 80%;
+                 background: $surface;
+             }
+         
+             #dialog > Label { /* Style title label */
+                 width: 100%;
+                 text-align: center;
+                 margin-bottom: 1;
+             }
+         
+             #sort-list { /* Style the ListView */
+                 border: none;
+                 background: $surface;
+                 height: auto; /* Adjust height based on content */
+                 max-height: 15; /* Limit max height to prevent overflow */
+             }
+         
+             #sort-list > ListItem {
+                 padding: 0 1; /* Remove vertical padding, keep horizontal */
+                 height: 1; /* Explicitly set height to 1 */
+             }
+         
+             #sort-list > ListItem.--highlight {
+                 background: $accent;
+             }
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+      Inline CSS, useful for quick scripts. Rules here take priority over CSS_PATH.
+
+      .. note:: This CSS applies to the whole app.
+
+
+   .. py:attribute:: BINDINGS
+
+      A list of key bindings.
+
+
+   .. py:attribute:: column_options
+      :type:  List[Tuple[str, textual.widgets._data_table.ColumnKey]]
+      :value: []
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+      Called by Textual to create child widgets.
+
+      This method is called when a widget is mounted or by setting `recompose=True` when
+      calling [`refresh()`][textual.widget.Widget.refresh].
+
+      Note that you don't typically need to explicitly call this method.
+
+      .. rubric:: Example
+
+      ```python
+      def compose(self) -> ComposeResult:
+          yield Header()
+          yield Label("Press the button below:")
+          yield Button()
+          yield Footer()
+      ```
+
+
+
+   .. py:method:: handle_selection(event: textual.widgets.ListView.Selected) -> None
+
+      Handle selection of a column from the ListView.
+
+
+
+   .. py:method:: action_cancel_sort() -> None
+
+      Called when escape is pressed.
+
+
+
+   .. py:attribute:: DEFAULT_CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             ModalScreen {
+                 layout: vertical;
+                 overflow-y: auto;
+                 background: $background 60%;
+                 &:ansi {
+                     background: transparent;                   
+                 }
+             }
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+      Default TCSS.
+
+
+   .. py:attribute:: AUTO_FOCUS
+      :type:  ClassVar[str | None]
+      :value: None
+
+
+      A selector to determine what to focus automatically when the screen is activated.
+
+      The widget focused is the first that matches the given [CSS selector](/guide/queries/#query-selectors).
+      Set to `None` to inherit the value from the screen's app.
+      Set to `""` to disable auto focus.
+
+
+   .. py:attribute:: CSS_PATH
+      :type:  ClassVar[textual._path.CSSPathType | None]
+      :value: None
+
+
+      File paths to load CSS from.
+
+      .. note:: This CSS applies to the whole app.
+
+
+   .. py:attribute:: COMPONENT_CLASSES
+
+      Virtual DOM nodes, used to expose styles to line API widgets.
+
+
+   .. py:attribute:: TITLE
+      :type:  ClassVar[str | None]
+      :value: None
+
+
+      A class variable to set the *default* title for the screen.
+
+      This overrides the app title.
+      To update the title while the screen is running,
+      you can set the [title][textual.screen.Screen.title] attribute.
+
+
+   .. py:attribute:: SUB_TITLE
+      :type:  ClassVar[str | None]
+      :value: None
+
+
+      A class variable to set the *default* sub-title for the screen.
+
+      This overrides the app sub-title.
+      To update the sub-title while the screen is running,
+      you can set the [sub_title][textual.screen.Screen.sub_title] attribute.
+
+
+   .. py:attribute:: HORIZONTAL_BREAKPOINTS
+      :type:  ClassVar[list[tuple[int, str]]] | None
+      :value: None
+
+
+      Horizontal breakpoints, will override [App.HORIZONTAL_BREAKPOINTS][textual.app.App.HORIZONTAL_BREAKPOINTS] if not `None`.
+
+
+   .. py:attribute:: VERTICAL_BREAKPOINTS
+      :type:  ClassVar[list[tuple[int, str]]] | None
+      :value: None
+
+
+      Vertical breakpoints, will override [App.VERTICAL_BREAKPOINTS][textual.app.App.VERTICAL_BREAKPOINTS] if not `None`.
+
+
+   .. py:attribute:: focused
+      :type:  textual.reactive.Reactive[textual.widget.Widget | None]
+
+      The focused [widget][textual.widget.Widget] or `None` for no focus.
+      To set focus, do not update this value directly. Use [set_focus][textual.screen.Screen.set_focus] instead.
+
+
+   .. py:attribute:: stack_updates
+      :type:  textual.reactive.Reactive[int]
+
+      An integer that updates when the screen is resumed.
+
+
+   .. py:attribute:: sub_title
+      :type:  textual.reactive.Reactive[str | None]
+
+      Screen sub-title to override [the app sub-title][textual.app.App.sub_title].
+
+
+   .. py:attribute:: title
+      :type:  textual.reactive.Reactive[str | None]
+
+      Screen title to override [the app title][textual.app.App.title].
+
+
+   .. py:attribute:: COMMANDS
+      :type:  ClassVar[set[type[textual.command.Provider] | Callable[[], type[textual.command.Provider]]]]
+
+      Command providers used by the [command palette](/guide/command_palette), associated with the screen.
+
+      Should be a set of [`command.Provider`][textual.command.Provider] classes.
+
+
+   .. py:attribute:: ALLOW_IN_MAXIMIZED_VIEW
+      :type:  ClassVar[str | None]
+      :value: None
+
+
+      A selector for the widgets (direct children of Screen) that are allowed in the maximized view (in addition to maximized widget). Or
+      `None` to default to [App.ALLOW_IN_MAXIMIZED_VIEW][textual.app.App.ALLOW_IN_MAXIMIZED_VIEW]
+
+
+   .. py:attribute:: ESCAPE_TO_MINIMIZE
+      :type:  ClassVar[bool | None]
+      :value: None
+
+
+      Use escape key to minimize (potentially overriding bindings) or `None` to defer to [`App.ESCAPE_TO_MINIMIZE`][textual.app.App.ESCAPE_TO_MINIMIZE].
+
+
+   .. py:attribute:: maximized
+      :type:  textual.reactive.Reactive[textual.widget.Widget | None]
+
+      The currently maximized widget, or `None` for no maximized widget.
+
+
+   .. py:attribute:: selections
+      :type:  textual.reactive.var[dict[textual.widget.Widget, textual.selection.Selection]]
+
+      Map of widgets and selected ranges.
+
+
+   .. py:attribute:: css_path
+
+
+   .. py:attribute:: screen_layout_refresh_signal
+      :type:  textual.signal.Signal[Screen]
+
+      The signal that is published when the screen's layout is refreshed.
+
+
+   .. py:attribute:: bindings_updated_signal
+      :type:  textual.signal.Signal[Screen]
+
+      A signal published when the bindings have been updated
+
+
+   .. py:attribute:: text_selection_started_signal
+      :type:  textual.signal.Signal[Screen]
+
+      A signal published when text selection has started.
+
+
+   .. py:property:: is_modal
+      :type: bool
+
+
+      Is the screen modal?
+
+
+   .. py:property:: is_current
+      :type: bool
+
+
+      Is the screen current (i.e. visible to user)?
+
+
+   .. py:property:: layers
+      :type: tuple[str, Ellipsis]
+
+
+      Layers from parent.
+
+      :returns: Tuple of layer names.
+
+
+   .. py:property:: size
+      :type: textual.geometry.Size
+
+
+      The size of the screen.
+
+
+   .. py:method:: refresh_bindings() -> None
+
+      Call to request a refresh of bindings.
+
+
+
+   .. py:property:: active_bindings
+      :type: dict[str, textual.binding.ActiveBinding]
+
+
+      Get currently active bindings for this screen.
+
+      If no widget is focused, then app-level bindings are returned.
+      If a widget is focused, then any bindings present in the screen and app are merged and returned.
+
+      This property may be used to inspect current bindings.
+
+      :returns: A map of keys to a tuple containing (NAMESPACE, BINDING, ENABLED).
+
+
+   .. py:method:: arrange(size: textual.geometry.Size, _optimal: bool = False) -> textual.layout.DockArrangeResult
+
+      Arrange children.
+
+      :param size: Size of container.
+      :param optimal: Ignored on screen.
+
+      :returns: Widget locations.
+
+
+
+   .. py:property:: is_active
+      :type: bool
+
+
+      Is the screen active (i.e. visible and top of the stack)?
+
+
+   .. py:property:: allow_select
+      :type: bool
+
+
+      Check if this widget permits text selection.
+
+
+   .. py:method:: get_loading_widget() -> textual.widget.Widget
+
+      Get a widget to display a loading indicator.
+
+      The default implementation will defer to App.get_loading_widget.
+
+      :returns: A widget in place of this widget to indicate a loading.
+
+
+
+   .. py:method:: render() -> rich.console.RenderableType
+
+      Render method inherited from widget, used to render the screen's background.
+
+      :returns: Background renderable.
+
+
+
+   .. py:method:: get_offset(widget: textual.widget.Widget) -> textual.geometry.Offset
+
+      Get the absolute offset of a given Widget.
+
+      :param widget: A widget
+
+      :returns: The widget's offset relative to the top left of the terminal.
+
+
+
+   .. py:method:: get_widget_at(x: int, y: int) -> tuple[textual.widget.Widget, textual.geometry.Region]
+
+      Get the widget at a given coordinate.
+
+      :param x: X Coordinate.
+      :param y: Y Coordinate.
+
+      :returns: Widget and screen region.
+
+      :raises NoWidget: If there is no widget under the screen coordinate.
+
+
+
+   .. py:method:: get_hover_widgets_at(x: int, y: int) -> HoverWidgets
+
+      Get the widget, and its region directly under the mouse, and the first
+      widget, region pair with a hover style.
+
+      :param x: X Coordinate.
+      :param y: Y Coordinate.
+
+      :returns: A pair of (WIDGET, REGION) tuples for the top most and first hover style respectively.
+
+      :raises NoWidget: If there is no widget under the screen coordinate.
+
+
+
+   .. py:method:: get_widgets_at(x: int, y: int) -> Iterable[tuple[textual.widget.Widget, textual.geometry.Region]]
+
+      Get all widgets under a given coordinate.
+
+      :param x: X coordinate.
+      :param y: Y coordinate.
+
+      :returns: Sequence of (WIDGET, REGION) tuples.
+
+
+
+   .. py:method:: get_focusable_widget_at(x: int, y: int) -> textual.widget.Widget | None
+
+      Get the focusable widget under a given coordinate.
+
+      If the widget directly under the given coordinate is not focusable, then this method will check
+      if any of the ancestors are focusable. If no ancestors are focusable, then `None` will be returned.
+
+      :param x: X coordinate.
+      :param y: Y coordinate.
+
+      :returns: A `Widget`, or `None` if there is no focusable widget underneath the coordinate.
+
+
+
+   .. py:method:: get_style_at(x: int, y: int) -> rich.style.Style
+
+      Get the style under a given coordinate.
+
+      :param x: X Coordinate.
+      :param y: Y Coordinate.
+
+      :returns: Rich Style object.
+
+
+
+   .. py:method:: get_widget_and_offset_at(x: int, y: int) -> tuple[textual.widget.Widget | None, textual.geometry.Offset | None]
+
+      Get the widget under a given coordinate, and an offset within the original content.
+
+      :param x: X Coordinate.
+      :param y: Y Coordinate.
+
+      :returns: Tuple of Widget and Offset, both of which may be None.
+
+
+
+   .. py:method:: find_widget(widget: textual.widget.Widget) -> textual._compositor.MapGeometry
+
+      Get the screen region of a Widget.
+
+      :param widget: A Widget within the composition.
+
+      :returns: Region relative to screen.
+
+      :raises NoWidget: If the widget could not be found in this screen.
+
+
+
+   .. py:method:: clear_selection() -> None
+
+      Clear any selected text.
+
+
+
+   .. py:property:: focus_chain
+      :type: list[textual.widget.Widget]
+
+
+      A list of widgets that may receive focus, in focus order.
+
+
+   .. py:method:: focus_next(selector: str | type[textual.css.query.QueryType] = '*') -> textual.widget.Widget | None
+
+      Focus the next widget, optionally filtered by a CSS selector.
+
+      If no widget is currently focused, this will focus the first focusable widget.
+      If no focusable widget matches the given CSS selector, focus is set to `None`.
+
+      :param selector: CSS selector to filter
+                       what nodes can be focused.
+
+      :returns:
+
+                Newly focused widget, or None for no focus. If the return
+                    is not `None`, then it is guaranteed that the widget returned matches
+                    the CSS selectors given in the argument.
+
+
+
+   .. py:method:: focus_previous(selector: str | type[textual.css.query.QueryType] = '*') -> textual.widget.Widget | None
+
+      Focus the previous widget, optionally filtered by a CSS selector.
+
+      If no widget is currently focused, this will focus the first focusable widget.
+      If no focusable widget matches the given CSS selector, focus is set to `None`.
+
+      :param selector: CSS selector to filter
+                       what nodes can be focused.
+
+      :returns:
+
+                Newly focused widget, or None for no focus. If the return
+                    is not `None`, then it is guaranteed that the widget returned matches
+                    the CSS selectors given in the argument.
+
+
+
+   .. py:method:: maximize(widget: textual.widget.Widget, container: bool = True) -> bool
+
+      Maximize a widget, so it fills the screen.
+
+      :param widget: Widget to maximize.
+      :param container: If one of the widgets ancestors is a maximizeable widget, maximize that instead.
+
+      :returns: `True` if the widget was maximized, otherwise `False`.
+
+
+
+   .. py:method:: minimize() -> None
+
+      Restore any maximized widget to normal state.
+
+
+
+   .. py:method:: get_selected_text() -> str | None
+
+      Get text under selection.
+
+      :returns: Selected text, or `None` if no text was selected.
+
+
+
+   .. py:method:: action_copy_text() -> None
+
+      Copy selected text to clipboard.
+
+
+
+   .. py:method:: action_maximize() -> None
+
+      Action to maximize the currently focused widget.
+
+
+
+   .. py:method:: action_minimize() -> None
+
+      Action to minimize the currently maximized widget.
+
+
+
+   .. py:method:: action_blur() -> None
+
+      Action to remove focus (if set).
+
+
+
+   .. py:method:: action_focus(selector: str) -> None
+      :async:
+
+
+      An [action](/guide/actions) to focus the given widget.
+
+      :param selector: Selector of widget to focus (first match).
+
+
+
+   .. py:method:: set_focus(widget: textual.widget.Widget | None, scroll_visible: bool = True, from_app_focus: bool = False) -> None
+
+      Focus (or un-focus) a widget. A focused widget will receive key events first.
+
+      :param widget: Widget to focus, or None to un-focus.
+      :param scroll_visible: Scroll widget into view.
+      :param from_app_focus: True if this focus is due to the app itself having regained
+                             focus. False if the focus is being set because a widget within the app
+                             regained focus.
+
+
+
+   .. py:method:: dismiss(result: ScreenResultType | None = None) -> textual.await_complete.AwaitComplete
+
+      Dismiss the screen, optionally with a result.
+
+      Any callback provided in [push_screen][textual.app.App.push_screen] will be invoked with the supplied result.
+
+      Only the active screen may be dismissed. This method will produce a warning in the logs if
+      called on an inactive screen (but otherwise have no effect).
+
+      !!! warning
+
+          Textual will raise a [`ScreenError`][textual.app.ScreenError] if you await the return value from a
+          message handler on the Screen being dismissed. If you want to dismiss the current screen, you can
+          call `self.dismiss()` _without_ awaiting.
+
+      :param result: The optional result to be passed to the result callback.
+
+
+
+   .. py:method:: pop_until_active() -> None
+
+      Pop any screens on top of this one, until this screen is active.
+
+      :raises ScreenError: If this screen is not in the current mode.
+
+
+
+   .. py:method:: action_dismiss(result: ScreenResultType | None = None) -> None
+      :async:
+
+
+      A wrapper around [`dismiss`][textual.screen.Screen.dismiss] that can be called as an action.
+
+      :param result: The optional result to be passed to the result callback.
+
+
+
+   .. py:method:: can_view_entire(widget: textual.widget.Widget) -> bool
+
+      Check if a given widget is fully within the current screen.
+
+      Note: This doesn't necessarily equate to a widget being visible.
+      There are other reasons why a widget may not be visible.
+
+      :param widget: A widget.
+
+      :returns: `True` if the entire widget is in view, `False` if it is partially visible or not in view.
+
+
+
+   .. py:method:: can_view_partial(widget: textual.widget.Widget) -> bool
+
+      Check if a given widget is at least partially within the current view.
+
+      :param widget: A widget.
+
+      :returns: `True` if the any part of the widget is in view, `False` if it is completely outside of the screen.
+
+
+
+   .. py:method:: validate_title(title: Any) -> str | None
+
+      Ensure the title is a string or `None`.
+
+
+
+   .. py:method:: validate_sub_title(sub_title: Any) -> str | None
+
+      Ensure the sub-title is a string or `None`.
+
+
+
+   .. py:attribute:: BORDER_TITLE
+      :type:  ClassVar[str]
+      :value: ''
+
+
+      Initial value for border_title attribute.
+
+
+   .. py:attribute:: BORDER_SUBTITLE
+      :type:  ClassVar[str]
+      :value: ''
+
+
+      Initial value for border_subtitle attribute.
+
+
+   .. py:attribute:: ALLOW_MAXIMIZE
+      :type:  ClassVar[bool | None]
+      :value: None
+
+
+      Defines default logic to allow the widget to be maximized.
+
+      - `None` Use default behavior (Focusable widgets may be maximized)
+      - `False` Do not allow widget to be maximized
+      - `True` Allow widget to be maximized
+
+
+   .. py:attribute:: ALLOW_SELECT
+      :type:  ClassVar[bool]
+      :value: True
+
+
+      Does this widget support automatic text selection? May be further refined with [Widget.allow_select][textual.widget.Widget.allow_select].
+
+
+   .. py:attribute:: FOCUS_ON_CLICK
+      :type:  ClassVar[bool]
+      :value: True
+
+
+      Should focusable widgets be automatically focused on click? Default return value of [Widget.focus_on_click][textual.widget.Widget.focus_on_click].
+
+
+   .. py:attribute:: can_focus
+      :type:  bool
+      :value: False
+
+
+      Widget may receive focus.
+
+
+   .. py:attribute:: can_focus_children
+      :type:  bool
+      :value: True
+
+
+      Widget's children may receive focus.
+
+
+   .. py:attribute:: expand
+      :type:  textual.reactive.Reactive[bool]
+
+      Rich renderable may expand beyond optimal size.
+
+
+   .. py:attribute:: shrink
+      :type:  textual.reactive.Reactive[bool]
+
+      Rich renderable may shrink below optimal size.
+
+
+   .. py:attribute:: auto_links
+      :type:  textual.reactive.Reactive[bool]
+
+      Widget will highlight links automatically.
+
+
+   .. py:attribute:: disabled
+      :type:  textual.reactive.Reactive[bool]
+
+      Is the widget disabled? Disabled widgets can not be interacted with, and are typically styled to look dimmer.
+
+
+   .. py:attribute:: hover_style
+      :type:  textual.reactive.Reactive[rich.style.Style]
+
+      The current hover style (style under the mouse cursor). Read only.
+
+
+   .. py:attribute:: highlight_link_id
+      :type:  textual.reactive.Reactive[str]
+
+      The currently highlighted link id. Read only.
+
+
+   .. py:attribute:: loading
+      :type:  textual.reactive.Reactive[bool]
+
+      If set to `True` this widget will temporarily be replaced with a loading indicator.
+
+
+   .. py:attribute:: virtual_size
+      :type:  textual.reactive.Reactive[textual.geometry.Size]
+
+      The virtual (scrollable) [size][textual.geometry.Size] of the widget.
+
+
+   .. py:attribute:: has_focus
+      :type:  textual.reactive.Reactive[bool]
+
+      Does this widget have focus? Read only.
+
+
+   .. py:attribute:: mouse_hover
+      :type:  textual.reactive.Reactive[bool]
+
+      Is the mouse over this widget? Read only.
+
+
+   .. py:attribute:: scroll_x
+      :type:  textual.reactive.Reactive[float]
+
+      The scroll position on the X axis.
+
+
+   .. py:attribute:: scroll_y
+      :type:  textual.reactive.Reactive[float]
+
+      The scroll position on the Y axis.
+
+
+   .. py:attribute:: scroll_target_x
+
+      Scroll target destination, X coord.
+
+
+   .. py:attribute:: scroll_target_y
+
+      Scroll target destination, Y coord.
+
+
+   .. py:attribute:: show_vertical_scrollbar
+      :type:  textual.reactive.Reactive[bool]
+
+      Show a vertical scrollbar?
+
+
+   .. py:attribute:: show_horizontal_scrollbar
+      :type:  textual.reactive.Reactive[bool]
+
+      Show a horizontal scrollbar?
+
+
+   .. py:attribute:: border_title
+
+      A title to show in the top border (if there is one).
+
+
+   .. py:attribute:: border_subtitle
+
+      A title to show in the bottom border (if there is one).
+
+
+   .. py:attribute:: sort_order
+      :value: 0
+
+
+
+   .. py:attribute:: highlight_style
+      :type:  rich.style.Style | None
+      :value: None
+
+
+
+   .. py:attribute:: absolute_offset
+      :type:  textual.geometry.Offset | None
+      :value: None
+
+
+      Force an absolute offset for the widget (used by tooltips).
+
+
+   .. py:attribute:: lock
+
+      `asyncio` lock to be used to synchronize the state of the widget.
+
+      Two different tasks might call methods on a widget at the same time, which
+      might result in a race condition.
+      This can be fixed by adding `async with widget.lock:` around the method calls.
+
+
+   .. py:property:: is_mounted
+      :type: bool
+
+
+      Check if this widget is mounted.
+
+
+   .. py:property:: siblings
+      :type: list[Widget]
+
+
+      Get the widget's siblings (self is removed from the return list).
+
+      :returns: A list of siblings.
+
+
+   .. py:property:: visible_siblings
+      :type: list[Widget]
+
+
+      A list of siblings which will be shown.
+
+      :returns: List of siblings.
+
+
+   .. py:property:: allow_vertical_scroll
+      :type: bool
+
+
+      Check if vertical scroll is permitted.
+
+      May be overridden if you want different logic regarding allowing scrolling.
+
+
+   .. py:property:: allow_horizontal_scroll
+      :type: bool
+
+
+      Check if horizontal scroll is permitted.
+
+      May be overridden if you want different logic regarding allowing scrolling.
+
+
+   .. py:property:: allow_maximize
+      :type: bool
+
+
+      Check if the widget may be maximized.
+
+      :returns: `True` if the widget may be maximized, or `False` if it should not be maximized.
+
+
+   .. py:property:: offset
+      :type: textual.geometry.Offset
+
+
+      Widget offset from origin.
+
+      :returns: Relative offset.
+
+
+   .. py:property:: opacity
+      :type: float
+
+
+      Total opacity of widget.
+
+
+   .. py:property:: is_anchored
+      :type: bool
+
+
+      Is this widget anchored?
+
+      See [anchor()][textual.widget.Widget.anchor] for an explanation of anchoring.
+
+
+   .. py:property:: is_mouse_over
+      :type: bool
+
+
+      Is the mouse currently over this widget?
+
+      Note this will be `True` if the mouse pointer is within the widget's region, even if
+      the mouse pointer is not directly over the widget (there could be another widget between
+      the mouse pointer and self).
+
+
+   .. py:property:: is_maximized
+      :type: bool
+
+
+      Is this widget maximized?
+
+
+   .. py:property:: is_in_maximized_view
+      :type: bool
+
+
+      Is this widget, or a parent maximized?
+
+
+   .. py:property:: text_selection
+      :type: textual.selection.Selection | None
+
+
+      Text selection information, or `None` if no text is selected in this widget.
+
+
+   .. py:method:: focus_on_click() -> bool
+
+      Automatically focus the widget on click?
+
+      Implement this if you want to change the default click to focus behavior.
+      The default will return the classvar `FOCUS_ON_CLICK`.
+
+      :returns: `True` if Textual should set focus automatically on a click, or `False` if it shouldn't.
+
+
+
+   .. py:method:: get_line_filters() -> Sequence[textual.filter.LineFilter]
+
+      Get the line filters enabled for this widget.
+
+      :returns: A sequence of [LineFilter][textual.filters.LineFilter] instances.
+
+
+
+   .. py:method:: preflight_checks() -> None
+
+      Called in debug mode to do preflight checks.
+
+      This is used by Textual to log some common errors, but you could implement this
+      in custom widgets to perform additional checks.
+
+
+
+
+   .. py:method:: pre_render() -> None
+
+      Called prior to rendering.
+
+      If you implement this in a subclass, be sure to call the base class method via super.
+
+
+
+
+   .. py:method:: process_layout(placements: list[textual.layout.WidgetPlacement]) -> list[textual.layout.WidgetPlacement]
+
+      A hook to allow for the manipulation of widget placements before rendering.
+
+      You could use this as a way to modify the positions / margins of widgets if your requirement is
+      not supported in TCSS. In practice, this method is rarely needed!
+
+      :param placements: A list of [`WidgetPlacement`][textual.layout.WidgetPlacement] objects.
+
+      :returns: A new list of placements.
+
+
+
+   .. py:method:: anchor(anchor: bool = True) -> None
+
+      Anchor a scrollable widget.
+
+      An anchored widget will stay scrolled the bottom when new content is added, until
+      the user moves the scroll position.
+
+      :param anchor: Anchor the widget if `True`, clear the anchor if `False`.
+
+
+
+   .. py:method:: release_anchor() -> None
+
+      Release the [anchor][textual.widget.Widget].
+
+      If a widget is anchored, releasing the anchor will allow the user to scroll as normal.
+
+
+
+
+   .. py:property:: tooltip
+      :type: textual.visual.VisualType | None
+
+
+      Tooltip for the widget, or `None` for no tooltip.
+
+
+   .. py:method:: with_tooltip(tooltip: textual.visual.Visual | rich.console.RenderableType | None) -> typing_extensions.Self
+
+      Chainable method to set a tooltip.
+
+      .. rubric:: Example
+
+      ```python
+      def compose(self) -> ComposeResult:
+          yield Label("Hello").with_tooltip("A greeting")
+      ```
+
+      :param tooltip: New tooltip, or `None` to clear the tooltip.
+
+      :returns: Self.
+
+
+
+   .. py:method:: allow_focus() -> bool
+
+      Check if the widget is permitted to focus.
+
+      The base class returns [`can_focus`][textual.widget.Widget.can_focus].
+      This method may be overridden if additional logic is required.
+
+      :returns: `True` if the widget may be focused, or `False` if it may not be focused.
+
+
+
+   .. py:method:: allow_focus_children() -> bool
+
+      Check if a widget's children may be focused.
+
+      The base class returns [`can_focus_children`][textual.widget.Widget.can_focus_children].
+      This method may be overridden if additional logic is required.
+
+      :returns: `True` if the widget's children may be focused, or `False` if the widget's children may not be focused.
+
+
+
+   .. py:method:: compose_add_child(widget: Widget) -> None
+
+      Add a node to children.
+
+      This is used by the compose process when it adds children.
+      There is no need to use it directly, but you may want to override it in a subclass
+      if you want children to be attached to a different node.
+
+      :param widget: A Widget to add.
+
+
+
+   .. py:property:: is_disabled
+      :type: bool
+
+
+      Is the widget disabled either because `disabled=True` or an ancestor has `disabled=True`.
+
+
+   .. py:property:: has_focus_within
+      :type: bool
+
+
+      Are any descendants focused?
+
+
+   .. py:property:: first_of_type
+      :type: bool
+
+
+      Is this the first widget of its type in its siblings?
+
+
+   .. py:property:: last_of_type
+      :type: bool
+
+
+      Is this the last widget of its type in its siblings?
+
+
+   .. py:property:: first_child
+      :type: bool
+
+
+      Is this the first widget in its siblings?
+
+
+   .. py:property:: last_child
+      :type: bool
+
+
+      Is this the last widget in its siblings?
+
+
+   .. py:property:: is_odd
+      :type: bool
+
+
+      Is this widget at an oddly numbered position within its siblings?
+
+
+   .. py:property:: is_even
+      :type: bool
+
+
+      Is this widget at an evenly numbered position within its siblings?
+
+
+   .. py:method:: __enter__() -> typing_extensions.Self
+
+      Use as context manager when composing.
+
+
+
+   .. py:method:: __exit__(exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: types.TracebackType | None) -> None
+
+      Exit compose context manager.
+
+
+
+   .. py:method:: clear_cached_dimensions() -> None
+
+      Clear cached results of `get_content_width` and `get_content_height`.
+
+      Call if the widget's renderable changes size after the widget has been created.
+
+      !!! note
+
+          This is not required if you are extending [`Static`][textual.widgets.Static].
+
+
+
+
+   .. py:method:: set_loading(loading: bool) -> None
+
+      Set or reset the loading state of this widget.
+
+      A widget in a loading state will display a `LoadingIndicator` or a custom widget
+      set through overriding the `get_loading_widget` method.
+
+      :param loading: `True` to put the widget into a loading state, or `False` to reset the loading state.
+
+
+
+   .. py:attribute:: ExpectType
+
+
+   .. py:method:: get_child_by_id(id: str) -> Widget
+
+      Return the first child (immediate descendent) of this node with the given ID.
+
+      :param id: The ID of the child.
+      :param expect_type: Require the object be of the supplied type, or None for any type.
+
+      :returns: The first child of this node with the ID.
+
+      :raises NoMatches: if no children could be found for this ID
+      :raises WrongType: if the wrong type was found.
+
+
+
+   .. py:method:: get_widget_by_id(id: str) -> Widget
+
+      Return the first descendant widget with the given ID.
+
+      Performs a depth-first search rooted at this widget.
+
+      :param id: The ID to search for in the subtree.
+      :param expect_type: Require the object be of the supplied type, or None for any type.
+
+      :returns: The first descendant encountered with this ID.
+
+      :raises NoMatches: if no children could be found for this ID.
+      :raises WrongType: if the wrong type was found.
+
+
+
+   .. py:method:: get_child_by_type(expect_type: type[ExpectType]) -> ExpectType
+
+      Get the first immediate child of a given type.
+
+      Only returns exact matches, and so will not match subclasses of the given type.
+
+      :param expect_type: The type of the child to search for.
+
+      :raises NoMatches: If no matching child is found.
+
+      :returns: The first immediate child widget with the expected type.
+
+
+
+   .. py:method:: get_component_rich_style(*names: str, partial: bool = False) -> rich.style.Style
+
+      Get a *Rich* style for a component.
+
+      :param names: Names of components.
+      :param partial: Return a partial style (not combined with parent).
+
+      :returns: A Rich style object.
+
+
+
+   .. py:method:: get_visual_style(*component_classes: str, partial: bool = False) -> textual.style.Style
+
+      Get the visual style for the widget, including any component styles.
+
+      :param component_classes: Optional component styles.
+      :param partial: Return a partial style (not combined with parent).
+
+      :returns: A Visual style instance.
+
+
+
+   .. py:method:: render_str(text_content: str) -> textual.content.Content
+                  render_str(text_content: textual.content.Content) -> textual.content.Content
+
+      Convert str into a [Content][textual.content.Content] instance.
+
+      If you pass in an existing Content instance it will be returned unaltered.
+
+      :param text_content: Content or str.
+
+      :returns: Content object.
+
+
+
+   .. py:method:: mount(*widgets: Widget, before: int | str | Widget | None = None, after: int | str | Widget | None = None) -> AwaitMount
+
+      Mount widgets below this widget (making this widget a container).
+
+      :param \*widgets: The widget(s) to mount.
+      :param before: Optional location to mount before. An `int` is the index
+                     of the child to mount before, a `str` is a `query_one` query to
+                     find the widget to mount before.
+      :param after: Optional location to mount after. An `int` is the index
+                    of the child to mount after, a `str` is a `query_one` query to
+                    find the widget to mount after.
+
+      :returns: An awaitable object that waits for widgets to be mounted.
+
+      :raises MountError: If there is a problem with the mount request.
+
+      .. note::
+
+         Only one of ``before`` or ``after`` can be provided. If both are
+         provided a ``MountError`` will be raised.
+
+
+
+   .. py:method:: mount_all(widgets: Iterable[Widget], *, before: int | str | Widget | None = None, after: int | str | Widget | None = None) -> AwaitMount
+
+      Mount widgets from an iterable.
+
+      :param widgets: An iterable of widgets.
+      :param before: Optional location to mount before. An `int` is the index
+                     of the child to mount before, a `str` is a `query_one` query to
+                     find the widget to mount before.
+      :param after: Optional location to mount after. An `int` is the index
+                    of the child to mount after, a `str` is a `query_one` query to
+                    find the widget to mount after.
+
+      :returns: An awaitable object that waits for widgets to be mounted.
+
+      :raises MountError: If there is a problem with the mount request.
+
+      .. note::
+
+         Only one of `before` or `after` can be provided. If both are
+         provided a `MountError` will be raised.
+
+
+
+   .. py:method:: mount_compose(compose_result: textual.app.ComposeResult, *, before: int | str | Widget | None = None, after: int | str | Widget | None = None) -> AwaitMount
+
+      Mount widgets from the result of a compose method.
+
+      Example:
+      ```python
+          def on_key(self, event:events.Key) -> None:
+
+              def add_key(key:str) -> ComposeResult:
+                  '''Compose key information widgets'''
+                  with containers.HorizontalGroup():
+                      yield Label("You pressed:")
+                      yield Label(key)
+
+              self.mount_compose(add_key(event.key))
+
+      ```
+
+      :param compose_result: The result of a compose method.
+      :param before: Optional location to mount before. An `int` is the index
+                     of the child to mount before, a `str` is a `query_one` query to
+                     find the widget to mount before.
+      :param after: Optional location to mount after. An `int` is the index
+                    of the child to mount after, a `str` is a `query_one` query to
+                    find the widget to mount after.
+
+      :returns: An awaitable object that waits for widgets to be mounted.
+
+      :raises MountError: If there is a problem with the mount request.
+
+      .. note::
+
+         Only one of `before` or `after` can be provided. If both are
+         provided a `MountError` will be raised.
+
+
+
+   .. py:method:: move_child(child: int | Widget, *, before: int | Widget, after: None = None) -> None
+
+      Move a child widget within its parent's list of children.
+
+      :param child: The child widget to move.
+      :param before: Child widget or location index to move before.
+      :param after: Child widget or location index to move after.
+
+      :raises WidgetError: If there is a problem with the child or target.
+
+      .. note::
+
+         Only one of `before` or `after` can be provided. If neither
+         or both are provided a `WidgetError` will be raised.
+
+
+
+   .. py:method:: recompose() -> None
+      :async:
+
+
+      Recompose the widget.
+
+      Recomposing will remove children and call `self.compose` again to remount.
+
+
+
+   .. py:method:: get_content_width(container: textual.geometry.Size, viewport: textual.geometry.Size) -> int
+
+      Called by textual to get the width of the content area. May be overridden in a subclass.
+
+      :param container: Size of the container (immediate parent) widget.
+      :param viewport: Size of the viewport.
+
+      :returns: The optimal width of the content.
+
+
+
+   .. py:method:: get_content_height(container: textual.geometry.Size, viewport: textual.geometry.Size, width: int) -> int
+
+      Called by Textual to get the height of the content area. May be overridden in a subclass.
+
+      :param container: Size of the container (immediate parent) widget.
+      :param viewport: Size of the viewport.
+      :param width: Width of renderable.
+
+      :returns: The height of the content.
+
+
+
+   .. py:method:: watch_hover_style(previous_hover_style: rich.style.Style, hover_style: rich.style.Style) -> None
+
+
+   .. py:method:: watch_scroll_x(old_value: float, new_value: float) -> None
+
+
+   .. py:method:: watch_scroll_y(old_value: float, new_value: float) -> None
+
+
+   .. py:method:: validate_scroll_x(value: float) -> float
+
+
+   .. py:method:: validate_scroll_target_x(value: float) -> float
+
+
+   .. py:method:: validate_scroll_y(value: float) -> float
+
+
+   .. py:method:: validate_scroll_target_y(value: float) -> float
+
+
+   .. py:property:: max_scroll_x
+      :type: int
+
+
+      The maximum value of `scroll_x`.
+
+
+   .. py:property:: max_scroll_y
+      :type: int
+
+
+      The maximum value of `scroll_y`.
+
+
+   .. py:property:: is_vertical_scroll_end
+      :type: bool
+
+
+      Is the vertical scroll position at the maximum?
+
+
+   .. py:property:: is_horizontal_scroll_end
+      :type: bool
+
+
+      Is the horizontal scroll position at the maximum?
+
+
+   .. py:property:: is_vertical_scrollbar_grabbed
+      :type: bool
+
+
+      Is the user dragging the vertical scrollbar?
+
+
+   .. py:property:: is_horizontal_scrollbar_grabbed
+      :type: bool
+
+
+      Is the user dragging the vertical scrollbar?
+
+
+   .. py:property:: scrollbar_corner
+      :type: textual.scrollbar.ScrollBarCorner
+
+
+      The scrollbar corner.
+
+      .. note:: This will *create* a scrollbar corner if one doesn't exist.
+
+      :returns: ScrollBarCorner Widget.
+
+
+   .. py:property:: vertical_scrollbar
+      :type: textual.scrollbar.ScrollBar
+
+
+      The vertical scrollbar (create if necessary).
+
+      .. note:: This will *create* a scrollbar if one doesn't exist.
+
+      :returns: ScrollBar Widget.
+
+
+   .. py:property:: horizontal_scrollbar
+      :type: textual.scrollbar.ScrollBar
+
+
+      The horizontal scrollbar.
+
+      .. note:: This will *create* a scrollbar if one doesn't exist.
+
+      :returns: ScrollBar Widget.
+
+
+   .. py:property:: scrollbars_enabled
+      :type: tuple[bool, bool]
+
+
+      A tuple of booleans that indicate if scrollbars are enabled.
+
+      :returns: A tuple of (<vertical scrollbar enabled>, <horizontal scrollbar enabled>)
+
+
+   .. py:property:: scrollbars_space
+      :type: tuple[int, int]
+
+
+      The number of cells occupied by scrollbars for width and height
+
+
+   .. py:property:: scrollbar_size_vertical
+      :type: int
+
+
+      Get the width used by the *vertical* scrollbar.
+
+      :returns: Number of columns in the vertical scrollbar.
+
+
+   .. py:property:: scrollbar_size_horizontal
+      :type: int
+
+
+      Get the height used by the *horizontal* scrollbar.
+
+      :returns: Number of rows in the horizontal scrollbar.
+
+
+   .. py:property:: scrollbar_gutter
+      :type: textual.geometry.Spacing
+
+
+      Spacing required to fit scrollbar(s).
+
+      :returns: Scrollbar gutter spacing.
+
+
+   .. py:property:: gutter
+      :type: textual.geometry.Spacing
+
+
+      Spacing for padding / border / scrollbars.
+
+      :returns: Additional spacing around content area.
+
+
+   .. py:property:: scrollable_size
+      :type: textual.geometry.Size
+
+
+      The size of the scrollable content.
+
+      :returns: Scrollable content size.
+
+
+   .. py:property:: outer_size
+      :type: textual.geometry.Size
+
+
+      The size of the widget (including padding and border).
+
+      :returns: Outer size.
+
+
+   .. py:property:: container_size
+      :type: textual.geometry.Size
+
+
+      The size of the container (parent widget).
+
+      :returns: Container size.
+
+
+   .. py:property:: content_region
+      :type: textual.geometry.Region
+
+
+      Gets an absolute region containing the content (minus padding and border).
+
+      :returns: Screen region that contains a widget's content.
+
+
+   .. py:property:: scrollable_content_region
+      :type: textual.geometry.Region
+
+
+      Gets an absolute region containing the scrollable content (minus padding, border, and scrollbars).
+
+      :returns: Screen region that contains a widget's content.
+
+
+   .. py:property:: content_offset
+      :type: textual.geometry.Offset
+
+
+      An offset from the Widget origin where the content begins.
+
+      :returns: Offset from widget's origin.
+
+
+   .. py:property:: content_size
+      :type: textual.geometry.Size
+
+
+      The size of the content area.
+
+      :returns: Content area size.
+
+
+   .. py:property:: region
+      :type: textual.geometry.Region
+
+
+      The region occupied by this widget, relative to the Screen.
+
+      :raises NoScreen: If there is no screen.
+      :raises errors.NoWidget: If the widget is not on the screen.
+
+      :returns: Region within screen occupied by widget.
+
+
+   .. py:property:: dock_gutter
+      :type: textual.geometry.Spacing
+
+
+      Space allocated to docks in the parent.
+
+      :returns: Space to be subtracted from scrollable area.
+
+
+   .. py:property:: container_viewport
+      :type: textual.geometry.Region
+
+
+      The viewport region (parent window).
+
+      :returns: The region that contains this widget.
+
+
+   .. py:property:: virtual_region
+      :type: textual.geometry.Region
+
+
+      The widget region relative to its container (which may not be visible,
+      depending on scroll offset).
+
+
+      :returns: The virtual region.
+
+
+   .. py:property:: window_region
+      :type: textual.geometry.Region
+
+
+      The region within the scrollable area that is currently visible.
+
+      :returns: New region.
+
+
+   .. py:property:: virtual_region_with_margin
+      :type: textual.geometry.Region
+
+
+      The widget region relative to its container (*including margin*), which may not be visible,
+      depending on the scroll offset.
+
+      :returns: The virtual region of the Widget, inclusive of its margin.
+
+
+   .. py:property:: focusable
+      :type: bool
+
+
+      Can this widget currently be focused?
+
+
+   .. py:property:: scroll_offset
+      :type: textual.geometry.Offset
+
+
+      Get the current scroll offset.
+
+      :returns: Offset a container has been scrolled by.
+
+
+   .. py:property:: container_scroll_offset
+      :type: textual.geometry.Offset
+
+
+      The scroll offset the nearest container ancestor.
+
+
+   .. py:property:: is_on_screen
+      :type: bool
+
+
+      Check if the node was displayed in the last screen update.
+
+
+   .. py:method:: animate(attribute: str, value: float | textual._animator.Animatable, *, final_value: object = ..., duration: float | None = None, speed: float | None = None, delay: float = 0.0, easing: textual._animator.EasingFunction | str = DEFAULT_EASING, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'full') -> None
+
+      Animate an attribute.
+
+      :param attribute: Name of the attribute to animate.
+      :param value: The value to animate to.
+      :param final_value: The final value of the animation. Defaults to `value` if not set.
+      :param duration: The duration (in seconds) of the animation.
+      :param speed: The speed of the animation.
+      :param delay: A delay (in seconds) before the animation starts.
+      :param easing: An easing method.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+
+
+
+   .. py:method:: stop_animation(attribute: str, complete: bool = True) -> None
+      :async:
+
+
+      Stop an animation on an attribute.
+
+      :param attribute: Name of the attribute whose animation should be stopped.
+      :param complete: Should the animation be set to its final value?
+
+      .. note:: If there is no animation scheduled or running, this is a no-op.
+
+
+
+   .. py:property:: layout
+      :type: textual.layout.Layout
+
+
+      Get the layout object if set in styles, or a default layout.
+
+      :returns: A layout object.
+
+
+   .. py:property:: is_container
+      :type: bool
+
+
+      Is this widget a container (contains other widgets)?
+
+
+   .. py:property:: is_scrollable
+      :type: bool
+
+
+      Can this widget be scrolled?
+
+
+   .. py:property:: is_scrolling
+      :type: bool
+
+
+      Is this widget currently scrolling?
+
+
+   .. py:property:: layer
+      :type: str
+
+
+      Get the name of this widgets layer.
+
+      :returns: Name of layer.
+
+
+   .. py:property:: link_style
+      :type: rich.style.Style
+
+
+      Style of links.
+
+      :returns: Rich style.
+
+
+   .. py:property:: link_style_hover
+      :type: rich.style.Style
+
+
+      Style of links underneath the mouse cursor.
+
+      :returns: Rich Style.
+
+
+   .. py:property:: select_container
+      :type: Widget
+
+
+      The widget's container used when selecting text..
+
+      :returns: A widget which contains this widget.
+
+
+   .. py:method:: pre_layout(layout: textual.layout.Layout) -> None
+
+      This method id called prior to a layout operation.
+
+      Implement this method if you want to make updates that should impact
+      the layout.
+
+      :param layout: The [Layout][textual.layout.Layout] instance that will be used to arrange this widget's children.
+
+
+
+   .. py:method:: set_scroll(x: float | None, y: float | None) -> None
+
+      Set the scroll position without any validation.
+
+      This is a low-level method for when you want to see the scroll position in the next frame.
+      For a more fully featured method, see [`scroll_to`][textual.widget.Widget.scroll_to].
+
+      :param x: Desired `X` coordinate.
+      :param y: Desired `Y` coordinate.
+
+
+
+   .. py:method:: scroll_to(x: float | None = None, y: float | None = None, *, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False, release_anchor: bool = True) -> None
+
+      Scroll to a given (absolute) coordinate, optionally animating.
+
+      :param x: X coordinate (column) to scroll to, or `None` for no change.
+      :param y: Y coordinate (row) to scroll to, or `None` for no change.
+      :param animate: Animate to new scroll position.
+      :param speed: Speed of scroll if `animate` is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+      :param release_anchor: If `True` call `release_anchor`.
+
+      .. note:: The call to scroll is made after the next refresh.
+
+
+
+   .. py:method:: scroll_relative(x: float | None = None, y: float | None = None, *, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False) -> None
+
+      Scroll relative to current position.
+
+      :param x: X distance (columns) to scroll, or ``None`` for no change.
+      :param y: Y distance (rows) to scroll, or ``None`` for no change.
+      :param animate: Animate to new scroll position.
+      :param speed: Speed of scroll if `animate` is `True`. Or `None` to use `duration`.
+      :param duration: Duration of animation, if animate is `True` and speed is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+
+
+
+   .. py:method:: scroll_home(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False, x_axis: bool = True, y_axis: bool = True) -> None
+
+      Scroll to home position.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if animate is `True`; or `None` to use duration.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+      :param x_axis: Allow scrolling on X axis?
+      :param y_axis: Allow scrolling on Y axis?
+
+
+
+   .. py:method:: scroll_end(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False, x_axis: bool = True, y_axis: bool = True) -> None
+
+      Scroll to the end of the container.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if `animate` is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+      :param x_axis: Allow scrolling on X axis?
+      :param y_axis: Allow scrolling on Y axis?
+
+
+
+   .. py:method:: scroll_left(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False) -> None
+
+      Scroll one cell left.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if `animate` is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+
+
+
+   .. py:method:: scroll_right(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False) -> None
+
+      Scroll one cell right.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if animate is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+
+
+
+   .. py:method:: scroll_down(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False) -> None
+
+      Scroll one line down.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if `animate` is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+
+
+
+   .. py:method:: scroll_up(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False) -> None
+
+      Scroll one line up.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if `animate` is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and speed is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+
+
+
+   .. py:method:: scroll_page_up(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic') -> None
+
+      Scroll one page up.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if animate is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+
+
+
+   .. py:method:: scroll_page_down(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic') -> None
+
+      Scroll one page down.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if animate is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+
+
+
+   .. py:method:: scroll_page_left(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic') -> None
+
+      Scroll one page left.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if animate is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+
+
+
+   .. py:method:: scroll_page_right(*, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic') -> None
+
+      Scroll one page right.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if animate is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+
+
+
+   .. py:method:: scroll_to_widget(widget: Widget, *, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, center: bool = False, top: bool = False, origin_visible: bool = True, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False) -> bool
+
+      Scroll scrolling to bring a widget into view.
+
+      :param widget: A descendant widget.
+      :param animate: `True` to animate, or `False` to jump.
+      :param speed: Speed of scroll if `animate` is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param top: Scroll widget to top of container.
+      :param origin_visible: Ensure that the top left of the widget is within the window.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+
+      :returns: `True` if any scrolling has occurred in any descendant, otherwise `False`.
+
+
+
+   .. py:method:: scroll_to_region(region: textual.geometry.Region, *, spacing: textual.geometry.Spacing | None = None, animate: bool = True, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, center: bool = False, top: bool = False, origin_visible: bool = True, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', x_axis: bool = True, y_axis: bool = True, immediate: bool = False) -> textual.geometry.Offset
+
+      Scrolls a given region into view, if required.
+
+      This method will scroll the least distance required to move `region` fully within
+      the scrollable area.
+
+      :param region: A region that should be visible.
+      :param spacing: Optional spacing around the region.
+      :param animate: `True` to animate, or `False` to jump.
+      :param speed: Speed of scroll if `animate` is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param top: Scroll `region` to top of container.
+      :param origin_visible: Ensure that the top left of the widget is within the window.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param x_axis: Allow scrolling on X axis?
+      :param y_axis: Allow scrolling on Y axis?
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+
+      :returns: The distance that was scrolled.
+
+
+
+   .. py:method:: scroll_visible(animate: bool = True, *, speed: float | None = None, duration: float | None = None, top: bool = False, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False) -> None
+
+      Scroll the container to make this widget visible.
+
+      :param animate: Animate scroll.
+      :param speed: Speed of scroll if animate is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param top: Scroll to top of container.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+
+
+
+   .. py:method:: scroll_to_center(widget: Widget, animate: bool = True, *, speed: float | None = None, duration: float | None = None, easing: textual._animator.EasingFunction | str | None = None, force: bool = False, origin_visible: bool = True, on_complete: textual.messages.CallbackType | None = None, level: textual._types.AnimationLevel = 'basic', immediate: bool = False) -> None
+
+      Scroll this widget to the center of self.
+
+      The center of the widget will be scrolled to the center of the container.
+
+      :param widget: The widget to scroll to the center of self.
+      :param animate: Whether to animate the scroll.
+      :param speed: Speed of scroll if animate is `True`; or `None` to use `duration`.
+      :param duration: Duration of animation, if `animate` is `True` and `speed` is `None`.
+      :param easing: An easing method for the scrolling animation.
+      :param force: Force scrolling even when prohibited by overflow styling.
+      :param origin_visible: Ensure that the top left corner of the widget remains visible after the scroll.
+      :param on_complete: A callable to invoke when the animation is finished.
+      :param level: Minimum level required for the animation to take place (inclusive).
+      :param immediate: If `False` the scroll will be deferred until after a screen refresh,
+                        set to `True` to scroll immediately.
+
+
+
+   .. py:method:: __init_subclass__(can_focus: bool | None = None, can_focus_children: bool | None = None, inherit_css: bool = True, inherit_bindings: bool = True) -> None
+      :classmethod:
+
+
+
+   .. py:method:: __rich_repr__() -> rich.repr.Result
+
+
+   .. py:method:: get_pseudo_class_state() -> PseudoClasses
+
+      Get an object describing whether each pseudo class is present on this object or not.
+
+      :returns: A PseudoClasses object describing the pseudo classes that are present.
+
+
+
+   .. py:method:: post_render(renderable: rich.console.RenderableType, base_style: rich.style.Style) -> rich.console.ConsoleRenderable
+
+      Applies style attributes to the default renderable.
+
+      This method is called by Textual itself.
+      It is unlikely you will need to call or implement this method.
+
+      :returns: A new renderable.
+
+
+
+   .. py:method:: watch_has_focus(_has_focus: bool) -> None
+
+      Update from CSS if has focus state changes.
+
+
+
+   .. py:method:: watch_disabled(disabled: bool) -> None
+
+      Update the styles of the widget and its children when disabled is toggled.
+
+
+
+   .. py:property:: visual_style
+      :type: textual.style.Style
+
+
+
+   .. py:method:: get_selection(selection: textual.selection.Selection) -> tuple[str, str] | None
+
+      Get the text under the selection.
+
+              Args:
+                  selection: Selection information.
+
+              Returns:
+                  Tuple of extracted text and ending (typically "
+      " or " "), or `None` if no text could be extracted.
+
+
+
+
+   .. py:method:: selection_updated(selection: textual.selection.Selection | None) -> None
+
+      Called when the selection is updated.
+
+      :param selection: Selection information or `None` if no selection.
+
+
+
+   .. py:method:: render_line(y: int) -> textual.strip.Strip
+
+      Render a line of content.
+
+      :param y: Y Coordinate of line.
+
+      :returns: A rendered line.
+
+
+
+   .. py:method:: render_lines(crop: textual.geometry.Region) -> list[textual.strip.Strip]
+
+      Render the widget into lines.
+
+      :param crop: Region within visible area to render.
+
+      :returns: A list of list of segments.
+
+
+
+   .. py:method:: suppress_click() -> None
+
+      Suppress a click event.
+
+      This will prevent a [Click][textual.events.Click] event being sent,
+      if called after a mouse down event and before the click itself.
+
+
+
+
+   .. py:method:: refresh(*regions: textual.geometry.Region, repaint: bool = True, layout: bool = False, recompose: bool = False) -> typing_extensions.Self
+
+      Initiate a refresh of the widget.
+
+      This method sets an internal flag to perform a refresh, which will be done on the
+      next idle event. Only one refresh will be done even if this method is called multiple times.
+
+      By default this method will cause the content of the widget to refresh, but not change its size. You can also
+      set `layout=True` to perform a layout.
+
+      !!! warning
+
+          It is rarely necessary to call this method explicitly. Updating styles or reactive attributes will
+          do this automatically.
+
+      :param \*regions: Additional screen regions to mark as dirty.
+      :param repaint: Repaint the widget (will call render() again).
+      :param layout: Also layout widgets in the view.
+      :param recompose: Re-compose the widget (will remove and re-mount children).
+
+      :returns: The `Widget` instance.
+
+
+
+   .. py:method:: remove() -> textual.await_remove.AwaitRemove
+
+      Remove the Widget from the DOM (effectively deleting it).
+
+      :returns: An awaitable object that waits for the widget to be removed.
+
+
+
+   .. py:method:: remove_children(selector: str | type[textual.css.query.QueryType] | Iterable[Widget] = '*') -> textual.await_remove.AwaitRemove
+
+      Remove the immediate children of this Widget from the DOM.
+
+      :param selector: A CSS selector or iterable of widgets to remove.
+
+      :returns: An awaitable object that waits for the direct children to be removed.
+
+
+
+   .. py:method:: batch() -> AsyncGenerator[None, None]
+      :async:
+
+
+      Async context manager that combines widget locking and update batching.
+
+      Use this async context manager whenever you want to acquire the widget lock and
+      batch app updates at the same time.
+
+      .. rubric:: Example
+
+      ```py
+      async with container.batch():
+          await container.remove_children(Button)
+          await container.mount(Label("All buttons are gone."))
+      ```
+
+
+
+   .. py:method:: run_action(action: str, namespaces: Mapping[str, textual.dom.DOMNode] | None = None) -> None
+      :async:
+
+
+      Perform a given action, with this widget as the default namespace.
+
+      :param action: Action encoded as a string.
+      :param namespaces: Mapping of namespaces.
+
+
+
+   .. py:method:: post_message(message: textual.message.Message) -> bool
+
+      Post a message to this widget.
+
+      :param message: Message to post.
+
+      :returns: True if the message was posted, False if this widget was closed / closing.
+
+
+
+   .. py:method:: on_prune(event: textual.messages.Prune) -> None
+      :async:
+
+
+      Close message loop when asked to prune.
+
+
+
+   .. py:method:: focus(scroll_visible: bool = True) -> typing_extensions.Self
+
+      Give focus to this widget.
+
+      :param scroll_visible: Scroll parent to make this widget visible.
+
+      :returns: The `Widget` instance.
+
+
+
+   .. py:method:: blur() -> typing_extensions.Self
+
+      Blur (un-focus) the widget.
+
+      Focus will be moved to the next available widget in the focus chain.
+
+      :returns: The `Widget` instance.
+
+
+
+   .. py:method:: capture_mouse(capture: bool = True) -> None
+
+      Capture (or release) the mouse.
+
+      When captured, mouse events will go to this widget even when the pointer is not directly over the widget.
+
+      :param capture: True to capture or False to release.
+
+
+
+   .. py:method:: release_mouse() -> None
+
+      Release the mouse.
+
+      Mouse events will only be sent when the mouse is over the widget.
+
+
+
+   .. py:method:: text_select_all() -> None
+
+      Select the entire widget.
+
+
+
+   .. py:method:: begin_capture_print(stdout: bool = True, stderr: bool = True) -> None
+
+      Capture text from print statements (or writes to stdout / stderr).
+
+      If printing is captured, the widget will be sent an [`events.Print`][textual.events.Print] message.
+
+      Call [`end_capture_print`][textual.widget.Widget.end_capture_print] to disable print capture.
+
+      :param stdout: Whether to capture stdout.
+      :param stderr: Whether to capture stderr.
+
+
+
+   .. py:method:: end_capture_print() -> None
+
+      End print capture (set with [`begin_capture_print`][textual.widget.Widget.begin_capture_print]).
+
+
+
+   .. py:method:: check_message_enabled(message: textual.message.Message) -> bool
+
+      Check if a given message is enabled (allowed to be sent).
+
+      :param message: A message object
+
+      :returns: `True` if the message will be sent, or `False` if it is disabled.
+
+
+
+   .. py:method:: broker_event(event_name: str, event: textual.events.Event) -> bool
+      :async:
+
+
+
+   .. py:method:: notify_style_update() -> None
+
+      Called after styles are updated.
+
+      Implement this in a subclass if you want to clear any cached data when the CSS is reloaded.
+
+
+
+   .. py:method:: handle_key(event: textual.events.Key) -> bool
+      :async:
+
+
+
+   .. py:method:: mount_composed_widgets(widgets: list[Widget]) -> None
+      :async:
+
+
+      Called by Textual to mount widgets after compose.
+
+      There is generally no need to implement this method in your application.
+      See [Lazy][textual.lazy.Lazy] for a class which uses this method to implement
+      *lazy* mounting.
+
+      :param widgets: A list of child widgets.
+
+
+
+   .. py:method:: action_scroll_home() -> None
+
+
+   .. py:method:: action_scroll_end() -> None
+
+
+   .. py:method:: action_scroll_left() -> None
+
+
+   .. py:method:: action_scroll_right() -> None
+
+
+   .. py:method:: action_scroll_up() -> None
+
+
+   .. py:method:: action_scroll_down() -> None
+
+
+   .. py:method:: action_page_down() -> None
+
+
+   .. py:method:: action_page_up() -> None
+
+
+   .. py:method:: action_page_left() -> None
+
+
+   .. py:method:: action_page_right() -> None
+
+
+   .. py:method:: notify(message: str, *, title: str = '', severity: textual.notifications.SeverityLevel = 'information', timeout: float | None = None, markup: bool = True) -> None
+
+      Create a notification.
+
+      !!! tip
+
+          This method is thread-safe.
+
+      :param message: The message for the notification.
+      :param title: The title for the notification.
+      :param severity: The severity of the notification.
+      :param timeout: The timeout (in seconds) for the notification, or `None` for default.
+      :param markup: Render the message as content markup?
+
+      See [`App.notify`][textual.app.App.notify] for the full
+      documentation for this method.
+
+
+
+   .. py:method:: action_notify(message: str, title: str = '', severity: str = 'information', markup: bool = True) -> None
+
+
+   .. py:attribute:: DEFAULT_CLASSES
+      :type:  ClassVar[str]
+      :value: ''
+
+
+      Default classes argument if not supplied.
+
+
+   .. py:attribute:: BINDING_GROUP_TITLE
+      :type:  str | None
+      :value: None
+
+
+      Title of widget used where bindings are displayed (such as in the key panel).
+
+
+   .. py:attribute:: SCOPED_CSS
+      :type:  ClassVar[bool]
+      :value: True
+
+
+      Should default css be limited to the widget type?
+
+
+   .. py:attribute:: HELP
+      :type:  ClassVar[str | None]
+      :value: None
+
+
+      Optional help text shown in help panel (Markdown format).
+
+
+   .. py:attribute:: styles
+      :type:  textual.css.styles.RenderStyles
+
+
+   .. py:method:: set_reactive(reactive: textual.reactive.Reactive[ReactiveType], value: ReactiveType) -> None
+
+      Sets a reactive value *without* invoking validators or watchers.
+
+      .. rubric:: Example
+
+      ```python
+      self.set_reactive(App.theme, "textual-light")
+      ```
+
+      :param reactive: A reactive property (use the class scope syntax, i.e. `MyClass.my_reactive`).
+      :param value: New value of reactive.
+
+      :raises AttributeError: If the first argument is not a reactive.
+
+
+
+   .. py:method:: mutate_reactive(reactive: textual.reactive.Reactive[ReactiveType]) -> None
+
+      Force an update to a mutable reactive.
+
+      .. rubric:: Example
+
+      ```python
+      self.reactive_name_list.append("Jessica")
+      self.mutate_reactive(MyClass.reactive_name_list)
+      ```
+
+      Textual will automatically detect when a reactive is set to a new value, but it is unable
+      to detect if a value is _mutated_ (such as updating a list, dict, or attribute of an object).
+      If you do wish to use a collection or other mutable object in a reactive, then you can call
+      this method after your reactive is updated. This will ensure that all the reactive _superpowers_
+      work.
+
+      !!! note
+
+          This method will cause watchers to be called, even if the value hasn't changed.
+
+      :param reactive: A reactive property (use the class scope syntax, i.e. `MyClass.my_reactive`).
+
+
+
+   .. py:method:: data_bind(*reactives: textual.reactive.Reactive[Any], **bind_vars: textual.reactive.Reactive[Any] | object) -> typing_extensions.Self
+
+      Bind reactive data so that changes to a reactive automatically change the reactive on another widget.
+
+      Reactives may be given as positional arguments or keyword arguments.
+      See the [guide on data binding](/guide/reactivity#data-binding).
+
+      .. rubric:: Example
+
+      ```python
+      def compose(self) -> ComposeResult:
+          yield WorldClock("Europe/London").data_bind(WorldClockApp.time)
+          yield WorldClock("Europe/Paris").data_bind(WorldClockApp.time)
+          yield WorldClock("Asia/Tokyo").data_bind(WorldClockApp.time)
+      ```
+
+      :raises ReactiveError: If the data wasn't bound.
+
+      :returns: Self.
+
+
+
+   .. py:property:: children
+      :type: Sequence[textual.widget.Widget]
+
+
+      A view on to the children.
+
+      :returns: The node's children.
+
+
+   .. py:property:: displayed_children
+      :type: Sequence[textual.widget.Widget]
+
+
+      The displayed children (where `node.display==True`).
+
+      :returns: A sequence of widgets.
+
+
+   .. py:property:: displayed_and_visible_children
+      :type: Sequence[textual.widget.Widget]
+
+
+      The displayed children (where `node.display==True` and `node.visible==True`).
+
+      :returns: A sequence of widgets.
+
+
+   .. py:property:: is_empty
+      :type: bool
+
+
+      Are there no displayed children?
+
+
+   .. py:method:: sort_children(*, key: Callable[[textual.widget.Widget], _typeshed.SupportsRichComparison] | None = None, reverse: bool = False) -> None
+
+      Sort child widgets with an optional key function.
+
+      If `key` is not provided then widgets will be sorted in the order they are constructed.
+
+      .. rubric:: Example
+
+      ```python
+      # Sort widgets by name
+      screen.sort_children(key=lambda widget: widget.name or "")
+      ```
+
+      :param key: A callable which accepts a widget and returns something that can be sorted,
+                  or `None` to sort without a key function.
+      :param reverse: Sort in descending order.
+
+
+
+   .. py:property:: auto_refresh
+      :type: float | None
+
+
+      Number of seconds between automatic refresh, or `None` for no automatic refresh.
+
+
+   .. py:property:: workers
+      :type: textual.worker_manager.WorkerManager
+
+
+      The app's worker manager. Shortcut for `self.app.workers`.
+
+
+   .. py:method:: trap_focus(trap_focus: bool = True) -> None
+
+      Trap the focus.
+
+      When applied to a container, this will limit tab-to-focus to the children of that
+      container (once focus is within that container).
+
+      This can be useful for widgets that act like modal dialogs, where you want to restrict
+      the user to the controls within the dialog.
+
+      :param trap_focus: `True` to trap focus. `False` to restore default behavior.
+
+
+
+   .. py:method:: run_worker(work: textual.worker.WorkType[textual.worker.ResultType], name: str | None = '', group: str = 'default', description: str = '', exit_on_error: bool = True, start: bool = True, exclusive: bool = False, thread: bool = False) -> textual.worker.Worker[textual.worker.ResultType]
+
+      Run work in a worker.
+
+      A worker runs a function, coroutine, or awaitable, in the *background* as an async task or as a thread.
+
+      :param work: A function, async function, or an awaitable object to run in a worker.
+      :param name: A short string to identify the worker (in logs and debugging).
+      :param group: A short string to identify a group of workers.
+      :param description: A longer string to store longer information on the worker.
+      :param exit_on_error: Exit the app if the worker raises an error. Set to `False` to suppress exceptions.
+      :param start: Start the worker immediately.
+      :param exclusive: Cancel all workers in the same group.
+      :param thread: Mark the worker as a thread worker.
+
+      :returns: New Worker instance.
+
+
+
+   .. py:method:: automatic_refresh() -> None
+
+      Perform an automatic refresh.
+
+      This method is called when you set the `auto_refresh` attribute.
+      You could implement this method if you want to perform additional work
+      during an automatic refresh.
+
+
+
+
+   .. py:method:: get_component_styles(*names: str) -> textual.css.styles.RenderStyles
+
+      Get a "component" styles object (must be defined in COMPONENT_CLASSES classvar).
+
+      :param names: Names of the components.
+
+      :raises KeyError: If the component class doesn't exist.
+
+      :returns: A Styles object.
+
+
+
+   .. py:property:: parent
+      :type: DOMNode | None
+
+
+      The parent node.
+
+      All nodes have parent once added to the DOM, with the exception of the App which is the *root* node.
+
+
+   .. py:property:: screen
+      :type: Screen[object]
+
+
+      The screen containing this node.
+
+      :returns: A screen object.
+
+      :raises NoScreen: If this node isn't mounted (and has no screen).
+
+
+   .. py:property:: id
+      :type: str | None
+
+
+      The ID of this node, or None if the node has no ID.
+
+
+   .. py:property:: name
+      :type: str | None
+
+
+      The name of the node.
+
+
+   .. py:property:: css_identifier
+      :type: str
+
+
+      A CSS selector that identifies this DOM node.
+
+
+   .. py:property:: css_identifier_styled
+      :type: rich.text.Text
+
+
+      A syntax highlighted CSS identifier.
+
+      :returns: A Rich Text object.
+
+
+   .. py:attribute:: classes
+
+      CSS class names for this node.
+
+
+   .. py:property:: pseudo_classes
+      :type: frozenset[str]
+
+
+      A (frozen) set of all pseudo classes.
+
+
+   .. py:property:: css_path_nodes
+      :type: list[DOMNode]
+
+
+      A list of nodes from the App to this node, forming a "path".
+
+      :returns: A list of nodes, where the first item is the App, and the last is this node.
+
+
+   .. py:property:: display
+      :type: bool
+
+
+      Should the DOM node be displayed?
+
+      May be set to a boolean to show or hide the node, or to any valid value for the `display` rule.
+
+      .. rubric:: Example
+
+      ```python
+      my_widget.display = False  # Hide my_widget
+      ```
+
+
+   .. py:property:: visible
+      :type: bool
+
+
+      Is this widget visible in the DOM?
+
+      If a widget hasn't had its visibility set explicitly, then it inherits it from its
+      DOM ancestors.
+
+      This may be set explicitly to override inherited values.
+      The valid values include the valid values for the `visibility` rule and the booleans
+      `True` or `False`, to set the widget to be visible or invisible, respectively.
+
+      When a node is invisible, Textual will reserve space for it, but won't display anything.
+
+
+   .. py:property:: tree
+      :type: rich.tree.Tree
+
+
+      A Rich tree to display the DOM.
+
+      Log this to visualize your app in the textual console.
+
+      .. rubric:: Example
+
+      ```python
+      self.log(self.tree)
+      ```
+
+      :returns: A Tree renderable.
+
+
+   .. py:property:: css_tree
+      :type: rich.tree.Tree
+
+
+      A Rich tree to display the DOM, annotated with the node's CSS.
+
+      Log this to visualize your app in the textual console.
+
+      .. rubric:: Example
+
+      ```python
+      self.log(self.css_tree)
+      ```
+
+      :returns: A Tree renderable.
+
+
+   .. py:property:: text_style
+      :type: rich.style.Style
+
+
+      Get the text style object.
+
+      A widget's style is influenced by its parent. for instance if a parent is bold, then
+      the child will also be bold.
+
+      :returns: A Rich Style.
+
+
+   .. py:property:: selection_style
+      :type: rich.style.Style
+
+
+      The style of selected text.
+
+
+   .. py:property:: rich_style
+      :type: rich.style.Style
+
+
+      Get a Rich Style object for this DOMNode.
+
+      :returns: A Rich style.
+
+
+   .. py:method:: check_consume_key(key: str, character: str | None) -> bool
+
+      Check if the widget may consume the given key.
+
+      This should be implemented in widgets that handle [`Key`][textual.events.Key] events and
+      stop propagation (such as Input and TextArea).
+
+      Implementing this method will hide key bindings from the footer and key panel that would
+      be *consumed* by the focused widget.
+
+      :param key: A key identifier.
+      :param character: A character associated with the key, or `None` if there isn't one.
+
+      :returns: `True` if the widget may capture the key in its `Key` event handler, or `False` if it won't.
+
+
+
+   .. py:property:: background_colors
+      :type: tuple[textual.color.Color, textual.color.Color]
+
+
+      Background colors adjusted for opacity.
+
+      :returns: `(<background color>, <color>)`
+
+
+   .. py:property:: colors
+      :type: tuple[textual.color.Color, textual.color.Color, textual.color.Color, textual.color.Color]
+
+
+      The widget's background and foreground colors, and the parent's background and foreground colors.
+
+      :returns: `(<parent background>, <parent color>, <background>, <color>)`
+
+
+   .. py:property:: ancestors_with_self
+      :type: list[DOMNode]
+
+
+      A list of ancestor nodes found by tracing a path all the way back to App.
+
+      .. note:: This is inclusive of ``self``.
+
+      :returns: A list of nodes.
+
+
+   .. py:property:: ancestors
+      :type: list[DOMNode]
+
+
+      A list of ancestor nodes found by tracing a path all the way back to App.
+
+      :returns: A list of nodes.
+
+
+   .. py:method:: watch(obj: DOMNode, attribute_name: str, callback: textual._types.WatchCallbackType, init: bool = True) -> None
+
+      Watches for modifications to reactive attributes on another object.
+
+      .. rubric:: Example
+
+      ```python
+      def on_theme_change(old_value:str, new_value:str) -> None:
+          # Called when app.theme changes.
+          print(f"App.theme went from {old_value} to {new_value}")
+
+      self.watch(self.app, "theme", self.on_theme_change, init=False)
+      ```
+
+      :param obj: Object containing attribute to watch.
+      :param attribute_name: Attribute to watch.
+      :param callback: A callback to run when attribute changes.
+      :param init: Check watchers on first call.
+
+
+
+   .. py:method:: get_pseudo_classes() -> set[str]
+
+      Pseudo classes for a widget.
+
+      :returns: Names of the pseudo classes.
+
+
+
+   .. py:method:: reset_styles() -> None
+
+      Reset styles back to their initial state.
+
+
+
+   .. py:attribute:: WalkType
+
+
+   .. py:method:: walk_children(filter_type: type[WalkType], *, with_self: bool = False, method: WalkMethod = 'depth', reverse: bool = False) -> list[WalkType]
+
+      Walk the subtree rooted at this node, and return every descendant encountered in a list.
+
+      :param filter_type: Filter only this type, or None for no filter.
+      :param with_self: Also yield self in addition to descendants.
+      :param method: One of "depth" or "breadth".
+      :param reverse: Reverse the order (bottom up).
+
+      :returns: A list of nodes.
+
+
+
+   .. py:method:: query(selector: str | None = None) -> textual.css.query.DOMQuery[textual.widget.Widget]
+
+      Query the DOM for children that match a selector or widget type.
+
+      :param selector: A CSS selector, widget type, or `None` for all nodes.
+
+      :returns: A query object.
+
+
+
+   .. py:method:: query_children(selector: str | None = None) -> textual.css.query.DOMQuery[textual.widget.Widget]
+
+      Query the DOM for the immediate children that match a selector or widget type.
+
+      Note that this will not return child widgets more than a single level deep.
+      If you want to a query to potentially match all children in the widget tree,
+      see [query][textual.dom.DOMNode.query].
+
+      :param selector: A CSS selector, widget type, or `None` for all nodes.
+
+      :returns: A query object.
+
+
+
+   .. py:method:: query_one(selector: str) -> textual.widget.Widget
+
+      Get a widget from this widget's children that matches a selector or widget type.
+
+      :param selector: A selector or widget type.
+      :param expect_type: Require the object be of the supplied type, or None for any type.
+
+      :raises WrongType: If the wrong type was found.
+      :raises NoMatches: If no node matches the query.
+
+      :returns: A widget matching the selector.
+
+
+
+   .. py:method:: query_exactly_one(selector: str) -> textual.widget.Widget
+
+      Get a widget from this widget's children that matches a selector or widget type.
+
+      !!! Note
+          This method is similar to [query_one][textual.dom.DOMNode.query_one].
+          The only difference is that it will raise `TooManyMatches` if there is more than a single match.
+
+      :param selector: A selector or widget type.
+      :param expect_type: Require the object be of the supplied type, or None for any type.
+
+      :raises WrongType: If the wrong type was found.
+      :raises NoMatches: If no node matches the query.
+      :raises TooManyMatches: If there is more than one matching node in the query (and `exactly_one==True`).
+
+      :returns: A widget matching the selector.
+
+
+
+   .. py:method:: query_ancestor(selector: str) -> DOMNode
+
+      Get an ancestor which matches a query.
+
+      :param selector: A TCSS selector.
+      :param expect_type: Expected type, or `None` for any DOMNode.
+
+      :raises InvalidQueryFormat: If the selector is invalid.
+      :raises NoMatches: If there are no matching ancestors.
+
+      :returns: A DOMNode or subclass if `expect_type` is provided.
+
+
+
+   .. py:method:: set_styles(css: str | None = None, **update_styles: Any) -> typing_extensions.Self
+
+      Set custom styles on this object.
+
+      :param css: Styles in CSS format.
+      :param update_styles: Keyword arguments map style names onto style values.
+
+      :returns: Self.
+
+
+
+   .. py:method:: has_class(*class_names: str) -> bool
+
+      Check if the Node has all the given class names.
+
+      :param \*class_names: CSS class names to check.
+
+      :returns: ``True`` if the node has all the given class names, otherwise ``False``.
+
+
+
+   .. py:method:: set_class(add: bool, *class_names: str, update: bool = True) -> typing_extensions.Self
+
+      Add or remove class(es) based on a condition.
+
+      This can condense the four lines required to implement the equivalent branch into a single line.
+
+      .. rubric:: Example
+
+      ```python
+      #if foo:
+      #    self.add_class("-foo")
+      #else:
+      #    self.remove_class("-foo")
+      self.set_class(foo, "-foo")
+      ```
+
+      :param add: Add the classes if True, otherwise remove them.
+      :param update: Also update styles.
+
+      :returns: Self.
+
+
+
+   .. py:method:: set_classes(classes: str | Iterable[str]) -> typing_extensions.Self
+
+      Replace all classes.
+
+      :param classes: A string containing space separated classes, or an
+                      iterable of class names.
+
+      :returns: Self.
+
+
+
+   .. py:method:: add_class(*class_names: str, update: bool = True) -> typing_extensions.Self
+
+      Add class names to this Node.
+
+      :param \*class_names: CSS class names to add.
+      :param update: Also update styles.
+
+      :returns: Self.
+
+
+
+   .. py:method:: remove_class(*class_names: str, update: bool = True) -> typing_extensions.Self
+
+      Remove class names from this Node.
+
+      :param \*class_names: CSS class names to remove.
+      :param update: Also update styles.
+
+      :returns: Self.
+
+
+
+   .. py:method:: toggle_class(*class_names: str) -> typing_extensions.Self
+
+      Toggle class names on this Node.
+
+      :param \*class_names: CSS class names to toggle.
+
+      :returns: Self.
+
+
+
+   .. py:method:: has_pseudo_class(class_name: str) -> bool
+
+      Check the node has the given pseudo class.
+
+      :param class_name: The pseudo class to check for.
+
+      :returns: `True` if the DOM node has the pseudo class, `False` if not.
+
+
+
+   .. py:method:: has_pseudo_classes(class_names: set[str]) -> bool
+
+      Check the node has all the given pseudo classes.
+
+      :param class_names: Set of class names to check for.
+
+      :returns: `True` if all pseudo class names are present.
+
+
+
+   .. py:method:: check_action(action: str, parameters: tuple[object, Ellipsis]) -> bool | None
+
+      Check whether an action is enabled.
+
+      Implement this method to add logic for [dynamic actions](/guide/actions#dynamic-actions) / bindings.
+
+      :param action: The name of an action.
+      :param parameters: A tuple of any action parameters.
+
+      :returns:
+
+                `True` if the action is enabled+visible,
+                    `False` if the action is disabled+hidden,
+                    `None` if the action is disabled+visible (grayed out in footer)
+
+
+
+   .. py:method:: action_toggle(attribute_name: str) -> None
+      :async:
+
+
+      Toggle an attribute on the node.
+
+      Assumes the attribute is a bool.
+
+      :param attribute_name: Name of the attribute.
+
+
+
+   .. py:attribute:: message_signal
+      :type:  textual.signal.Signal[textual.message.Message]
+
+      Subscribe to this signal to be notified of all messages sent to this widget.
+
+      This is a fairly low-level mechanism, and shouldn't replace regular message handling.
+
+
+   .. py:method:: prevent(*message_types: type[textual.message.Message]) -> Generator[None, None, None]
+
+      A context manager to *temporarily* prevent the given message types from being posted.
+
+      .. rubric:: Example
+
+      ```python
+      input = self.query_one(Input)
+      with self.prevent(Input.Changed):
+          input.value = "foo"
+      ```
+
+
+
+   .. py:property:: task
+      :type: asyncio.Task
+
+
+
+   .. py:property:: has_parent
+      :type: bool
+
+
+      Does this object have a parent?
+
+
+   .. py:property:: message_queue_size
+      :type: int
+
+
+      The current size of the message queue.
+
+
+   .. py:property:: is_dom_root
+
+      Is this a root node (i.e. the App)?
+
+
+   .. py:attribute:: app
+
+
+   .. py:property:: is_attached
+      :type: bool
+
+
+      Is this node linked to the app through the DOM?
+
+
+   .. py:property:: is_parent_active
+      :type: bool
+
+
+      Is the parent active?
+
+
+   .. py:property:: is_running
+      :type: bool
+
+
+      Is the message pump running (potentially processing messages)?
+
+
+   .. py:property:: log
+      :type: textual.Logger
+
+
+      Get a logger for this object.
+
+      :returns: A logger.
+
+
+   .. py:method:: disable_messages(*messages: type[textual.message.Message]) -> None
+
+      Disable message types from being processed.
+
+
+
+   .. py:method:: enable_messages(*messages: type[textual.message.Message]) -> None
+
+      Enable processing of messages types.
+
+
+
+   .. py:method:: set_timer(delay: float, callback: textual.timer.TimerCallback | None = None, *, name: str | None = None, pause: bool = False) -> textual.timer.Timer
+
+      Call a function after a delay.
+
+      .. rubric:: Example
+
+      ```python
+      def ready():
+          self.notify("Your soft boiled egg is ready!")
+      # Call ready() after 3 minutes
+      self.set_timer(3 * 60, ready)
+      ```
+
+      :param delay: Time (in seconds) to wait before invoking callback.
+      :param callback: Callback to call after time has expired.
+      :param name: Name of the timer (for debug).
+      :param pause: Start timer paused.
+
+      :returns: A timer object.
+
+
+
+   .. py:method:: set_interval(interval: float, callback: textual.timer.TimerCallback | None = None, *, name: str | None = None, repeat: int = 0, pause: bool = False) -> textual.timer.Timer
+
+      Call a function at periodic intervals.
+
+      :param interval: Time (in seconds) between calls.
+      :param callback: Function to call.
+      :param name: Name of the timer object.
+      :param repeat: Number of times to repeat the call or 0 for continuous.
+      :param pause: Start the timer paused.
+
+      :returns: A timer object.
+
+
+
+   .. py:method:: call_after_refresh(callback: Callback, *args: Any, **kwargs: Any) -> bool
+
+      Schedule a callback to run after all messages are processed and the screen
+      has been refreshed. Positional and keyword arguments are passed to the callable.
+
+      :param callback: A callable.
+
+      :returns:
+
+                `True` if the callback was scheduled, or `False` if the callback could not be
+                    scheduled (may occur if the message pump was closed or closing).
+
+
+
+   .. py:method:: wait_for_refresh() -> bool
+      :async:
+
+
+      Wait for the next refresh.
+
+      This method should only be called from a task other than the one running this widget.
+      If called from the same task, it will return immediately to avoid blocking the event loop.
+
+      :returns:
+
+                `True` if waiting for refresh was successful, or `False` if the call was a null-op
+                    due to calling it within the node's own task.
+
+
+
+   .. py:method:: call_later(callback: Callback, *args: Any, **kwargs: Any) -> bool
+
+      Schedule a callback to run after all messages are processed in this object.
+      Positional and keywords arguments are passed to the callable.
+
+      :param callback: Callable to call next.
+      :param \*args: Positional arguments to pass to the callable.
+      :param \*\*kwargs: Keyword arguments to pass to the callable.
+
+      :returns:
+
+                `True` if the callback was scheduled, or `False` if the callback could not be
+                    scheduled (may occur if the message pump was closed or closing).
+
+
+
+   .. py:method:: call_next(callback: Callback, *args: Any, **kwargs: Any) -> None
+
+      Schedule a callback to run immediately after processing the current message.
+
+      :param callback: Callable to run after current event.
+      :param \*args: Positional arguments to pass to the callable.
+      :param \*\*kwargs: Keyword arguments to pass to the callable.
+
+
+
+   .. py:method:: on_event(event: textual.events.Event) -> None
+      :async:
+
+
+      Called to process an event.
+
+      :param event: An Event object.
+
+
+
+   .. py:method:: check_idle() -> None
+
+      Prompt the message pump to call idle if the queue is empty.
+
+
+
+   .. py:method:: on_callback(event: textual.events.Callback) -> None
+      :async:
+
+
+
+   .. py:method:: on_timer(event: textual.events.Timer) -> None
+      :async:
+
+
+

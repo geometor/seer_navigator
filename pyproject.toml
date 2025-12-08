@@ -2,9 +2,9 @@
 name = "geometor-seer_navigator"
 dynamic = ["version"]
 authors = [
-  { name="phi ARCHITECT", email="github@phiarchitect.com" },
+  { name="geometor", email="github@geometor.com" },
 ]
-description = "tools for reviewing test results with SEER"
+description = "A terminal-based interface for reviewing SEER test results."
 readme = "README.rst"
 requires-python = ">=3.7"
 classifiers = [

@@ -2,7 +2,7 @@ seer_navigator
 ==============
 
 
-tools for reviewing test results with SEER
+A terminal-based interface for reviewing SEER test results.
 
 Features
 --------

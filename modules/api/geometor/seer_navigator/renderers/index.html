@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>geometor.seer_navigator.renderers &mdash; Project name not set  documentation</title>
   <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=ea5fcf70" />
-  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/styles.css?v=bc127b54" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/styles.css?v=38c7a96b" />
   <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
   <link rel="stylesheet" href="../../../../../_static/css/print.css" type="text/css" media="print" />
   <link rel="icon" href="../../../../../_static/favicon.ico" />
 </head>
 
 <body>
-    <header>
+  <header>
     <div class="logo">
       <a href="../../../../../index.html">
         <h1>Project name not set</h1>
@@ -35,237 +35,221 @@
     <div class="motto"></div>
   </header>
   <main>
-    
     <article>
-      <div class="content">
+      <header>
       <nav class="breadcrumbs">
         <span><a href="../../../../../index.html">Home</a></span>
-        <span>/</span>
-        <span>geometor.seer_navigator.renderers</span>
       </nav>
         <nav class="context">
           <div class="prev">
-             <a href="image_grid/index.html" class="btn btn-neutral float-left" title="geometor.seer_navigator.renderers.image_grid" >Prev</a>
           </div>
           <div class="next">
-            <a href="solid_grid/index.html" class="btn btn-neutral float-right" title="geometor.seer_navigator.renderers.solid_grid" >Next</a>
           </div>
         </nav>
-          <section id="module-geometor.seer_navigator.renderers">
-<span id="geometor-seer-navigator-renderers"></span><h1>geometor.seer_navigator.renderers<a class="headerlink" href="#module-geometor.seer_navigator.renderers" title="Link to this heading">¶</a></h1>
-<p>Grid rendering widgets for the Seer Navigator.</p>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="base_grid/index.html">geometor.seer_navigator.renderers.base_grid</a></li>
-<li class="toctree-l1"><a class="reference internal" href="block_grid/index.html">geometor.seer_navigator.renderers.block_grid</a></li>
-<li class="toctree-l1"><a class="reference internal" href="char_grid/index.html">geometor.seer_navigator.renderers.char_grid</a></li>
-<li class="toctree-l1"><a class="reference internal" href="image_grid/index.html">geometor.seer_navigator.renderers.image_grid</a></li>
-<li class="toctree-l1"><a class="reference internal" href="solid_grid/index.html">geometor.seer_navigator.renderers.solid_grid</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tiny_grid/index.html">geometor.seer_navigator.renderers.tiny_grid</a></li>
-</ul>
-</div>
-</section>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.BaseGrid" title="geometor.seer_navigator.renderers.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseGrid</span></code></a></p></td>
-<td><p>Base widget class for rendering the colored grid.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.SolidGrid" title="geometor.seer_navigator.renderers.SolidGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SolidGrid</span></code></a></p></td>
-<td><p>Base widget class for rendering the colored grid.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.CharGrid" title="geometor.seer_navigator.renderers.CharGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CharGrid</span></code></a></p></td>
-<td><p>Renders each grid cell as a single Unicode square character (default: '■'),</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.BlockGrid" title="geometor.seer_navigator.renderers.BlockGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BlockGrid</span></code></a></p></td>
-<td><p>first row cells are made of 3 characters - half vertical and full</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.TinyGrid" title="geometor.seer_navigator.renderers.TinyGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TinyGrid</span></code></a></p></td>
-<td><p>Renders the grid using the Unicode upper half block character '▀'.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="package-contents">
-<h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">BaseGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">textual.widgets.Static</span></code></p>
-<p>Base widget class for rendering the colored grid.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid.grid">
-<span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid.grid" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+      </header>
+      <div class="content">
+        <section id="module-geometor.seer_navigator.renderers">
+          <span id="geometor-seer-navigator-renderers"></span><h1>geometor.seer_navigator.renderers<a class="headerlink" href="#module-geometor.seer_navigator.renderers" title="Link to this heading">¶</a></h1>
+          <p>Grid rendering widgets for the Seer Navigator.</p>
+          <section id="submodules">
+          <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+          <div class="toctree-wrapper compound">
+          <ul>
+          <li class="toctree-l1"><a class="reference internal" href="base_grid/index.html">geometor.seer_navigator.renderers.base_grid</a></li>
+          <li class="toctree-l1"><a class="reference internal" href="block_grid/index.html">geometor.seer_navigator.renderers.block_grid</a></li>
+          <li class="toctree-l1"><a class="reference internal" href="char_grid/index.html">geometor.seer_navigator.renderers.char_grid</a></li>
+          <li class="toctree-l1"><a class="reference internal" href="image_grid/index.html">geometor.seer_navigator.renderers.image_grid</a></li>
+          <li class="toctree-l1"><a class="reference internal" href="solid_grid/index.html">geometor.seer_navigator.renderers.solid_grid</a></li>
+          <li class="toctree-l1"><a class="reference internal" href="tiny_grid/index.html">geometor.seer_navigator.renderers.tiny_grid</a></li>
+          </ul>
+          </div>
+          </section>
+          <section id="classes">
+          <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+          <table class="autosummary longtable docutils align-default">
+          <tbody>
+          <tr class="row-odd"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.BaseGrid" title="geometor.seer_navigator.renderers.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseGrid</span></code></a></p></td>
+          <td><p>Base widget class for rendering the colored grid.</p></td>
+          </tr>
+          <tr class="row-even"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.SolidGrid" title="geometor.seer_navigator.renderers.SolidGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SolidGrid</span></code></a></p></td>
+          <td><p>Base widget class for rendering the colored grid.</p></td>
+          </tr>
+          <tr class="row-odd"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.CharGrid" title="geometor.seer_navigator.renderers.CharGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CharGrid</span></code></a></p></td>
+          <td><p>Renders each grid cell as a single Unicode square character (default: '■'),</p></td>
+          </tr>
+          <tr class="row-even"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.BlockGrid" title="geometor.seer_navigator.renderers.BlockGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BlockGrid</span></code></a></p></td>
+          <td><p>first row cells are made of 3 characters - half vertical and full</p></td>
+          </tr>
+          <tr class="row-odd"><td><p><a class="reference internal" href="#geometor.seer_navigator.renderers.TinyGrid" title="geometor.seer_navigator.renderers.TinyGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TinyGrid</span></code></a></p></td>
+          <td><p>Renders the grid using the Unicode upper half block character '▀'.</p></td>
+          </tr>
+          </tbody>
+          </table>
+          </section>
+          <section id="package-contents">
+          <h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading">¶</a></h2>
+          <dl class="py class">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid">
+          <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">BaseGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid" title="Link to this definition">¶</a></dt>
+          <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">textual.widgets.Static</span></code></p>
+          <p>Base widget class for rendering the colored grid.</p>
+          <dl class="py attribute">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid.grid">
+          <span class="sig-name descname"><span class="pre">grid</span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid.grid" title="Link to this definition">¶</a></dt>
+          <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid.rows">
-<span class="sig-name descname"><span class="pre">rows</span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid.rows" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+          <dl class="py attribute">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid.rows">
+          <span class="sig-name descname"><span class="pre">rows</span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid.rows" title="Link to this definition">¶</a></dt>
+          <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid.cols">
-<span class="sig-name descname"><span class="pre">cols</span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid.cols" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+          <dl class="py attribute">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid.cols">
+          <span class="sig-name descname"><span class="pre">cols</span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid.cols" title="Link to this definition">¶</a></dt>
+          <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid.get_color">
-<span class="sig-name descname"><span class="pre">get_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.13/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">textual.color.Color</span></span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid.get_color" title="Link to this definition">¶</a></dt>
-<dd><p>Gets a Textual Color object for the given cell value.</p>
-</dd></dl>
+          <dl class="py method">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BaseGrid.get_color">
+          <span class="sig-name descname"><span class="pre">get_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.13/builtins/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">textual.color.Color</span></span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.BaseGrid.get_color" title="Link to this definition">¶</a></dt>
+          <dd><p>Gets a Textual Color object for the given cell value.</p>
+          </dd></dl>
 
-</dd></dl>
+          </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.SolidGrid">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">SolidGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.SolidGrid" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="base_grid/index.html#geometor.seer_navigator.renderers.base_grid.BaseGrid" title="geometor.seer_navigator.renderers.base_grid.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometor.seer_navigator.renderers.base_grid.BaseGrid</span></code></a></p>
-<p>Base widget class for rendering the colored grid.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.SolidGrid.render">
-<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.SolidGrid.render" title="Link to this definition">¶</a></dt>
-<dd><p>Get a rich renderable for the widget’s content.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A rich renderable.</p>
-</dd>
-</dl>
-</dd></dl>
+          <dl class="py class">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.SolidGrid">
+          <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">SolidGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.SolidGrid" title="Link to this definition">¶</a></dt>
+          <dd><p>Bases: <a class="reference internal" href="base_grid/index.html#geometor.seer_navigator.renderers.base_grid.BaseGrid" title="geometor.seer_navigator.renderers.base_grid.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometor.seer_navigator.renderers.base_grid.BaseGrid</span></code></a></p>
+          <p>Base widget class for rendering the colored grid.</p>
+          <dl class="py method">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.SolidGrid.render">
+          <span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.SolidGrid.render" title="Link to this definition">¶</a></dt>
+          <dd><p>Get a rich renderable for the widget’s content.</p>
+          <dl class="field-list simple">
+          <dt class="field-odd">Returns<span class="colon">:</span></dt>
+          <dd class="field-odd"><p>A rich renderable.</p>
+          </dd>
+          </dl>
+          </dd></dl>
 
-</dd></dl>
+          </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.CharGrid">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">CharGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.CharGrid" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="base_grid/index.html#geometor.seer_navigator.renderers.base_grid.BaseGrid" title="geometor.seer_navigator.renderers.base_grid.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometor.seer_navigator.renderers.base_grid.BaseGrid</span></code></a></p>
-<p>Renders each grid cell as a single Unicode square character (default: ‘■’),
-styled with the cell’s fill color.</p>
-<p>You can switch the character to something else (e.g. ‘⬛’, ‘◼’, ‘▣’) if desired.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.CharGrid.SQUARE_CHAR">
-<span class="sig-name descname"><span class="pre">SQUARE_CHAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'■'</span></em><a class="headerlink" href="#geometor.seer_navigator.renderers.CharGrid.SQUARE_CHAR" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+          <dl class="py class">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.CharGrid">
+          <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">CharGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.CharGrid" title="Link to this definition">¶</a></dt>
+          <dd><p>Bases: <a class="reference internal" href="base_grid/index.html#geometor.seer_navigator.renderers.base_grid.BaseGrid" title="geometor.seer_navigator.renderers.base_grid.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometor.seer_navigator.renderers.base_grid.BaseGrid</span></code></a></p>
+          <p>Renders each grid cell as a single Unicode square character (default: ‘■’),
+          styled with the cell’s fill color.</p>
+          <p>You can switch the character to something else (e.g. ‘⬛’, ‘◼’, ‘▣’) if desired.</p>
+          <dl class="py attribute">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.CharGrid.SQUARE_CHAR">
+          <span class="sig-name descname"><span class="pre">SQUARE_CHAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'■'</span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.CharGrid.SQUARE_CHAR" title="Link to this definition">¶</a></dt>
+          <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.CharGrid.render">
-<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.CharGrid.render" title="Link to this definition">¶</a></dt>
-<dd><p>Get a rich renderable for the widget’s content.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A rich renderable.</p>
-</dd>
-</dl>
-</dd></dl>
+          <dl class="py method">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.CharGrid.render">
+          <span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.CharGrid.render" title="Link to this definition">¶</a></dt>
+          <dd><p>Get a rich renderable for the widget’s content.</p>
+          <dl class="field-list simple">
+          <dt class="field-odd">Returns<span class="colon">:</span></dt>
+          <dd class="field-odd"><p>A rich renderable.</p>
+          </dd>
+          </dl>
+          </dd></dl>
 
-</dd></dl>
+          </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BlockGrid">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">BlockGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.BlockGrid" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="base_grid/index.html#geometor.seer_navigator.renderers.base_grid.BaseGrid" title="geometor.seer_navigator.renderers.base_grid.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometor.seer_navigator.renderers.base_grid.BaseGrid</span></code></a></p>
-<p>first row cells are made of 3 characters - half vertical and full
-next row made of top and bottom half - 1 space, 1 half block
-“ ██”
-“ ▄▄”
-“ ▀▀”</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BlockGrid.render">
-<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.BlockGrid.render" title="Link to this definition">¶</a></dt>
-<dd><p>Get a rich renderable for the widget’s content.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A rich renderable.</p>
-</dd>
-</dl>
-</dd></dl>
+          <dl class="py class">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BlockGrid">
+          <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">BlockGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.BlockGrid" title="Link to this definition">¶</a></dt>
+          <dd><p>Bases: <a class="reference internal" href="base_grid/index.html#geometor.seer_navigator.renderers.base_grid.BaseGrid" title="geometor.seer_navigator.renderers.base_grid.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometor.seer_navigator.renderers.base_grid.BaseGrid</span></code></a></p>
+          <p>first row cells are made of 3 characters - half vertical and full
+          next row made of top and bottom half - 1 space, 1 half block
+          “ ██”
+          “ ▄▄”
+          “ ▀▀”</p>
+          <dl class="py method">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.BlockGrid.render">
+          <span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.BlockGrid.render" title="Link to this definition">¶</a></dt>
+          <dd><p>Get a rich renderable for the widget’s content.</p>
+          <dl class="field-list simple">
+          <dt class="field-odd">Returns<span class="colon">:</span></dt>
+          <dd class="field-odd"><p>A rich renderable.</p>
+          </dd>
+          </dl>
+          </dd></dl>
 
-</dd></dl>
+          </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.TinyGrid">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">TinyGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.TinyGrid" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="base_grid/index.html#geometor.seer_navigator.renderers.base_grid.BaseGrid" title="geometor.seer_navigator.renderers.base_grid.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometor.seer_navigator.renderers.base_grid.BaseGrid</span></code></a></p>
-<p>Renders the grid using the Unicode upper half block character ‘▀’.
-Each character represents two rows:
-- Foreground color = top row cell color
-- Background color = bottom row cell color
-If there’s an odd number of rows, the last row uses black for the background.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.TinyGrid.HALF_BLOCK_CHAR">
-<span class="sig-name descname"><span class="pre">HALF_BLOCK_CHAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'▀'</span></em><a class="headerlink" href="#geometor.seer_navigator.renderers.TinyGrid.HALF_BLOCK_CHAR" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+          <dl class="py class">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.TinyGrid">
+          <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.renderers.</span></span><span class="sig-name descname"><span class="pre">TinyGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.renderers.TinyGrid" title="Link to this definition">¶</a></dt>
+          <dd><p>Bases: <a class="reference internal" href="base_grid/index.html#geometor.seer_navigator.renderers.base_grid.BaseGrid" title="geometor.seer_navigator.renderers.base_grid.BaseGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometor.seer_navigator.renderers.base_grid.BaseGrid</span></code></a></p>
+          <p>Renders the grid using the Unicode upper half block character ‘▀’.
+          Each character represents two rows:
+          - Foreground color = top row cell color
+          - Background color = bottom row cell color
+          If there’s an odd number of rows, the last row uses black for the background.</p>
+          <dl class="py attribute">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.TinyGrid.HALF_BLOCK_CHAR">
+          <span class="sig-name descname"><span class="pre">HALF_BLOCK_CHAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'▀'</span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.TinyGrid.HALF_BLOCK_CHAR" title="Link to this definition">¶</a></dt>
+          <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="geometor.seer_navigator.renderers.TinyGrid.render">
-<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">rich.text.Text</span></span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.TinyGrid.render" title="Link to this definition">¶</a></dt>
-<dd><p>Get a rich renderable for the widget’s content.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A rich renderable.</p>
-</dd>
-</dl>
-</dd></dl>
+          <dl class="py method">
+          <dt class="sig sig-object py" id="geometor.seer_navigator.renderers.TinyGrid.render">
+          <span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">rich.text.Text</span></span></span><a class="headerlink" href="#geometor.seer_navigator.renderers.TinyGrid.render" title="Link to this definition">¶</a></dt>
+          <dd><p>Get a rich renderable for the widget’s content.</p>
+          <dl class="field-list simple">
+          <dt class="field-odd">Returns<span class="colon">:</span></dt>
+          <dd class="field-odd"><p>A rich renderable.</p>
+          </dd>
+          </dl>
+          </dd></dl>
 
-</dd></dl>
+          </dd></dl>
 
-</section>
-</section>
+          </section>
+          </section>
 
       </div>
       <footer>
 
-
         <nav class="context">
           <div class="prev">
-             <a href="image_grid/index.html" class="btn btn-neutral float-left" title="geometor.seer_navigator.renderers.image_grid" >Prev</a>
           </div>
           <div class="next">
-            <a href="solid_grid/index.html" class="btn btn-neutral float-right" title="geometor.seer_navigator.renderers.solid_grid" >Next</a>
           </div>
-        </nav></footer>
+        </nav>
+      </footer>
     </article>
-
   </main>
-
   <div class="asides">
     <aside>
-        <h3>Search</h3>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
+      <h3>Search</h3>
+      <div role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+          <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+      </div>
     </aside>
-    
-    
-
-    
-
-    
-
-</div>
+  </div>
   <footer>
-    <hr/>
+    <hr />
     <div role="contentinfo">
-        <p>
-                &copy; Copyright .
-        </p>
+      <p>
+        &copy; Copyright .
+      </p>
     </div>
-</footer>
-  
+  </footer>
+
   <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
   <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
   <script src="../../../../../_static/documentation_options.js?v=5929fcd5"></script>
-  <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
-  <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+  <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+  <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
   <script src="../../../../../_static/js/collection_controls.js?v=b6b5297a"></script>
-  
 
 </body>
-
 </html>

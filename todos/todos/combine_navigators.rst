@@ -1,6 +1,9 @@
-# Combine TasksNavigator and SessionsNavigator
+:order: 9
 
-**Goal:** Merge the `TasksNavigator` and `SessionsNavigator` components into a single application view.
+Combine TasksNavigator and SessionsNavigator
+============================================
+
+**Goal:** Merge the ``TasksNavigator`` and ``SessionsNavigator`` components into a single application view.
 
 **Details:**
 - The combined view should allow the user to easily toggle between the "Tasks" screen and the "Sessions" screen.

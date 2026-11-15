@@ -1,0 +1,33 @@
+geometor.seer_navigator.renderers.solid_grid
+============================================
+
+.. py:module:: geometor.seer_navigator.renderers.solid_grid
+
+.. autoapi-nested-parse::
+
+   Provides the SolidGrid renderer using solid block characters.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer_navigator.renderers.solid_grid.SolidGrid
+
+
+Module Contents
+---------------
+
+.. py:class:: SolidGrid(grid, **kwargs)
+
+   Bases: :py:obj:`geometor.seer_navigator.renderers.base_grid.BaseGrid`
+
+
+   Base widget class for rendering the colored grid.
+
+
+   .. py:method:: render()
+
+

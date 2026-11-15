@@ -1,0 +1,41 @@
+geometor.seer_navigator.renderers.char_grid
+===========================================
+
+.. py:module:: geometor.seer_navigator.renderers.char_grid
+
+.. autoapi-nested-parse::
+
+   Provides the CharGrid renderer using Unicode block characters.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer_navigator.renderers.char_grid.CharGrid
+
+
+Module Contents
+---------------
+
+.. py:class:: CharGrid(grid, **kwargs)
+
+   Bases: :py:obj:`geometor.seer_navigator.renderers.base_grid.BaseGrid`
+
+
+   Renders each grid cell as a single Unicode square character (default: '■'),
+   styled with the cell's fill color.
+
+   You can switch the character to something else (e.g. '⬛', '◼', '▣') if desired.
+
+
+   .. py:attribute:: SQUARE_CHAR
+      :value: '■'
+
+
+
+   .. py:method:: render()
+
+

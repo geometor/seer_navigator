@@ -1,0 +1,150 @@
+geometor.seer_navigator.screens.sessions_screen
+===============================================
+
+.. py:module:: geometor.seer_navigator.screens.sessions_screen
+
+.. autoapi-nested-parse::
+
+   Defines the SessionsScreen, the initial screen listing all sessions.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer_navigator.screens.sessions_screen.SessionsScreen
+
+
+Module Contents
+---------------
+
+.. py:class:: SessionsScreen(sessions_root: pathlib.Path)
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             Screen > Vertical {
+                 grid-size: 2;
+                 grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+             }
+             #summary-grid {
+                 grid-size: 3; /* Three columns for the summary tables */
+                 grid-gutter: 1 2;
+                 height: auto; /* Let the grid determine its height */
+                 padding: 0 1; /* Add some horizontal padding */
+                 margin-bottom: 1; /* Space below summary */
+             }
+             .summary-table {
+                 height: auto; /* Fit content height */
+                 border: none; /* No border for summary tables */
+             }
+             /* Ensure no focus border on summary tables */
+             .summary-table:focus {
+                 border: none;
+             }
+             DataTable { /* Style for the main sessions table */
+                 height: 1fr;
+             }
+             /* Keep old Static style for reference or remove if not needed */
+             /* Static {padding: 1; height: 3} */
+             Vertical {height: 100%;}
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: sessions_root
+
+
+   .. py:attribute:: session_dirs
+      :value: []
+
+
+
+   .. py:attribute:: session_index
+      :value: 0
+
+
+
+   .. py:attribute:: current_sort_key
+      :type:  textual.widgets._data_table.ColumnKey | None
+      :value: None
+
+
+
+   .. py:attribute:: current_sort_reverse
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_mount() -> None
+
+
+   .. py:method:: load_sessions()
+
+      Loads data into the main sessions DataTable.
+
+
+
+   .. py:method:: update_summary()
+
+      Updates the three summary DataTables.
+
+
+
+   .. py:method:: select_session_by_index(index: int) -> None
+
+
+   .. py:method:: previous_sibling()
+
+
+   .. py:method:: next_sibling()
+
+
+   .. py:method:: action_move_up()
+
+
+   .. py:method:: action_move_down()
+
+
+   .. py:method:: action_select_row()
+
+
+   .. py:method:: on_data_table_row_selected(event: textual.widgets.DataTable.RowSelected)
+
+
+   .. py:method:: refresh_content() -> None
+
+      Reloads session data and updates the screen.
+
+
+
+   .. py:method:: perform_sort(sort_key: textual.widgets._data_table.ColumnKey) -> None
+
+      Sorts the DataTable by the given column key.
+
+
+

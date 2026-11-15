@@ -1,0 +1,132 @@
+geometor.seer_navigator.screens.trial_split_view_screen
+=======================================================
+
+.. py:module:: geometor.seer_navigator.screens.trial_split_view_screen
+
+.. autoapi-nested-parse::
+
+   Defines the TrialSplitViewScreen for showing code alongside trial grids.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer_navigator.screens.trial_split_view_screen.TrialSplitViewScreen
+
+
+Module Contents
+---------------
+
+.. py:class:: TrialSplitViewScreen(trial_paths: list[pathlib.Path], renderer_class_arg: type[textual.widgets.Static], name: str | None = None, id: str | None = None, classes: str | None = None)
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   A screen that displays Python source code side-by-side with the
+   rendered TrialViewer grid for a set of trials, allowing navigation between them.
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             TrialSplitViewScreen > Horizontal {
+                 height: 1fr; /* Make horizontal fill the screen */
+             }
+         
+             #json-container {
+                 width: 50%;
+                 border-right: thick $accent;
+                 height: 1fr;
+             }
+         
+             #trial-viewer-container {
+                 width: 50%;
+                 height: 1fr;
+             }
+         
+             /* Ensure children fill their containers */
+             #json-text-area {
+                 height: 1fr;
+                 border: none;
+             }
+             #trial-viewer-widget {
+                /* TrialViewer is scrollable, let it manage its own height/scrolling */
+                height: 1fr;
+             }
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: trial_paths
+      :type:  textual.reactive.var[list[pathlib.Path]]
+
+
+   .. py:attribute:: current_index
+      :type:  textual.reactive.var[int]
+
+
+   .. py:attribute:: current_python_path
+      :type:  textual.reactive.var[pathlib.Path | None]
+
+
+   .. py:attribute:: renderer
+      :type:  textual.reactive.var[type[textual.widgets.Static] | None]
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_mount() -> None
+
+      Load the initial trial content when the screen is mounted.
+
+
+
+   .. py:method:: watch_current_index(old_index: int, new_index: int) -> None
+
+      Called when current_index changes. Reloads the content.
+
+
+
+   .. py:method:: load_current_trial() -> None
+
+      Loads the Python code and TrialViewer grid for the current index.
+
+
+
+   .. py:method:: action_next_trial() -> None
+
+      Go to the next trial in the list.
+
+
+
+   .. py:method:: action_previous_trial() -> None
+
+      Go to the previous trial in the list.
+
+
+
+   .. py:method:: action_set_renderer(renderer_name: str) -> None
+
+      Sets the grid renderer type for the TrialViewer.
+
+
+

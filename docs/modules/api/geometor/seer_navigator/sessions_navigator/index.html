@@ -1,0 +1,247 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-content_root="../../../../../">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>geometor.seer_navigator.sessions_navigator &mdash; geometor • seer_navigator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Fira+Sans+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=ea5fcf70" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/styles.css?v=c5e95cff" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../../../../_static/css/print.css" type="text/css" media="print" />
+  <link rel="icon" href="../../../../../_static/favicon.ico" />
+</head>
+
+<body class="book-theme-classical-serif">
+  <header>
+    <div class="logo">
+      <a href="../../../../../index.html">
+        <img src="../../../../../_static/logo.png" class="logo" alt="Logo"/>
+      </a>
+      <div class="org-repo">
+        <span class="org">geometor</span>
+        •
+        <span class="repo">seer_navigator</span>
+      </div>
+    </div>
+    <nav aria-label="Header">
+      <input type="checkbox" id="nav-Header-toggle" >
+      <label for="nav-Header-toggle" >Header</label>
+      <ul>
+      </ul>
+    </nav>
+    <div class="motto"></div>
+  </header>
+  <main class="book-main">
+    <article class="book-layout book-reading-pane">
+      <header class="book-header">
+        <div class="book-header-bar">
+          <div class="book-header-identity">
+            <a class="book-portal-link" href="../../../../../index.html" title="Return to Project Portal">&larr; seer_navigator</a>
+            <span class="book-header-sep">/</span>
+            <a class="book-title-link" href="../../../../../index.html">geometor • seer_navigator</a>
+          </div>
+        </div>
+      </header>
+      <div class="content body book-content" role="main">
+        <section class="level-1" id="module-geometor.seer_navigator.sessions_navigator">
+        <span id="geometor-seer-navigator-sessions-navigator"></span><h1>geometor.seer_navigator.sessions_navigator<a class="headerlink" href="#module-geometor.seer_navigator.sessions_navigator" title="Link to this heading">¶</a></h1>
+        <p>Defines the main SessionsNavigator Textual App class.</p>
+        <section class="level-2" id="attributes">
+        <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+        <table class="autosummary longtable docutils align-default">
+        <tbody>
+        <tr class="row-odd"><td><p><a class="reference internal" href="#geometor.seer_navigator.sessions_navigator.RENDERERS" title="geometor.seer_navigator.sessions_navigator.RENDERERS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RENDERERS</span></code></a></p></td>
+        <td><p></p></td>
+        </tr>
+        </tbody>
+        </table>
+        </section>
+        <section class="level-2" id="classes">
+        <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+        <table class="autosummary longtable docutils align-default">
+        <tbody>
+        <tr class="row-odd"><td><p><a class="reference internal" href="#geometor.seer_navigator.sessions_navigator.DummyGrid" title="geometor.seer_navigator.sessions_navigator.DummyGrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DummyGrid</span></code></a></p></td>
+        <td><p>Placeholder widget used when real renderers fail to import.</p></td>
+        </tr>
+        <tr class="row-even"><td><p><a class="reference internal" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator" title="geometor.seer_navigator.sessions_navigator.SessionsNavigator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SessionsNavigator</span></code></a></p></td>
+        <td><p></p></td>
+        </tr>
+        </tbody>
+        </table>
+        </section>
+        <section class="level-2" id="functions">
+        <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+        <table class="autosummary longtable docutils align-default">
+        <tbody>
+        <tr class="row-odd"><td><p><a class="reference internal" href="#geometor.seer_navigator.sessions_navigator.run" title="geometor.seer_navigator.sessions_navigator.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>()</p></td>
+        <td><p></p></td>
+        </tr>
+        </tbody>
+        </table>
+        </section>
+        <section class="level-2" id="module-contents">
+        <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+        <dl class="py class">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.DummyGrid">
+        <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.sessions_navigator.</span></span><span class="sig-name descname"><span class="pre">DummyGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.DummyGrid" title="Link to this definition">¶</a></dt>
+        <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">textual.widgets.Static</span></code></p>
+        <p>Placeholder widget used when real renderers fail to import.</p>
+        </dd></dl>
+
+        <dl class="py data">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.RENDERERS">
+        <span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.sessions_navigator.</span></span><span class="sig-name descname"><span class="pre">RENDERERS</span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.RENDERERS" title="Link to this definition">¶</a></dt>
+        <dd></dd></dl>
+
+        <dl class="py class">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator">
+        <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.sessions_navigator.</span></span><span class="sig-name descname"><span class="pre">SessionsNavigator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sessions_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'./sessions'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator" title="Link to this definition">¶</a></dt>
+        <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">textual.app.App</span></code></p>
+        <dl class="py attribute">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.BINDINGS">
+        <span class="sig-name descname"><span class="pre">BINDINGS</span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.BINDINGS" title="Link to this definition">¶</a></dt>
+        <dd></dd></dl>
+
+        <dl class="py attribute">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.sessions_root">
+        <span class="sig-name descname"><span class="pre">sessions_root</span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.sessions_root" title="Link to this definition">¶</a></dt>
+        <dd></dd></dl>
+
+        <dl class="py attribute">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.renderer">
+        <span class="sig-name descname"><span class="pre">renderer</span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.renderer" title="Link to this definition">¶</a></dt>
+        <dd></dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.compose">
+        <span class="sig-name descname"><span class="pre">compose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">textual.app.ComposeResult</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.compose" title="Link to this definition">¶</a></dt>
+        <dd><p>Yield the initial container for the app’s default screen.</p>
+        </dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.on_mount">
+        <span class="sig-name descname"><span class="pre">on_mount</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.on_mount" title="Link to this definition">¶</a></dt>
+        <dd></dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_previous_sibling">
+        <span class="sig-name descname"><span class="pre">action_previous_sibling</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_previous_sibling" title="Link to this definition">¶</a></dt>
+        <dd><p>Navigate to the previous sibling directory.</p>
+        </dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_next_sibling">
+        <span class="sig-name descname"><span class="pre">action_next_sibling</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_next_sibling" title="Link to this definition">¶</a></dt>
+        <dd><p>Navigate to the next sibling directory.</p>
+        </dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_set_renderer">
+        <span class="sig-name descname"><span class="pre">action_set_renderer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">renderer_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_set_renderer" title="Link to this definition">¶</a></dt>
+        <dd><p>Sets the grid renderer and refreshes the TrialScreen if active.</p>
+        </dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_refresh_screen">
+        <span class="sig-name descname"><span class="pre">action_refresh_screen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_refresh_screen" title="Link to this definition">¶</a></dt>
+        <dd><p>Calls the refresh method on the current screen if it exists.</p>
+        </dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_view_images">
+        <span class="sig-name descname"><span class="pre">action_view_images</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_view_images" title="Link to this definition">¶</a></dt>
+        <dd><p>Pushes the image view modal screen.</p>
+        </dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.launch_sxiv">
+        <span class="sig-name descname"><span class="pre">launch_sxiv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.launch_sxiv" title="Link to this definition">¶</a></dt>
+        <dd><p>Finds images based on filter and launches sxiv. task_id is ignored in this navigator.</p>
+        </dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_sort_table">
+        <span class="sig-name descname"><span class="pre">action_sort_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_sort_table" title="Link to this definition">¶</a></dt>
+        <dd><p>Pushes the SortModal screen to select a column for sorting.</p>
+        </dd></dl>
+
+        <dl class="py method">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_quit">
+        <span class="sig-name descname"><span class="pre">action_quit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.SessionsNavigator.action_quit" title="Link to this definition">¶</a></dt>
+        <dd><p>Quits the application</p>
+        </dd></dl>
+
+        </dd></dl>
+
+        <dl class="py function">
+        <dt class="sig sig-object py" id="geometor.seer_navigator.sessions_navigator.run">
+        <span class="sig-prename descclassname"><span class="pre">geometor.seer_navigator.sessions_navigator.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#geometor.seer_navigator.sessions_navigator.run" title="Link to this definition">¶</a></dt>
+        <dd></dd></dl>
+
+        </section>
+        </section>
+
+      </div>
+      <footer class="book-footer">
+        <div class="book-footer-ornament">&#10086;</div>
+        <div class="book-footer-nav">
+          <div class="book-nav-prev">
+          </div>
+          <div class="book-nav-center">
+            <a class="book-toc-link" href="../../../../../index.html">geometor • seer_navigator</a>
+          </div>
+          <div class="book-nav-next">
+          </div>
+        </div>
+      </footer>
+    </article>
+  </main>
+  <div class="asides">
+    <aside class="aside-search">
+      <h3>Search</h3>
+      <div id="searchbox" role="search">
+        <form id="rtd-search-form" class="wy-form search-form" action="../../../../../search.html" method="get">
+          <div class="search-field">
+            <input type="search" name="q" placeholder="Search docs..." aria-label="Search docs" autocomplete="off" />
+            <button type="submit" class="search-submit" aria-label="Search" title="Search">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+          </div>
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </form>
+      </div>
+    </aside>
+  </div>
+  <footer>
+    <hr />
+    <div role="contentinfo">
+      <p>
+        &copy; Copyright 2026, geometor.
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+  <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+  <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+  <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+  <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+  <script src="../../../../../_static/js/collection_controls.js?v=b6b5297a"></script>
+  <script src="../../../../../_static/js/geometor_interactive.js?v=b2892320"></script>
+  <script src="../../../../../_static/js/search_highlight.js"></script>
+
+</body>
+</html>

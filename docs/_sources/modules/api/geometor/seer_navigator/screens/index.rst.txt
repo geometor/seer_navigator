@@ -1,0 +1,1140 @@
+geometor.seer_navigator.screens
+===============================
+
+.. py:module:: geometor.seer_navigator.screens
+
+.. autoapi-nested-parse::
+
+   Screen definitions for the Seer Navigator application.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /modules/api/geometor/seer_navigator/screens/image_view_modal/index
+   /modules/api/geometor/seer_navigator/screens/session_screen/index
+   /modules/api/geometor/seer_navigator/screens/sessions_screen/index
+   /modules/api/geometor/seer_navigator/screens/sort_modal/index
+   /modules/api/geometor/seer_navigator/screens/step_screen/index
+   /modules/api/geometor/seer_navigator/screens/task_screen/index
+   /modules/api/geometor/seer_navigator/screens/task_sessions_screen/index
+   /modules/api/geometor/seer_navigator/screens/tasks_screen/index
+   /modules/api/geometor/seer_navigator/screens/trial_screen/index
+   /modules/api/geometor/seer_navigator/screens/trial_split_view_screen/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer_navigator.screens.SessionsScreen
+   geometor.seer_navigator.screens.SessionScreen
+   geometor.seer_navigator.screens.TaskScreen
+   geometor.seer_navigator.screens.StepScreen
+   geometor.seer_navigator.screens.TrialViewer
+   geometor.seer_navigator.screens.ImageViewModal
+   geometor.seer_navigator.screens.TasksScreen
+   geometor.seer_navigator.screens.TaskSessionsScreen
+   geometor.seer_navigator.screens.SortModal
+
+
+Package Contents
+----------------
+
+.. py:class:: SessionsScreen(sessions_root: pathlib.Path)
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             Screen > Vertical {
+                 grid-size: 2;
+                 grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+             }
+             #summary-grid {
+                 grid-size: 3; /* Three columns for the summary tables */
+                 grid-gutter: 1 2;
+                 height: auto; /* Let the grid determine its height */
+                 padding: 0 1; /* Add some horizontal padding */
+                 margin-bottom: 1; /* Space below summary */
+             }
+             .summary-table {
+                 height: auto; /* Fit content height */
+                 border: none; /* No border for summary tables */
+             }
+             /* Ensure no focus border on summary tables */
+             .summary-table:focus {
+                 border: none;
+             }
+             DataTable { /* Style for the main sessions table */
+                 height: 1fr;
+             }
+             /* Keep old Static style for reference or remove if not needed */
+             /* Static {padding: 1; height: 3} */
+             Vertical {height: 100%;}
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: sessions_root
+
+
+   .. py:attribute:: session_dirs
+      :value: []
+
+
+
+   .. py:attribute:: session_index
+      :value: 0
+
+
+
+   .. py:attribute:: current_sort_key
+      :type:  textual.widgets._data_table.ColumnKey | None
+      :value: None
+
+
+
+   .. py:attribute:: current_sort_reverse
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_mount() -> None
+
+
+   .. py:method:: load_sessions()
+
+      Loads data into the main sessions DataTable.
+
+
+
+   .. py:method:: update_summary()
+
+      Updates the three summary DataTables.
+
+
+
+   .. py:method:: select_session_by_index(index: int) -> None
+
+
+   .. py:method:: previous_sibling()
+
+
+   .. py:method:: next_sibling()
+
+
+   .. py:method:: action_move_up()
+
+
+   .. py:method:: action_move_down()
+
+
+   .. py:method:: action_select_row()
+
+
+   .. py:method:: on_data_table_row_selected(event: textual.widgets.DataTable.RowSelected)
+
+
+   .. py:method:: refresh_content() -> None
+
+      Reloads session data and updates the screen.
+
+
+
+   .. py:method:: perform_sort(sort_key: textual.widgets._data_table.ColumnKey) -> None
+
+      Sorts the DataTable by the given column key.
+
+
+
+.. py:class:: SessionScreen(session_path: pathlib.Path, task_dirs: list[pathlib.Path])
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             Screen > Vertical {
+                 grid-size: 2;
+                 grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+             }
+             #summary-grid {
+                 grid-size: 3; /* Three columns for the summary tables */
+                 grid-gutter: 1 2;
+                 height: auto; /* Let the grid determine its height */
+                 padding: 0 1; /* Add some horizontal padding */
+                 margin-bottom: 1; /* Space below summary */
+             }
+             .summary-table {
+                 height: auto; /* Fit content height */
+                 border: none; /* No border for summary tables */
+             }
+             /* Ensure no focus border on summary tables */
+             .summary-table:focus {
+                 border: none;
+             }
+             DataTable { /* Style for the main tasks table */
+                 height: 1fr;
+             }
+             Vertical {height: 100%;}
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: session_path
+
+
+   .. py:attribute:: task_dirs
+
+
+   .. py:attribute:: task_index
+      :value: 0
+
+
+
+   .. py:attribute:: current_sort_key
+      :type:  textual.widgets._data_table.ColumnKey | None
+      :value: None
+
+
+
+   .. py:attribute:: current_sort_reverse
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_mount() -> None
+
+
+   .. py:method:: update_tasks_list()
+
+      Loads data into the main tasks DataTable.
+
+
+
+   .. py:method:: update_summary()
+
+      Updates the three summary DataTables for the current session.
+
+
+
+   .. py:method:: select_task_by_index(index: int) -> None
+
+
+   .. py:method:: previous_sibling()
+
+
+   .. py:method:: next_sibling()
+
+
+   .. py:method:: action_move_up()
+
+
+   .. py:method:: action_move_down()
+
+
+   .. py:method:: action_select_row()
+
+
+   .. py:method:: on_data_table_row_selected(event: textual.widgets.DataTable.RowSelected)
+
+
+   .. py:method:: refresh_content() -> None
+
+      Reloads task data for the session and updates the screen.
+
+
+
+   .. py:method:: perform_sort(sort_key: textual.widgets._data_table.ColumnKey) -> None
+
+      Sorts the DataTable by the given column key.
+
+
+
+.. py:class:: TaskScreen(session_path: pathlib.Path, task_path: pathlib.Path, step_dirs: list[pathlib.Path])
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             Screen > Vertical {
+                 grid-size: 2;
+                 grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+             }
+             #summary-grid {
+                 grid-size: 3; /* Three columns for the summary tables */
+                 grid-gutter: 1 2;
+                 height: auto; /* Let the grid determine its height */
+                 padding: 0 1; /* Add some horizontal padding */
+                 margin-bottom: 1; /* Space below summary */
+             }
+             .summary-table {
+                 height: auto; /* Fit content height */
+                 border: none; /* No border for summary tables */
+             }
+             /* Ensure no focus border on summary tables */
+             .summary-table:focus {
+                 border: none;
+             }
+             DataTable { /* Style for the main steps table */
+                 height: 1fr;
+             }
+             Vertical {height: 100%;}
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: session_path
+
+
+   .. py:attribute:: task_path
+
+
+   .. py:attribute:: task_name
+
+
+   .. py:attribute:: step_dirs
+
+
+   .. py:attribute:: step_index
+      :value: 0
+
+
+
+   .. py:attribute:: current_sort_key
+      :type:  textual.widgets._data_table.ColumnKey | None
+      :value: None
+
+
+
+   .. py:attribute:: current_sort_reverse
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_mount() -> None
+
+
+   .. py:method:: load_steps()
+
+      Loads data into the main steps DataTable.
+
+
+
+   .. py:method:: update_summary()
+
+      Updates the three summary DataTables for the current task.
+
+
+
+   .. py:method:: select_step_by_index(index: int) -> None
+
+
+   .. py:method:: previous_sibling()
+
+
+   .. py:method:: next_sibling()
+
+
+   .. py:method:: action_move_up()
+
+
+   .. py:method:: action_move_down()
+
+
+   .. py:method:: action_select_row()
+
+      Called when a row is selected (Enter or 'l').
+
+
+
+   .. py:method:: on_data_table_row_selected(event: textual.widgets.DataTable.RowSelected)
+
+
+   .. py:method:: refresh_content() -> None
+
+      Reloads step data for the task and updates the screen.
+
+
+
+   .. py:method:: perform_sort(sort_key: textual.widgets._data_table.ColumnKey) -> None
+
+      Sorts the DataTable by the given column key.
+
+
+
+   .. py:method:: action_view_all_trials() -> None
+
+      Finds all trial files across all steps in this task and pushes TrialSplitViewScreen.
+
+
+
+.. py:class:: StepScreen(session_path: pathlib.Path, task_path: pathlib.Path, step_path: pathlib.Path)
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   Displays the files within a step folder and their content.
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             Screen {
+                 layers: base overlay;
+             }
+         
+             Horizontal {
+                 height: 1fr;
+             }
+         
+             #file-list-container {
+                 width: 30%;
+                 border-right: thick $accent;
+                 height: 1fr;
+                 overflow-y: auto; /* Ensure DataTable scrolls if needed */
+             }
+         
+             #file-content-container {
+                 width: 70%;
+                 height: 1fr;
+             }
+         
+             DataTable {
+                height: 100%; /* Make DataTable fill its container */
+                width: 100%;
+             }
+         
+             /* Ensure ContentSwitcher and its children fill the container */
+             ContentSwitcher {
+                 height: 1fr;
+             }
+             TextArea, #content-placeholder {
+                 height: 1fr;
+                 border: none; /* Remove default border if desired */
+             }
+             /* Center placeholder text */
+             #content-placeholder {
+                 content-align: center middle;
+                 color: $text-muted;
+             }
+         
+         
+             /* Style the focused row in the DataTable */
+             DataTable > .datatable--cursor {
+                 background: $accent;
+                 color: $text;
+             }
+             DataTable:focus > .datatable--cursor {
+                  background: $accent-darken-1;
+             }
+         
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: file_paths
+
+
+   .. py:attribute:: selected_file_path
+
+
+   .. py:attribute:: session_path
+
+
+   .. py:attribute:: task_path
+
+
+   .. py:attribute:: step_path
+
+
+   .. py:attribute:: step_name
+
+
+   .. py:attribute:: task_name
+
+
+   .. py:attribute:: session_name
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_mount() -> None
+
+      Called when the screen is mounted.
+
+
+
+   .. py:method:: select_row_index(index: int)
+
+      Selects a row by index and triggers loading/display logic.
+
+
+
+   .. py:method:: watch_selected_file_path(old_path: pathlib.Path | None, new_path: pathlib.Path | None) -> None
+
+      Called when selected_file_path changes. Updates the content viewer.
+
+
+
+   .. py:method:: action_cursor_down() -> None
+
+      Move the cursor down in the DataTable.
+
+
+
+   .. py:method:: action_cursor_up() -> None
+
+      Move the cursor up in the DataTable.
+
+
+
+   .. py:method:: action_select_file() -> None
+
+      Action triggered by pressing Enter on the table.
+
+
+
+   .. py:method:: action_view_trial_split() -> None
+
+      Finds all trial files in the current step and pushes TrialSplitViewScreen.
+
+
+
+   .. py:method:: action_open_terminal() -> None
+
+      Opens a new terminal window in the current step directory.
+
+
+
+   .. py:method:: on_data_table_row_selected(event: textual.widgets.DataTable.RowSelected) -> None
+
+      Handle row selection in the DataTable (e.g., by clicking).
+
+
+
+   .. py:method:: refresh_content() -> None
+
+      Reloads the file list and the content of the selected file.
+
+
+
+.. py:class:: TrialViewer(trial_path: pathlib.Path | None = None, renderer: type[textual.widgets.Static] = SolidGrid, **kwargs)
+
+   Bases: :py:obj:`textual.containers.ScrollableContainer`
+
+
+   Displays the input, expected output, and actual output grids from a trial.json file.
+
+
+   .. py:attribute:: DEFAULT_CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             TrialViewer {
+                 /* Inherit background from parent */
+             }
+             .trial-grid {
+                 grid-size: 4; /* Details, Input, Expected, Actual */
+                 grid-gutter: 1 2;
+                 grid-rows: auto;
+                 padding: 1 2;
+                 align: center top;
+                 border-bottom: thick $accent-darken-1;
+                 height: auto; /* Fit content height */
+                 margin-bottom: 1;
+             }
+             .trial-details-table {
+                 height: auto; /* Fit content height */
+                 border: none; /* No border for summary tables */
+                 width: auto; /* Fit content width */
+             }
+             /* Ensure no focus border on summary tables */
+             .trial-details-table:focus {
+                 border: none;
+             }
+             .trial-set-label {
+                 width: 100%;
+                 text-align: center;
+                 text-style: bold underline;
+                 margin-top: 2;
+                 margin-bottom: 1;
+             }
+             /* Style for grid labels (optional, if needed above each grid) */
+             .grid-label {
+                 text-style: bold;
+                 text-align: center;
+                 margin-bottom: 1;
+             }
+             /* Add style for the individual grid renderer cells */
+             .grid-renderer-cell {
+                 overflow-x: scroll; /* Enable horizontal scrolling */
+                 overflow-y: hidden; /* Prevent vertical scrolling within the cell */
+                 height: auto; /* Let content determine height */
+                 /* The TextualGrid layout will determine the width */
+             }
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: trial_path
+      :value: None
+
+
+
+   .. py:attribute:: renderer
+
+
+   .. py:attribute:: trial_data
+      :value: None
+
+
+
+   .. py:attribute:: trials_container
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_mount() -> None
+
+      Load data and display trials when the widget is mounted or path changes.
+
+
+
+   .. py:method:: load_and_display()
+
+      Loads the trial JSON and populates the trials container.
+
+
+
+   .. py:method:: display_trials() -> None
+
+      Clears and repopulates the trials container with trial data using the current renderer.
+
+
+
+   .. py:method:: refresh_display() -> None
+
+      Refreshes the grid display using the current renderer.
+
+
+
+.. py:class:: ImageViewModal(context_path: pathlib.Path, task_id: str | None = None, *args, **kwargs)
+
+   Bases: :py:obj:`textual.screen.ModalScreen`
+
+
+   Screen with a dialog to select image view filters.
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+         ImageViewModal {
+             align: center middle;
+         }
+         
+         #dialog {
+             padding: 0 1;
+             width: 60;
+             height: 20;
+             border: thick $background 80%;
+             background: $surface;
+         }
+         
+         #question {
+             column-span: 2;
+             height: 1fr;
+             width: 1fr;
+             content-align: center middle;
+         }
+         
+         Button {
+             width: 100%;
+         }
+         """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: context_path
+
+
+   .. py:attribute:: task_id
+      :value: None
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_button_pressed(event: textual.widgets.Button.Pressed) -> None
+
+
+   .. py:method:: action_select_filter(filter_type: str) -> None
+
+      Called by key bindings.
+
+
+
+.. py:class:: TasksScreen(sessions_root: pathlib.Path)
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   Displays aggregated task data across all sessions.
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             Screen > Vertical {
+                 grid-size: 2;
+                 grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+             }
+             #summary-grid {
+                 grid-size: 3; /* Three columns for the summary tables */
+                 grid-gutter: 1 2;
+                 height: auto; /* Let the grid determine its height */
+                 padding: 0 1; /* Add some horizontal padding */
+                 margin-bottom: 1; /* Space below summary */
+             }
+             .summary-table {
+                 height: auto; /* Fit content height */
+                 border: none; /* No border for summary tables */
+             }
+             /* Ensure no focus border on summary tables */
+             .summary-table:focus {
+                 border: none;
+             }
+             #tasks-table { /* Style for the main tasks table */
+                 height: 1fr;
+             }
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: sessions_root
+
+
+   .. py:attribute:: tasks_summary
+
+
+   .. py:attribute:: sorted_task_ids
+      :value: []
+
+
+
+   .. py:attribute:: current_sort_key
+      :type:  textual.widgets._data_table.ColumnKey | None
+      :value: None
+
+
+
+   .. py:attribute:: current_sort_reverse
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_mount() -> None
+
+      Called when the screen is mounted.
+
+
+
+   .. py:method:: load_and_display_tasks()
+
+      Scans sessions, aggregates task data, and populates the DataTable.
+
+
+
+   .. py:method:: update_summary()
+
+      Updates the summary DataTables with aggregated data.
+
+
+
+   .. py:method:: action_cursor_down() -> None
+
+      Move the cursor down in the DataTable.
+
+
+
+   .. py:method:: action_cursor_up() -> None
+
+      Move the cursor up in the DataTable.
+
+
+
+   .. py:method:: action_select_task() -> None
+
+      Called when a task row is selected (Enter or 'l'). Pushes TaskSessionsScreen.
+
+
+
+   .. py:method:: on_data_table_row_selected(event: textual.widgets.DataTable.RowSelected)
+
+      Handle row selection via click.
+
+
+
+   .. py:method:: refresh_content() -> None
+
+      Reloads task data and updates the screen.
+
+
+
+   .. py:method:: perform_sort(sort_key: textual.widgets._data_table.ColumnKey) -> None
+
+      Sorts the task data and reloads the DataTable.
+
+
+
+.. py:class:: TaskSessionsScreen(sessions_root: pathlib.Path, task_id: str)
+
+   Bases: :py:obj:`textual.screen.Screen`
+
+
+   Displays instances of a specific task across multiple sessions.
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             Screen > Vertical {
+                 grid-size: 2;
+                 grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+             }
+             #summary-grid {
+                 grid-size: 3; /* Three columns for the summary tables */
+                 grid-gutter: 1 2;
+                 height: auto; /* Let the grid determine its height */
+                 padding: 0 1; /* Add some horizontal padding */
+                 margin-bottom: 1; /* Space below summary */
+             }
+             .summary-table {
+                 height: auto; /* Fit content height */
+                 border: none; /* No border for summary tables */
+             }
+             /* Ensure no focus border on summary tables */
+             .summary-table:focus {
+                 border: none;
+             }
+             DataTable { /* Style for the main tasks table */
+                 height: 1fr;
+             }
+             Vertical {height: 100%;}
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: sessions_root
+
+
+   .. py:attribute:: task_id
+
+
+   .. py:attribute:: task_instances
+      :type:  list[pathlib.Path]
+      :value: []
+
+
+
+   .. py:attribute:: instance_index
+      :value: 0
+
+
+
+   .. py:attribute:: current_sort_key
+      :type:  textual.widgets._data_table.ColumnKey | None
+      :value: None
+
+
+
+   .. py:attribute:: current_sort_reverse
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_mount() -> None
+
+
+   .. py:method:: load_task_instances()
+
+      Loads data for the specific task_id across all sessions.
+
+
+
+   .. py:method:: update_summary()
+
+      Updates the summary tables for the specific task across displayed sessions.
+
+
+
+   .. py:method:: select_instance_by_index(index: int) -> None
+
+
+   .. py:method:: action_move_up()
+
+
+   .. py:method:: action_move_down()
+
+
+   .. py:method:: action_select_row()
+
+
+   .. py:method:: on_data_table_row_selected(event: textual.widgets.DataTable.RowSelected)
+
+
+   .. py:method:: action_view_images() -> None
+
+      Action to trigger viewing images for the current task across sessions.
+
+
+
+   .. py:method:: refresh_content() -> None
+
+      Reloads task instance data and updates the screen.
+
+
+
+   .. py:method:: perform_sort(sort_key: textual.widgets._data_table.ColumnKey) -> None
+
+      Sorts the DataTable by the given column key.
+
+
+
+.. py:class:: SortModal(columns: Dict[textual.widgets._data_table.ColumnKey, object], *args, **kwargs)
+
+   Bases: :py:obj:`textual.screen.ModalScreen`\ [\ :py:obj:`Union`\ [\ :py:obj:`textual.widgets._data_table.ColumnKey`\ , :py:obj:`None`\ ]\ ]
+
+
+   Modal dialog for selecting a column to sort. Returns the selected ColumnKey or None.
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+             SortModal {
+                 align: center middle;
+             }
+         
+             #dialog { /* Changed ID and styling */
+                 padding: 0 1;
+                 width: auto; /* Auto width based on content */
+                 max-width: 60; /* Limit max width */
+                 height: auto; /* Auto height based on content */
+                 max-height: 80%; /* Limit max height */
+                 border: thick $background 80%;
+                 background: $surface;
+             }
+         
+             #dialog > Label { /* Style title label */
+                 width: 100%;
+                 text-align: center;
+                 margin-bottom: 1;
+             }
+         
+             #sort-list { /* Style the ListView */
+                 border: none;
+                 background: $surface;
+                 height: auto; /* Adjust height based on content */
+                 max-height: 15; /* Limit max height to prevent overflow */
+             }
+         
+             #sort-list > ListItem {
+                 padding: 0 1; /* Remove vertical padding, keep horizontal */
+                 height: 1; /* Explicitly set height to 1 */
+             }
+         
+             #sort-list > ListItem.--highlight {
+                 background: $accent;
+             }
+             """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: column_options
+      :type:  List[Tuple[str, textual.widgets._data_table.ColumnKey]]
+      :value: []
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: handle_selection(event: textual.widgets.ListView.Selected) -> None
+
+      Handle selection of a column from the ListView.
+
+
+
+   .. py:method:: action_cancel_sort() -> None
+
+      Called when escape is pressed.
+
+
+

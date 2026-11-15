@@ -1,0 +1,128 @@
+geometor.seer_navigator.renderers
+=================================
+
+.. py:module:: geometor.seer_navigator.renderers
+
+.. autoapi-nested-parse::
+
+   Grid rendering widgets for the Seer Navigator.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /modules/api/geometor/seer_navigator/renderers/base_grid/index
+   /modules/api/geometor/seer_navigator/renderers/block_grid/index
+   /modules/api/geometor/seer_navigator/renderers/char_grid/index
+   /modules/api/geometor/seer_navigator/renderers/image_grid/index
+   /modules/api/geometor/seer_navigator/renderers/solid_grid/index
+   /modules/api/geometor/seer_navigator/renderers/tiny_grid/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer_navigator.renderers.BaseGrid
+   geometor.seer_navigator.renderers.SolidGrid
+   geometor.seer_navigator.renderers.CharGrid
+   geometor.seer_navigator.renderers.BlockGrid
+   geometor.seer_navigator.renderers.TinyGrid
+
+
+Package Contents
+----------------
+
+.. py:class:: BaseGrid(grid, **kwargs)
+
+   Bases: :py:obj:`textual.widgets.Static`
+
+
+   Base widget class for rendering the colored grid.
+
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: rows
+
+
+   .. py:attribute:: cols
+
+
+   .. py:method:: get_color(cell_value: int) -> textual.color.Color
+
+      Gets a Textual Color object for the given cell value.
+
+
+
+.. py:class:: SolidGrid(grid, **kwargs)
+
+   Bases: :py:obj:`geometor.seer_navigator.renderers.base_grid.BaseGrid`
+
+
+   Base widget class for rendering the colored grid.
+
+
+   .. py:method:: render()
+
+
+.. py:class:: CharGrid(grid, **kwargs)
+
+   Bases: :py:obj:`geometor.seer_navigator.renderers.base_grid.BaseGrid`
+
+
+   Renders each grid cell as a single Unicode square character (default: '■'),
+   styled with the cell's fill color.
+
+   You can switch the character to something else (e.g. '⬛', '◼', '▣') if desired.
+
+
+   .. py:attribute:: SQUARE_CHAR
+      :value: '■'
+
+
+
+   .. py:method:: render()
+
+
+.. py:class:: BlockGrid(grid, **kwargs)
+
+   Bases: :py:obj:`geometor.seer_navigator.renderers.base_grid.BaseGrid`
+
+
+   first row cells are made of 3 characters - half vertical and full
+   next row made of top and bottom half - 1 space, 1 half block
+   " ██"
+   " ▄▄"
+   " ▀▀"
+
+
+   .. py:method:: render()
+
+
+.. py:class:: TinyGrid(grid, **kwargs)
+
+   Bases: :py:obj:`geometor.seer_navigator.renderers.base_grid.BaseGrid`
+
+
+   Renders the grid using the Unicode upper half block character '▀'.
+   Each character represents two rows:
+   - Foreground color = top row cell color
+   - Background color = bottom row cell color
+   If there's an odd number of rows, the last row uses black for the background.
+
+
+   .. py:attribute:: HALF_BLOCK_CHAR
+      :value: '▀'
+
+
+
+   .. py:method:: render() -> rich.text.Text
+
+

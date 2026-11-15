@@ -1,0 +1,94 @@
+geometor.seer_navigator.screens.image_view_modal
+================================================
+
+.. py:module:: geometor.seer_navigator.screens.image_view_modal
+
+.. autoapi-nested-parse::
+
+   Defines the ImageViewModal screen for selecting image viewing filters.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer_navigator.screens.image_view_modal.ImageViewModal
+
+
+Module Contents
+---------------
+
+.. py:class:: ImageViewModal(context_path: pathlib.Path, task_id: str | None = None, *args, **kwargs)
+
+   Bases: :py:obj:`textual.screen.ModalScreen`
+
+
+   Screen with a dialog to select image view filters.
+
+
+   .. py:attribute:: CSS
+      :value: Multiline-String
+
+      .. raw:: html
+
+         <details><summary>Show Value</summary>
+
+      .. code-block:: python
+
+         """
+         ImageViewModal {
+             align: center middle;
+         }
+         
+         #dialog {
+             padding: 0 1;
+             width: 60;
+             height: 20;
+             border: thick $background 80%;
+             background: $surface;
+         }
+         
+         #question {
+             column-span: 2;
+             height: 1fr;
+             width: 1fr;
+             content-align: center middle;
+         }
+         
+         Button {
+             width: 100%;
+         }
+         """
+
+      .. raw:: html
+
+         </details>
+
+
+
+
+   .. py:attribute:: BINDINGS
+
+
+   .. py:attribute:: context_path
+
+
+   .. py:attribute:: task_id
+      :value: None
+
+
+
+   .. py:method:: compose() -> textual.app.ComposeResult
+
+
+   .. py:method:: on_button_pressed(event: textual.widgets.Button.Pressed) -> None
+
+
+   .. py:method:: action_select_filter(filter_type: str) -> None
+
+      Called by key bindings.
+
+
+

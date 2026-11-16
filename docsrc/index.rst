@@ -1,15 +1,25 @@
-seer_navigator
+:site_title: SEER Navigator
+
+.. container:: author-overline
+
+   semantic digital archive • reasoning studio
+
 ==============
+SEER Navigator
+==============
+
+``geometor.seer_navigator`` is the interactive terminal inspection studio of the interconnected `GEOMETOR <https://geometor.com/books/>`_ semantic digital archive. Built with Textual and Rich, it provides an operator's dashboard for navigating multi-agent visual reasoning sessions, evaluating ARC trial outcomes, and inspecting synthesized transformation code.
 
 .. include:: intro.rst
 
 recent logs
 -----------
 
-.. postlist:: 5
-   :excerpts:
-
-
+.. collection::
+   :type: log
+   :sort: date
+   :reverse:
+   :limit: 5
 
 .. toctree::
    :hidden:
@@ -21,11 +31,10 @@ recent logs
    logs.rst
    demos/index.rst
    refs/index.rst
-   todos.rst
+   todos/index.rst
    changelog.rst
    connect.rst
    about.rst
-
 
 indices
 -------

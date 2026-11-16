@@ -1,49 +1,44 @@
-seer_navigator
-==============
+GEOMETOR • seer_navigator
+=========================
 
+**Visit the Online Archive:** https://geometor.github.io/seer_navigator/
 
-A terminal-based interface for reviewing SEER test results.
+**SEER Navigator • Textual TUI browser for inspecting SEER reasoning sessions and trials**
 
-Features
---------
+Mission
+-------
 
-.. todo:: TODO: insert features
+``geometor/seer_navigator`` is part of the interconnected `GEOMETOR <https://geometor.com>`_ semantic digital archive. It provides a keyboard-driven terminal user interface (TUI) built with Textual for browsing, inspecting, and evaluating multi-agent abstract visual reasoning sessions. By transforming complex JSON trial logs, candidate grid diffs, and synthesized Python code into real-time interactive terminal views, it liberates empirical AI research from opaque text files into transparent visual workbenches across the GEOMETOR corpus.
 
-Installation
-------------
+Capabilities & Interactive Docs
+-------------------------------
 
-You can install **seer_navigator** using pip:
-
-.. code-block:: bash
-
-   pip install geometor-seer_navigator
+- **`SEER Navigator TUI <https://geometor.github.io/seer_navigator/>`_** — Interactive Textual terminal dashboard for reviewing SEER benchmark results.
+- **`Sessions Navigator Screen <https://geometor.github.io/seer_navigator/usage/>`_** — Hierarchical session tree and summary metrics across reasoning runs.
+- **`Tasks & Trials Inspector <https://geometor.github.io/seer_navigator/usage/>`_** — Filter puzzles by pass/fail status, inspect input/output test grids, and trace synthesized Python code.
+- **`Visual Grid Renderers <https://geometor.github.io/seer_navigator/modules/>`_** — Color-accurate terminal block rendering and diff heatmaps for ARC puzzle states.
 
 Usage
 -----
 
+.. code-block:: bash
 
+   seer_navigator --session_dir <path/to/sessions>
 
-After installation, you can use the ``seer_navigator`` command to create a new project:
+Repository Contents
+-------------------
+
+- ``docsrc/`` — RST documentation, TUI guides, and module references compiled by `PHOTON publish <https://github.com/photon-platform/publish>`_.
+- ``src/geometor/seer_navigator/`` — Textual application, screen layouts, terminal grid renderers, and CLI entry point.
+
+Local Build & Verification
+--------------------------
 
 .. code-block:: bash
 
-   seer_navigator 
+   publish build
 
-.. todo:: TODO: list arguments
+Part of the GEOMETOR Knowledge Archive
+--------------------------------------
 
-Dependencies
-------------
-
-**seer_navigator** depends on the following Python packages:
-
-.. todo:: TODO: read from pyproject.toml 
-
-Contributing
-------------
-
-Contributions are welcome! Please see our [GitHub issues](https://github.com/geometor/seer_navigator/issues) for ways to contribute.
-
-License
--------
-
-**seer_navigator** is licensed under the MIT License. See the `LICENSE` file for more details.
+Explore all **74 Book Codices** and **11 Mathematical Catalogs** at https://geometor.com/books/.

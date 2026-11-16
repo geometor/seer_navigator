@@ -1,6 +1,3 @@
-``-`` 
+**Textual TUI browser for inspecting SEER reasoning sessions and trials.**
 
-
-    tools for reviewing test results with SEER
-
-.. todo:: complete project description in intro.rst
+``geometor.seer_navigator`` transforms deep-tree JSON session logs from the SEER reasoning engine into an interactive, keyboard-driven terminal dashboard. Researchers can drill down from aggregate benchmark statistics into individual ARC puzzle tasks, inspect training/test grid states with accurate 10-color terminal blocks, review natural language program hypotheses, and examine synthesized Python transformations alongside visual error heatmaps.

@@ -13,10 +13,10 @@ Mission
 Capabilities & Interactive Docs
 -------------------------------
 
-- **`SEER Navigator TUI <https://geometor.github.io/seer_navigator/>`_** — Interactive Textual terminal dashboard for reviewing SEER benchmark results.
-- **`Sessions Navigator Screen <https://geometor.github.io/seer_navigator/usage/>`_** — Hierarchical session tree and summary metrics across reasoning runs.
-- **`Tasks & Trials Inspector <https://geometor.github.io/seer_navigator/usage/>`_** — Filter puzzles by pass/fail status, inspect input/output test grids, and trace synthesized Python code.
-- **`Visual Grid Renderers <https://geometor.github.io/seer_navigator/modules/>`_** — Color-accurate terminal block rendering and diff heatmaps for ARC puzzle states.
+- `SEER Navigator TUI <https://geometor.github.io/seer_navigator/>`_ — Interactive Textual terminal dashboard for reviewing SEER benchmark results.
+- `Sessions Navigator Screen <https://geometor.github.io/seer_navigator/usage/>`_ — Hierarchical session tree and summary metrics across reasoning runs.
+- `Tasks & Trials Inspector <https://geometor.github.io/seer_navigator/usage/>`_ — Filter puzzles by pass/fail status, inspect input/output test grids, and trace synthesized Python code.
+- `Visual Grid Renderers <https://geometor.github.io/seer_navigator/modules/>`_ — Color-accurate terminal block rendering and diff heatmaps for ARC puzzle states.
 
 Usage
 -----

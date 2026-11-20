@@ -3,6 +3,17 @@ GEOMETOR • seer_navigator
 
 **Visit the Online Archive:** https://geometor.github.io/seer_navigator/
 
+.. image:: docsrc/_static/logo.png
+   :alt: GEOMETOR • seer_navigator Medallion
+   :target: https://geometor.github.io/seer_navigator/
+   :width: 180px
+   :align: center
+
+.. image:: docsrc/_static/social/banner.png
+   :alt: GEOMETOR • seer_navigator featured graphic
+   :target: https://geometor.github.io/seer_navigator/
+   :align: center
+
 **SEER Navigator • Textual TUI browser for inspecting SEER reasoning sessions and trials**
 
 Mission

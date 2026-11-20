@@ -8,6 +8,10 @@
 SEER Navigator
 ==============
 
+.. image:: _static/medallion.svg
+   :alt: SEER Navigator Medallion
+   :class: repo-medallion-hero
+
 ``geometor.seer_navigator`` is the interactive terminal inspection studio of the interconnected `GEOMETOR <https://geometor.com/books/>`_ semantic digital archive. Built with Textual and Rich, it provides an operator's dashboard for navigating multi-agent visual reasoning sessions, evaluating ARC trial outcomes, and inspecting synthesized transformation code.
 
 .. include:: intro.rst
